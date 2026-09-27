@@ -1,189 +1,240 @@
-/* MAHWORLD M15 :: COMBAT ZONES (owner 2026-09-27: "a world-integrated duel / combat-zone system that feels native to MAHWORLD … embedded
-   combat zones placed throughout the open world … ground only … no floating rings … no spectator stands … a square-diamond magical shell /
-   frame, grounded into the floor … crystalline, premium, elegant, not bulky or mechanical").
-   Each zone is a 12 m square set at 45° to its approach, so it reads as a diamond. It is drawn as light in the floor, with a low light
-   shell rising from its edges:
-     · DORMANT      nobody fighting: crystalline white / icy-blue linework (double frame, inscribed diamond, inner square, axes, corner and
-                    midpoint nodes, a centre sigil, faint crystal facets) breathing slowly, with one soft light travelling round the frame;
-                    the shell is a whisper;
-     · ACTIVATION   a duel begins: for ~2.8 s the ring splits by side into the two opponents' CLASS colours (a clean seam that blends
-                    through white at the centre line), a surge ripples out from the centre and the shell rises; then it lets go;
-     · ACTIVE       the ring returns to its cool base, and each fighter's class colour becomes LOCAL — a square-diamond footprint box
-                    under and around them that moves with them, recolouring the ring's linework near them (their presence and their side
-                    of pressure); airborne fighters' footprints shrink and fade with height;
-     · RELEASE      the duel ends: colours drain back to the dormant state over ~1.4 s.
-   Future-ready: the phase machine is a pure function (duelPhase); colours come from the registry crystal families through a class map
-   that new classes extend (setClassColor); begin / update / end take fighters as { id, cls, x, z, y } in world metres; onPhase(fn) reports
-   phase changes. The host's duel / spar authority drives it once the runtime bridge lands (CZ_PLAZA_SOUTH sits on the NPC spar spot).
-   Host safety: pure light — the inlay lies 2.5 cm above its ground, the shell is additive with no depth write, no collider, never
-   interactable. Cost: two instanced draws for every zone in the world (floor + shell); per-frame work only for a zone with a live duel. */
+/* MAHWORLD M15b :: DUEL COURTS (owner 2026-09-27 correction: the M15 zone was "TOO SMALL" and showed class colours while inactive).
+   A duel court is DORMANT WORLD INFRASTRUCTURE: a large square-diamond court drawn into the ground — crystalline inlay, faint faceted
+   seams, subtle diamond anchors, low ground-bound energy. No cage, no walls, no raised arena, no spectator structure.
+   SIZE (validated from the rules, not guessed): a four-fighter encounter needs every fighter's largest area effect (radius 2.5 melee units
+   = 6.25 m) to fit without two fighters' areas stacking, so 2 × 2 fighters pack into 25 m; the court is 26 m of clear playable width
+   (≈ 85 ft, above the owner's 18–24 m / 60–80 ft floor) plus a 1.2 m inlaid border — 28.4 m across in all.
+   STATES (the host drives them; the dev preview can stage each):
+     · DORMANT      nobody on it — white / cool white-blue / pale ice only, soft glass, a faint neutral shimmer, subtly world-reflective.
+                    ZERO class colour: no gold, red, pink, purple or blue class ownership.
+     · READY        someone stands on it — a neutral response: the inlay wakes a little and a soft WHITE presence forms under each occupant.
+                    Still zero class colour.
+     · ACTIVATION   a duel begins — the dramatic moment: the court splits into each fighter's CLASS territory (soft regions around each
+                    fighter, up to four; seams run through white), a surge crosses the court; after ~1.3 s the split lets go.
+     · ACTIVE_DUEL  the split is gone; the court is neutral again, and each fighter carries a LOCAL PRESENCE FIELD in their class colour
+                    that moves with them (eased, never flickering), fades at its perimeter (never a box or a UI ring) and blends with
+                    restraint where two fields overlap (the overlap leans to white). Airborne fighters' fields shrink and fade.
+     · RESOLUTION   the duel ends — colour drains back out over ~1.4 s.
+     · RESET        a neutral sweep runs in from the border (~1.2 s); then DORMANT (or READY if someone is still standing on it).
+   Contract (future-ready): fighters are { fighterId, classId, classColor?, worldPosition {x,y,z} | [x,y,z], isParticipant, teamId,
+   localInfluenceRadius, verticalState ('GROUNDED' | 'AIRBORNE'), airborneHeight } (the M15 shape { id, cls, x, z, y } still works). The
+   phase machine is a pure function (duelPhase). Class colours come from the registry crystal families through a class map a new class
+   extends (setClassColor).
+   Host safety: pure light — the inlay lies 2.5 cm above its ground (no depth write), no collider, never interactable. Cost: ONE instanced
+   draw for every court in the world; per-frame work only for a court with someone on it. */
 
 export var CLASS_FAMILY = { ATHLETE: 'gold', TITAN: 'blue', LEAN: 'red', VISIONARY: 'purple', BAGE: 'pink' };
-export var TIMING = { activation_s: 2.8, split_hold_s: 1.3, release_s: 1.4, presence_s: 0.35 };
-export var ZONE_DEFAULT_SIZE = 12;
+export var TIMING = { activation_s: 2.8, split_hold_s: 1.3, resolution_s: 1.4, reset_s: 1.2, presence_s: 0.35, follow_s: 0.08 };
+export var SIZING = { melee_unit_m: 2.5, max_aoe_radius_m: 6.25, four_fighter_packing_m: 25, playable_m: 26, border_m: 1.2 };
+export var MAX_FIGHTERS = 4;
+export var PHASES = ['DORMANT', 'READY', 'ACTIVATION', 'ACTIVE_DUEL', 'RESOLUTION', 'RESET'];
+export var CLASS_PHASES = ['ACTIVATION', 'ACTIVE_DUEL', 'RESOLUTION'];   /* the only phases in which any class colour may show */
+/* the neutral palette (display values): every dormant / ready colour is white or pale ice (colour law: NEUTRAL or the BLUE window, never
+   a class colour's saturation) */
+export var PALETTE = { ice: 0xb3d1ff, core: 0xe0edff, ready: 0xeef4ff, fill_day: 0xd2def0, fill_night: 0x0d1320, sky_day: 0xd6e6fa, sky_night: 0x2b3f6b };
 
-export function combatZoneList(reg) { var C = reg && reg.combat_zones, S = (C && C.size_m) || ZONE_DEFAULT_SIZE; return ((C && C.list) || []).filter(function (z) { return z && isFinite(z.x) && isFinite(z.z); }).map(function (z) { return Object.assign({ size_m: S, yaw_deg: 45, y: 0 }, z); }); }
-/* exclusion circles (ground cover, shards) — the square's circumcircle plus a pad */
+export function combatZoneList(reg) { var C = (reg && reg.combat_zones) || {}, PL = C.playable_m || SIZING.playable_m, BO = C.border_m === undefined ? SIZING.border_m : C.border_m;
+  return (C.list || []).filter(function (z) { return z && isFinite(z.x) && isFinite(z.z); }).map(function (z) { var o = Object.assign({ playable_m: PL, border_m: BO, yaw_deg: 45, y: 0 }, z); o.size_m = o.playable_m + 2 * o.border_m; return o; }); }
+/* exclusion circles (ground cover, shards): the court's circumcircle plus a pad */
 export function combatZoneCircles(reg, pad) { return combatZoneList(reg).map(function (z) { return { x: z.x, z: z.z, r: z.size_m * 0.7072 + (pad === undefined ? 1 : pad) }; }); }
-/* world → the zone's square frame (metres) */
+/* world → the court's square frame (metres) */
 export function zoneLocal(zone, x, z) { var a = -(zone.yaw_deg || 0) * Math.PI / 180, dx = x - zone.x, dz = z - zone.z; return [dx * Math.cos(a) - dz * Math.sin(a), dx * Math.sin(a) + dz * Math.cos(a)]; }
-export function insideZone(zone, x, z, margin) { var p = zoneLocal(zone, x, z); return Math.max(Math.abs(p[0]), Math.abs(p[1])) <= zone.size_m / 2 + (margin || 0); }
+/* inside the PLAYABLE square (plus an optional margin) */
+export function insideZone(zone, x, z, margin) { var p = zoneLocal(zone, x, z); return Math.max(Math.abs(p[0]), Math.abs(p[1])) <= (zone.playable_m || zone.size_m) / 2 + (margin || 0); }
 
-/* THE PHASE MACHINE (pure): tStart = duel begin (null = none), tEnd = duel end (null = running). Returns the phase and the three drives the
-   shaders read: split (0..1, the class-colour halves), surge (0..1, the activation wave's travel; 1 = done) and live (0..1, how much the
-   duel colours are present at all — 0 dormant, 1 during a duel, easing back to 0 on release). */
-export function duelPhase(t, tStart, tEnd) {
-  var T = TIMING; if (tStart === null || tStart === undefined || !isFinite(tStart)) return { phase: 'DORMANT', split: 0, surge: 1, live: 0 };
-  if (tEnd !== null && tEnd !== undefined && isFinite(tEnd) && t >= tEnd) { var r = Math.min(1, (t - tEnd) / T.release_s); return r >= 1 ? { phase: 'DORMANT', split: 0, surge: 1, live: 0 } : { phase: 'RELEASE', split: 0, surge: 1, live: 1 - r * r * (3 - 2 * r) }; }
-  var dt = Math.max(0, t - tStart);
-  if (dt < T.activation_s) { var f = dt <= T.split_hold_s ? 1 : 1 - (dt - T.split_hold_s) / (T.activation_s - T.split_hold_s); f = f * f * (3 - 2 * f); return { phase: 'ACTIVATION', split: f, surge: Math.min(1, dt / 1.6), live: 1 }; }
-  return { phase: 'ACTIVE', split: 0, surge: 1, live: 1 };
+/* THE PHASE MACHINE (pure). S = { occupied (someone stands on the court), tStart (duel begin; null = no duel), tResolve (duel end; null =
+   running) }. Returns the phase and the drives the shader reads: live (0..1 — how much class colour may show at all; 0 in DORMANT, READY
+   and RESET), split (0..1, the activation territories), surge (0..1, the activation wave's travel; 1 = done), ready (0/1, the neutral
+   occupied response) and reset (0..1, the neutral reset sweep). */
+function sm(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+export function duelPhase(t, S) {
+  S = S || {}; var T = TIMING, occ = S.occupied ? 1 : 0, rest = { phase: occ ? 'READY' : 'DORMANT', live: 0, split: 0, surge: 1, ready: occ, reset: 0 };
+  if (S.tStart === null || S.tStart === undefined || !isFinite(S.tStart)) return rest;
+  if (S.tResolve !== null && S.tResolve !== undefined && isFinite(S.tResolve) && t >= S.tResolve) { var e = t - S.tResolve;
+    if (e < T.resolution_s) return { phase: 'RESOLUTION', live: 1 - sm(e / T.resolution_s), split: 0, surge: 1, ready: occ, reset: 0 };
+    if (e < T.resolution_s + T.reset_s) return { phase: 'RESET', live: 0, split: 0, surge: 1, ready: occ, reset: (e - T.resolution_s) / T.reset_s };
+    return rest; }
+  var dt = Math.max(0, t - S.tStart);
+  if (dt < T.activation_s) return { phase: 'ACTIVATION', live: 1, split: dt <= T.split_hold_s ? 1 : 1 - sm((dt - T.split_hold_s) / (T.activation_s - T.split_hold_s)), surge: Math.min(1, dt / 1.6), ready: 1, reset: 0 };
+  return { phase: 'ACTIVE_DUEL', live: 1, split: 0, surge: 1, ready: 1, reset: 0 };
 }
 
 var FLOOR_V = [
-  'attribute vec4 iZ; attribute vec4 iK; attribute vec4 iAx; attribute vec4 iCA; attribute vec4 iCB; attribute vec4 iPA; attribute vec4 iPB;',
-  'varying vec2 vL; varying vec4 vK; varying vec4 vAx; varying vec4 vCA; varying vec4 vCB; varying vec4 vPA; varying vec4 vPB; varying float vDist;',
-  'void main() { float S = iK.x, M = S + 5.0; vec2 L = position.xy * M; vL = L; vK = iK; vAx = iAx; vCA = iCA; vCB = iCB; vPA = iPA; vPB = iPB;',
-  '  float c = cos(iZ.w), s = sin(iZ.w); vec3 w = vec3(iZ.x + L.x * c - L.y * s, iZ.y + 0.025, iZ.z + L.x * s + L.y * c);',   /* the square frame turned by the zone's yaw (local y = world z) */
-  '  vDist = length(cameraPosition - w); gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0); }'
+  'attribute vec4 iZ; attribute vec4 iK; attribute vec4 iK2; attribute vec4 iP0; attribute vec4 iP1; attribute vec4 iP2; attribute vec4 iP3; attribute vec4 iC0; attribute vec4 iC1; attribute vec4 iC2; attribute vec4 iC3;',
+  'uniform float uMargin;',
+  'varying vec4 vLD; varying vec4 vK; varying vec4 vK2; varying vec4 vP0; varying vec4 vP1; varying vec4 vP2; varying vec4 vP3; varying vec4 vC0; varying vec4 vC1; varying vec4 vC2; varying vec4 vC3;',
+  'void main() { float hb = iK.x + iK2.z; vec2 L = position.xy * (hb + uMargin) * 2.0;',   /* the court's square frame, reaching past the border for the ground-bound halo */
+  '  float c = cos(iZ.w), s = sin(iZ.w); vec3 w = vec3(iZ.x + L.x * c - L.y * s, iZ.y + 0.025, iZ.z + L.x * s + L.y * c);',   /* turned by the court's yaw (local y = world z); 2.5 cm inlay */
+  '  vec3 V = cameraPosition - w; float D = length(V); vLD = vec4(L, D, V.y / max(D, 1e-3));',
+  '  vK = iK; vK2 = iK2; vP0 = iP0; vP1 = iP1; vP2 = iP2; vP3 = iP3; vC0 = iC0; vC1 = iC1; vC2 = iC2; vC3 = iC3;',
+  '  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0); }'
 ].join('\n');
 
 var FLOOR_F = [
-  'uniform float uTime; uniform float uGlobal; uniform float uFacets; uniform float uFill;',
-  'varying vec2 vL; varying vec4 vK; varying vec4 vAx; varying vec4 vCA; varying vec4 vCB; varying vec4 vPA; varying vec4 vPB; varying float vDist;',
+  'uniform float uTime; uniform float uGlobal; uniform float uFacets; uniform float uFill; uniform float uSheen; uniform float uPres; uniform vec3 uIce; uniform vec3 uCore; uniform vec3 uReady; uniform vec3 uFillC; uniform vec3 uSky;',
+  'varying vec4 vLD; varying vec4 vK; varying vec4 vK2; varying vec4 vP0; varying vec4 vP1; varying vec4 vP2; varying vec4 vP3; varying vec4 vC0; varying vec4 vC1; varying vec4 vC2; varying vec4 vC3;',
   'float czLine(float d, float w) { float a = fwidth(d) * 1.2 + 1e-4; return 1.0 - smoothstep(w, w + a, abs(d)); }',
   'float czGlow(float d, float s) { return exp(-d * d / s); }',
-  'vec3 czFoot(vec2 L, vec4 P, vec4 C, out float own) {',   /* a fighter's square-diamond footprint box and the ownership it spreads through the ring */
-  '  vec2 r = L - P.xy; float lift = 1.0 / (1.0 + max(P.z, 0.0) * 0.35), b = 1.5 * mix(0.75, 1.0, lift), fsq = max(abs(r.x), abs(r.y)), fdm = (abs(r.x) + abs(r.y)) * 0.70710678;',
-  '  float k = C.w * lift, pulse = 0.85 + 0.15 * sin(uTime * 3.0 + P.w * 6.2831853);',
-  '  own = czGlow(length(r), 12.0) * C.w;',
-  '  return C.rgb * k * (czLine(fsq - b, 0.045) * 1.25 * pulse + czLine(fdm - b * 0.55, 0.03) * 0.8 + czGlow(fsq, b * b * 0.9) * 0.34 + czGlow(fsq - b, 0.5) * 0.35); }',
-  'void main() { vec2 L = vL; float S = vK.x, h = S * 0.5, t = uTime, live = vK.w, split = vK.y, surge = vK.z;',
-  '  float sq = max(abs(L.x), abs(L.y)), dm = (abs(L.x) + abs(L.y)) * 0.70710678, inside = 1.0 - smoothstep(h - 0.05, h + 0.05, sq);',
-  /* the linework (weights: frame, diamond, inner square, axes, diagonals) */
-  '  float frame = czLine(sq - h, 0.04) * 0.85 + czLine(sq - (h - 0.4), 0.022) * 0.6;',
-  '  float dia = czLine(dm - h * 0.70710678, 0.035) * 0.85, innerSq = czLine(sq - h * 0.46, 0.028) * 0.6;',
-  '  float axes = (czLine(L.x, 0.02) + czLine(L.y, 0.02)) * 0.32 * step(h * 0.46, sq) * inside;',
-  '  float diag = (czLine(abs(L.x) - abs(L.y), 0.02)) * 0.28 * step(h * 0.46, sq) * inside;',
-  '  vec2 cn = abs(L) - vec2(h); float corner = czLine((abs(cn.x) + abs(cn.y)) * 0.70710678 - 0.5, 0.035) * 0.9 + czGlow(length(cn), 0.2) * 0.45;',
-  '  vec2 mA = vec2(abs(L.x) - h, L.y), mB = vec2(L.x, abs(L.y) - h); float mid = czGlow(length(mA), 0.12) * 0.7 + czGlow(length(mB), 0.12) * 0.7;',
-  '  float sig = czLine(dm - 0.95, 0.03) * 0.9 + czGlow(dm, 0.25) * 0.8 + czGlow(abs(L.x) * abs(L.y) * 6.0, 0.04) * czGlow(length(L), 2.6) * 0.9;',   /* the centre sigil: a small diamond, a core and a four-point star */
-  '  float facets = 0.0; if (uFacets > 0.5) { vec2 q = L * 0.62; vec2 g = vec2(q.x + q.y * 0.57735, q.y * 1.1547); vec2 f = fract(g); float tri = min(min(f.x, f.y), abs(1.0 - f.x - f.y)); facets = czLine(tri, 0.012) * 0.14 * inside * (0.6 + 0.4 * sin(t * 0.3 + g.x * 1.7 + g.y * 2.3)); }',
-  '  float run = czGlow(mod(atan(L.y, L.x) / 6.2831853 + 1.0 - t * 0.035, 1.0) - 0.5, 0.004) * 0.9;',   /* one soft light travelling round the frame */
-  '  float breath = 0.86 + 0.14 * sin(t * 0.5 + vAx.w * 6.2831853);',
-  '  float lines = frame + dia + innerSq + axes + diag + facets, nodes = corner + mid + sig;',
-  '  float halo = czGlow(sq - h, 0.35) * 0.5 + czGlow(sq - h, 3.0) * 0.12;',
-  /* colours: the dormant base (white core, ice-blue glow); the activation split by side (seam through white); the fighters' local ownership */
-  '  vec3 ice = vec3(0.55, 0.75, 1.0), core = mix(vec3(0.86, 0.93, 1.0), ice, 0.3 * (1.0 - live));',   /* dormant runs cooler: crystalline ice, not signage white */
-  '  float sd = dot(L, vAx.xy); vec3 splitC = mix(vCB.rgb, vCA.rgb, smoothstep(-vAx.z, vAx.z, sd)); splitC = mix(splitC, vec3(1.0), (1.0 - smoothstep(0.0, vAx.z, abs(sd))) * 0.55);',
-  '  float ownA, ownB; vec3 footA = czFoot(L, vPA, vCA, ownA), footB = czFoot(L, vPB, vCB, ownB); ownA *= live; ownB *= live;',
-  '  vec3 lineC = mix(core, splitC, split * live); float ow = ownA + ownB; if (ow > 1e-3) lineC = mix(lineC, (vCA.rgb * ownA + vCB.rgb * ownB) / ow, clamp(ow, 0.0, 1.0) * (1.0 - split));',
-  '  vec3 glowC = mix(ice, splitC, split * live * 0.85);',
-  '  float wave = czGlow(sq - surge * h * 1.25, 0.6) * (1.0 - surge) * live;',   /* the activation surge */
-  '  float lvl = (breath + run * (1.0 - live) + 0.35 * split * live) * mix(0.6, 1.35, live);',   /* dormant is calm (it must not read as an active event) */
-  '  vec3 col = lineC * lines * lvl + mix(core, lineC, 0.6) * nodes * lvl + glowC * halo * lvl * 0.8 + mix(vec3(1.0), splitC, split) * wave * 1.4 + (footA + footB) * (1.0 - split * 0.6) * live;',
-  '  float far = 1.0 - smoothstep(180.0, 320.0, vDist);',
-  '  float fillA = uFill * inside * (0.55 + 0.45 * far);',   /* a faint polished-glass field under the lines gives definition by day */
-  '  col *= uGlobal * far; if (max(max(col.r, col.g), col.b) < 0.003 && fillA < 0.003) discard;',
-  '  gl_FragColor = vec4(vec3(0.05, 0.07, 0.11) * fillA + col, fillA); }'   /* premultiplied: the lines add light, the field darkens a touch */
+  'float czHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
+  /* a fighter's presence field: soft, mostly round with a quarter of the court's diamond in it, fading to nothing at its perimeter
+     (P.xy local position, P.z height above the floor, P.w presence 0..1; R the influence radius) */
+  'float czField(vec2 L, vec4 P, float R) { vec2 r = L - P.xy; float lift = 1.0 / (1.0 + max(P.z, 0.0) * 0.45), Rr = max(R, 0.5) * mix(0.7, 1.0, lift);',
+  '  float d = mix(length(r), (abs(r.x) + abs(r.y)) * 0.70710678, 0.25) / Rr; return P.w * lift * exp(-d * d * 1.8) * (1.0 - smoothstep(0.85, 1.35, d)); }',
+  'float czDist(vec2 L, vec4 P) { return P.w > 0.01 ? length(L - P.xy) : 1e4; }',
+  'void main() { vec2 L = vLD.xy; float h = vK.x, B = vK2.z, hb = h + B, t = uTime, split = vK.y, surge = vK.z, live = vK.w, ready = vK2.x, reset = vK2.y, seed = vK2.w;',
+  '  float sq = max(abs(L.x), abs(L.y)), dm = (abs(L.x) + abs(L.y)) * 0.70710678;',
+  '  float court = 1.0 - smoothstep(hb - 0.03, hb + 0.03, sq), field = 1.0 - smoothstep(h - 0.03, h + 0.03, sq), band = court - field;',
+  /* the border band: an inner and an outer edge, crossed by faint faceted seams (two diagonal families → crystal facets in the band) */
+  '  float across = sq - h, along = abs(L.x) > abs(L.y) ? L.y : L.x;',
+  '  float edges = czLine(sq - h, 0.03) * 0.8 + czLine(sq - hb, 0.022) * 0.5;',
+  '  float seams = (czLine(fract((along + across) / 1.6) - 0.5, 0.012) + czLine(fract((along - across) / 1.6) - 0.5, 0.012)) * 0.3 * band;',
+  /* diamond anchors: a gem at each corner and each edge midpoint of the band */
+  '  float m = h + B * 0.5; vec2 aL = abs(L), ca = aL - vec2(m); float cdm = (abs(ca.x) + abs(ca.y)) * 0.70710678;',
+  '  float mdm = min((abs(aL.x - m) + abs(L.y)) * 0.70710678, (abs(L.x) + abs(aL.y - m)) * 0.70710678);',
+  '  float anch = czLine(cdm - 0.5, 0.026) * 0.85 + czGlow(cdm, 0.05) * 0.7 + czLine(mdm - 0.36, 0.022) * 0.6 + czGlow(mdm, 0.025) * 0.5;',
+  /* the playable field: a faint inscribed diamond, a small centre diamond, faint crystal facets (calmer toward the centre) */
+  '  float dia = czLine(dm - h * 0.70710678, 0.02) * 0.2 * field, sig = czLine(dm - 1.1, 0.02) * 0.32 + czGlow(dm, 0.06) * 0.22;',
+  '  vec2 g = vec2(L.x * 0.62 + L.y * 0.62 * 0.57735, L.y * 0.62 * 1.1547), gf = fract(g), gc = floor(g); float up = step(1.0, gf.x + gf.y);',
+  '  float facetT = czHash(gc * 2.0 + up), facets = 0.0;',   /* each facet has its own tone: the court reads as cut glass, not a grid */
+  '  if (uFacets > 0.5) { float tri = min(min(gf.x, gf.y), abs(1.0 - gf.x - gf.y)); facets = czLine(tri, 0.012) * (0.05 + 0.07 * smoothstep(h * 0.35, h, sq)) * field * (0.7 + 0.3 * sin(t * 0.3 + gc.x * 1.7 + gc.y * 2.3)); }',
+  /* the neutral shimmer: one soft light travelling round the band, and rare facet glints */
+  '  float run = czGlow(mod(atan(L.y, L.x) / 6.2831853 + 1.0 - t * (0.018 + 0.02 * ready) + seed, 1.0) - 0.5, 0.0015) * band;',
+  '  float glint = uFacets > 0.5 ? step(0.965, facetT) * pow(0.5 + 0.5 * sin(t * 0.9 + facetT * 60.0), 16.0) * czGlow(length(gf - vec2(0.33)), 0.02) * field : 0.0;',
+  '  float breath = 0.9 + 0.1 * sin(t * 0.45 + seed * 6.2831853);',
+  /* fighters: presence fields (a WHITE presence while READY; the class colour only while live) */
+  '  float f0 = czField(L, vP0, vC0.w), f1 = czField(L, vP1, vC1.w), f2 = czField(L, vP2, vC2.w), f3 = czField(L, vP3, vC3.w);',
+  '  float fs = f0 + f1 + f2 + f3, fm = max(max(f0, f1), max(f2, f3));',
+  '  vec3 pc = fs > 1e-4 ? (vC0.rgb * f0 + vC1.rgb * f1 + vC2.rgb * f2 + vC3.rgb * f3) / fs : uReady;',
+  '  pc = mix(pc, vec3(1.0), clamp((fs - fm) * 1.2, 0.0, 0.6));',   /* restrained overlap: where two presences meet they lean to white */
+  '  vec3 presC = mix(uReady, pc, live); float pres = min(fs, 1.1) * mix(0.5 * ready, 0.95 * uPres, live);   /* uPres: bright day paving needs a stronger presence than night */',
+  /* activation territories: soft regions around each fighter, seams through white */
+  '  float d0 = czDist(L, vP0), d1 = czDist(L, vP1), d2 = czDist(L, vP2), d3 = czDist(L, vP3), dn = min(min(d0, d1), min(d2, d3));',
+  '  float e0 = exp(-(d0 - dn) * 1.6), e1 = exp(-(d1 - dn) * 1.6), e2 = exp(-(d2 - dn) * 1.6), e3 = exp(-(d3 - dn) * 1.6), eS = e0 + e1 + e2 + e3;',
+  '  vec3 terrC = (vC0.rgb * e0 + vC1.rgb * e1 + vC2.rgb * e2 + vC3.rgb * e3) / max(eS, 1e-4); terrC = mix(terrC, vec3(1.0), clamp(eS - 1.0, 0.0, 1.0) * 0.6);',
+  '  float terr = split * live * step(dn, 1e3);',
+  /* colour: the neutral inlay, the territories while splitting, the presences under the fighters */
+  '  vec3 lineC = mix(uCore, uIce, 0.35); lineC = mix(lineC, terrC, terr); lineC = mix(lineC, presC, clamp(pres, 0.0, 1.0) * 0.85);',
+  '  float lvl = (breath * 0.78 + ready * 0.36 + terr * 0.8) * mix(1.0, 1.3, live);   /* dormant is quiet infrastructure; someone stepping on wakes it */',
+  '  float lines = edges + seams + dia + facets;',
+  '  vec3 col = lineC * lines * lvl + mix(uCore, lineC, 0.6) * (anch + sig) * lvl + uIce * run * 0.7 + uCore * glint * 0.5;',
+  '  col += presC * pres * (0.3 * court + lines * 1.5);',   /* a presence warms the floor under the fighter and lights the inlay it stands on */
+  '  col += terrC * terr * (0.1 * field + 0.4 * band);',
+  '  col += vec3(1.0) * czGlow(sq - surge * hb * 1.15, 0.8) * (1.0 - surge) * live * 1.2;',   /* the activation surge */
+  '  col += uCore * czGlow(sq - (1.0 - reset) * hb, 0.5) * sin(reset * 3.14159265) * 0.6;',   /* the neutral reset sweep */
+  '  col += uIce * czGlow(sq - hb, 0.45) * 0.1 * (1.0 - 0.5 * court);',   /* low ground-bound energy just outside the border */
+  '  float far = 1.0 - smoothstep(180.0, 320.0, vLD.z); col *= uGlobal * far;',
+  '  float fres = pow(1.0 - clamp(vLD.w, 0.0, 1.0), 5.0); vec3 sheen = uSky * fres * uSheen * court * (0.75 + 0.5 * facetT) * far;',   /* the glass catches the sky at grazing angles, facet by facet */
+  '  float fillA = (uFill * field + (uFill + 0.08) * band) * (0.55 + 0.45 * far);',
+  '  vec3 outC = uFillC * fillA + sheen + col; if (max(max(outC.r, outC.g), outC.b) < 0.003 && fillA < 0.003) discard;',
+  '  gl_FragColor = vec4(outC, fillA); }'   /* premultiplied: the inlay adds light, the glass field tints the ground a touch */
 ].join('\n');
 
-var SHELL_V = [
-  'attribute vec4 iZ; attribute vec4 iK; attribute vec4 iAx; attribute vec4 iCA; attribute vec4 iCB; attribute vec4 iPA; attribute vec4 iPB;',
-  'varying vec3 vP; varying vec4 vK; varying vec4 vAx; varying vec4 vCA; varying vec4 vCB; varying vec4 vPA; varying vec4 vPB; varying float vDist;',
-  'void main() { float h = iK.x * 0.5; vec3 L = vec3(position.x * h, position.y, position.z * h); vP = L; vK = iK; vAx = iAx; vCA = iCA; vCB = iCB; vPA = iPA; vPB = iPB;',
-  '  float c = cos(iZ.w), s = sin(iZ.w); vec3 w = vec3(iZ.x + L.x * c - L.z * s, iZ.y + L.y, iZ.z + L.x * s + L.z * c);',
-  '  vDist = length(cameraPosition - w); gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0); }'
-].join('\n');
-
-var SHELL_F = [
-  'uniform float uTime; uniform float uGlobal; uniform float uStreak; uniform float uShellH;',
-  'varying vec3 vP; varying vec4 vK; varying vec4 vAx; varying vec4 vCA; varying vec4 vCB; varying vec4 vPA; varying vec4 vPB; varying float vDist;',
-  'void main() { float v = clamp(vP.y / uShellH, 0.0, 1.0), t = uTime, live = vK.w, split = vK.y, surge = vK.z;',
-  '  float rise = mix(0.55, 1.0, live) * (1.0 - v) * (1.0 - v);',   /* bright at the floor, gone by the top */
-  '  float along = vP.x + vP.z, streak = mix(1.0, 0.55 + 0.45 * sin(along * 2.2 + t * 0.6) * sin(v * 9.0 - t * 1.4), uStreak);',
-  '  float corner = exp(-pow(min(abs(abs(vP.x) - vK.x * 0.5), abs(abs(vP.z) - vK.x * 0.5)), 2.0) * 3.0);',   /* brighter seams at the four corners */
-  '  vec3 base = vec3(0.62, 0.8, 1.0); float sd = dot(vP.xz, vAx.xy); vec3 splitC = mix(vCB.rgb, vCA.rgb, smoothstep(-vAx.z, vAx.z, sd));',
-  '  float oa = exp(-dot(vP.xz - vPA.xy, vP.xz - vPA.xy) / 10.0) * vCA.w * live, ob = exp(-dot(vP.xz - vPB.xy, vP.xz - vPB.xy) / 10.0) * vCB.w * live;',
-  '  vec3 c = mix(base, splitC, split * live); c = mix(c, (vCA.rgb * oa + vCB.rgb * ob) / max(oa + ob, 1e-3), clamp(oa + ob, 0.0, 1.0) * (1.0 - split));',
-  '  float lvl = mix(0.07, 0.3, live) + 0.55 * split * live + 0.8 * (1.0 - surge) * live * exp(-pow(v - surge, 2.0) * 30.0) + 0.35 * (oa + ob);',   /* dormant: a whisper; activation: the shell rises; a fighter near a wall lights it */
-  '  float far = 1.0 - smoothstep(120.0, 260.0, vDist), near = smoothstep(1.5, 6.0, vDist);',
-  '  gl_FragColor = vec4(c * rise * streak * lvl * (1.0 + corner * 0.8) * uGlobal * far * near, 1.0); }'
-].join('\n');
-
-function shellGeometry(THREE) {   /* four walls on the unit square's edges (x, z in −1..1), height in metres (y 0..H) */
-  var H = 2.4, P = [], I = [], k = 0; [[-1, -1, 1, -1], [1, -1, 1, 1], [1, 1, -1, 1], [-1, 1, -1, -1]].forEach(function (e) { var n = 12; for (var i = 0; i <= n; i++) { var u = i / n, x = e[0] + (e[2] - e[0]) * u, z = e[1] + (e[3] - e[1]) * u; P.push(x, 0, z, x, H, z); if (i < n) { var b = k + i * 2; I.push(b, b + 2, b + 1, b + 1, b + 2, b + 3); } } k += (n + 1) * 2; });
-  var g = new THREE.InstancedBufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); return { geo: g, H: H };
-}
+function rawRGB(THREE, hex) { return new THREE.Vector3(((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255); }   /* display values (the shader writes them untouched) */
+function P3(p) { if (!p) return null; if (Array.isArray(p)) return { x: +p[0], y: +(p[1] || 0), z: +p[2] }; if (isFinite(p.x) && isFinite(p.z)) return { x: +p.x, y: +(p.y || 0), z: +p.z }; return null; }
 
 export function createCombatZones(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }, reg = ctx.registry || {}, night = !!ctx.night;
-  var zones = [], byId = {}, group = null, floor = null, shell = null, uF = null, uS = null, A = null, own = [], clock = 0, listeners = [], demo = null;
-  var famColor = {}, classColor = {};
+  var zones = [], byId = {}, group = null, floor = null, uF = null, A = null, own = [], clock = 0, listeners = [], demo = null, refs = null, classColor = {}, WHITE = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function fam(f) { var F = (reg.crystal_families || {})[f] || {}; return F.glow || F.color || '#f4f6ff'; }
   function colorOf(cls) { var k = String(cls || '').toUpperCase(); if (classColor[k]) return classColor[k]; var c = new THREE.Color(fam(CLASS_FAMILY[k] || 'platinum')); classColor[k] = c; return c; }
   function build() {
-    zones = combatZoneList(reg); if (!zones.length) { log('combatZones: registry.combat_zones empty — nothing built'); return; }
+    zones = combatZoneList(reg); WHITE = new THREE.Color(1, 1, 1); if (!zones.length) { log('combatZones: registry.combat_zones empty — nothing built'); return; }
     group = new THREE.Group(); group.name = 'MAHWORLD_COMBAT_ZONES'; group.userData.noMerge = true; group.userData.nonInteractable = true; ctx.group.add(group);
-    var n = zones.length, lowQ = tier() === 'LOW';
-    A = { iZ: new Float32Array(n * 4), iK: new Float32Array(n * 4), iAx: new Float32Array(n * 4), iCA: new Float32Array(n * 4), iCB: new Float32Array(n * 4), iPA: new Float32Array(n * 4), iPB: new Float32Array(n * 4) };
-    zones.forEach(function (z, i) { z.index = i; z.duel = null; byId[z.id] = z; A.iZ.set([z.x, z.y || 0, z.z, (z.yaw_deg || 0) * Math.PI / 180], i * 4); A.iK.set([z.size_m, 0, 1, 0], i * 4); A.iAx.set([1, 0, 0.9, (i * 0.618) % 1], i * 4); A.iCA.set([1, 1, 1, 0], i * 4); A.iCB.set([1, 1, 1, 0], i * 4); A.iPA.set([0, 0, 0, 0], i * 4); A.iPB.set([0, 0, 0, 0.5], i * 4); });
-    var attrs = {}; Object.keys(A).forEach(function (k) { attrs[k] = new THREE.InstancedBufferAttribute(A[k], 4); attrs[k].setUsage(THREE.DynamicDrawUsage); });
-    var fg = new THREE.InstancedBufferGeometry(), pl = new THREE.PlaneGeometry(1, 1); fg.index = pl.index; fg.setAttribute('position', pl.attributes.position); fg.instanceCount = n; Object.keys(attrs).forEach(function (k) { fg.setAttribute(k, attrs[k]); }); own.push(fg, pl);
-    uF = { uTime: { value: 0 }, uGlobal: { value: night ? 1.25 : 0.85 }, uFacets: { value: lowQ ? 0 : 1 }, uFill: { value: night ? 0.16 : 0.22 } };
+    var n = zones.length, lowQ = tier() === 'LOW', keys = ['iZ', 'iK', 'iK2', 'iP0', 'iP1', 'iP2', 'iP3', 'iC0', 'iC1', 'iC2', 'iC3'];
+    A = {}; keys.forEach(function (k) { A[k] = new Float32Array(n * 4); });
+    zones.forEach(function (z, i) { z.index = i; z.duel = null; z.occ = []; z.readyV = 0; z.lastPhase = 'DORMANT'; byId[z.id] = z; A.iZ.set([z.x, z.y || 0, z.z, (z.yaw_deg || 0) * Math.PI / 180], i * 4); A.iK.set([z.playable_m / 2, 0, 1, 0], i * 4); A.iK2.set([0, 0, z.border_m, (i * 0.618) % 1], i * 4); for (var s = 0; s < MAX_FIGHTERS; s++) A['iC' + s].set([1, 1, 1, 3.2], i * 4); });
+    var attrs = {}; keys.forEach(function (k) { attrs[k] = new THREE.InstancedBufferAttribute(A[k], 4); attrs[k].setUsage(THREE.DynamicDrawUsage); });
+    var fg = new THREE.InstancedBufferGeometry(), pl = new THREE.PlaneGeometry(1, 1); fg.index = pl.index; fg.setAttribute('position', pl.attributes.position); fg.instanceCount = n; keys.forEach(function (k) { fg.setAttribute(k, attrs[k]); }); own.push(fg, pl);
+    uF = { uTime: { value: 0 }, uGlobal: { value: 0 }, uFacets: { value: lowQ ? 0 : 1 }, uFill: { value: 0 }, uSheen: { value: 0 }, uPres: { value: 1 }, uMargin: { value: 2.5 },
+      uIce: { value: rawRGB(THREE, PALETTE.ice) }, uCore: { value: rawRGB(THREE, PALETTE.core) }, uReady: { value: rawRGB(THREE, PALETTE.ready) }, uFillC: { value: rawRGB(THREE, PALETTE.fill_day) }, uSky: { value: rawRGB(THREE, PALETTE.sky_day) } };
+    setNight(night);
     var fm = new THREE.ShaderMaterial({ vertexShader: FLOOR_V, fragmentShader: FLOOR_F, uniforms: uF, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8, toneMapped: false }); own.push(fm);
     floor = new THREE.Mesh(fg, fm); floor.name = 'COMBAT_ZONE_FLOORS'; floor.frustumCulled = false; floor.renderOrder = 3; floor.userData.noMerge = true; floor.userData.nonInteractable = true; group.add(floor);
-    var sh = shellGeometry(THREE), sg = sh.geo; sg.instanceCount = n; Object.keys(attrs).forEach(function (k) { sg.setAttribute(k, attrs[k]); }); own.push(sg);
-    uS = { uTime: uF.uTime, uGlobal: { value: night ? 1.1 : 0.7 }, uStreak: { value: lowQ ? 0 : 1 }, uShellH: { value: sh.H } };
-    var smt = new THREE.ShaderMaterial({ vertexShader: SHELL_V, fragmentShader: SHELL_F, uniforms: uS, transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false }); own.push(smt);
-    shell = new THREE.Mesh(sg, smt); shell.name = 'COMBAT_ZONE_SHELLS'; shell.frustumCulled = false; shell.renderOrder = 12; shell.userData.noMerge = true; shell.userData.nonInteractable = true; group.add(shell);
     A.attrs = attrs;
-    try { var m = /[?&]duelDemo=([^&]+)/.exec(typeof location !== 'undefined' ? location.search : ''); if (m) { var p = decodeURIComponent(m[1]).split(':'); demo = { id: p[0], a: p[1] || 'ATHLETE', b: p[2] || 'LEAN', phase: (p[3] || 'ACTIVE').toUpperCase(), t0: null }; } } catch (e) { }   /* dev preview only: ?duelDemo=ZONE:CLASS_A:CLASS_B:ACTIVATION|ACTIVE|RELEASE (ZONE = ALL for every zone) */
-    log('combatZones: ' + n + ' zones (' + zones.map(function (z) { return z.id; }).join(', ') + ') in 2 draws');
+    var qs = typeof location !== 'undefined' ? location.search : '';
+    try { var m = /[?&]duelDemo=([^&]+)/.exec(qs); if (m) { var p = decodeURIComponent(m[1]).split(':'); demo = { id: p[0], classes: (p[1] || 'ATHLETE,LEAN').split(',').filter(Boolean).slice(0, MAX_FIGHTERS), phase: (p[2] || 'ACTIVE_DUEL').toUpperCase() }; if (PHASES.indexOf(demo.phase) < 0) demo.phase = 'ACTIVE_DUEL'; } } catch (e) { }   /* dev preview only: ?duelDemo=ZONE:CLS_A,CLS_B[,…]:DORMANT|READY|ACTIVATION|ACTIVE_DUEL|RESOLUTION|RESET (ZONE = ALL for every court) */
+    try { var r = /[?&]scaleRefs=(\d+)/.exec(qs); if (r) buildRefs(Math.max(1, Math.min(8, +r[1]))); } catch (e) { }   /* dev preview only: full-size neutral human-scale references on each court */
+    zones.forEach(function (z) { write(z); }); flag();
+    log('combatZones: ' + n + ' courts (' + zones.map(function (z) { return z.id + ' ' + z.playable_m + ' m'; }).join(', ') + ') in 1 draw');
   }
-  function write(z) { var i = z.index * 4, d = z.duel, ph = d ? duelPhase(clock, d.tStart, d.tEnd) : duelPhase(clock, null, null);
-    A.iK[i + 1] = ph.split; A.iK[i + 2] = ph.surge; A.iK[i + 3] = ph.live;
-    if (d) { A.iAx[i] = d.axis[0]; A.iAx[i + 1] = d.axis[1];
-      [['a', A.iCA, A.iPA], ['b', A.iCB, A.iPB]].forEach(function (S) { var F = d[S[0]]; if (!F) return; S[1][i] = F.col.r; S[1][i + 1] = F.col.g; S[1][i + 2] = F.col.b; S[1][i + 3] = F.pres; S[2][i] = F.lx; S[2][i + 1] = F.lz; S[2][i + 2] = F.lift; S[2][i + 3] = F.seed; }); }
-    else { A.iCA[i + 3] = 0; A.iCB[i + 3] = 0; }
+  /* SCALE REFERENCES (dev only): neutral 1.88 m mannequins at the quarter points of each court, so the footprint reads at human scale */
+  var REF_AT = [[-6.5, -6.5], [6.5, 6.5], [-6.5, 6.5], [6.5, -6.5], [0, 0], [12.2, 0], [-12.2, 0], [0, 12.2]];
+  function buildRefs(N) { var body = new THREE.CapsuleGeometry(0.2, 1.2, 4, 10), head = new THREE.SphereGeometry(0.13, 12, 8), mat = new THREE.MeshStandardMaterial({ color: 0x9aa3ae, roughness: 0.7, metalness: 0 }); own.push(body, head, mat);
+    var cnt = zones.length * N, bI = new THREE.InstancedMesh(body, mat, cnt), hI = new THREE.InstancedMesh(head, mat, cnt), M = new THREE.Matrix4(), k = 0;
+    zones.forEach(function (z) { var c = Math.cos((z.yaw_deg || 0) * Math.PI / 180), s = Math.sin((z.yaw_deg || 0) * Math.PI / 180); for (var i = 0; i < N; i++) { var l = REF_AT[i], x = z.x + l[0] * c - l[1] * s, wz = z.z + l[0] * s + l[1] * c; M.makeTranslation(x, (z.y || 0) + 0.8, wz); bI.setMatrixAt(k, M); M.makeTranslation(x, (z.y || 0) + 1.75, wz); hI.setMatrixAt(k, M); k++; } });
+    [bI, hI].forEach(function (o, j) { o.name = j ? 'COMBAT_ZONE_SCALE_REF_HEADS' : 'COMBAT_ZONE_SCALE_REFS'; o.userData.noMerge = true; o.userData.nonInteractable = true; o.userData.devOnly = true; o.castShadow = true; group.add(o); });
+    refs = { n: N, height_m: 1.88 }; }
+  /* a fighter from the contract (or the M15 shape) → its slot on a court: local position, lift, colour, influence */
+  function norm(z, f, prev) { var wp = P3(f.worldPosition) || { x: +f.x, y: +(f.y || 0), z: +f.z }; if (!isFinite(wp.x) || !isFinite(wp.z)) return null;
+    var id = f.fighterId !== undefined ? f.fighterId : (f.id !== undefined ? f.id : (prev ? prev.fighterId : null)), cls = String(f.classId || f.cls || (prev && prev.classId) || '').toUpperCase(), p = zoneLocal(z, wp.x, wp.z);   /* an update may carry only what changed */
+    var lift = f.airborneHeight !== undefined ? +f.airborneHeight : (f.worldPosition ? wp.y - (z.y || 0) : +(f.y || 0)); if (f.verticalState === 'AIRBORNE') lift = Math.max(lift, 1); if (f.verticalState === 'GROUNDED') lift = 0; lift = Math.max(0, lift || 0);
+    var col = f.classColor !== undefined && f.classColor !== null ? new THREE.Color(f.classColor) : (prev && prev.classId === cls && prev.col ? prev.col : colorOf(cls));
+    var o = prev || { pres: 0, lx: p[0], lz: p[1] }; o.fighterId = id; o.classId = cls; o.col = col; o.part = f.isParticipant !== undefined ? f.isParticipant !== false : (prev ? prev.part : true); o.teamId = f.teamId !== undefined ? f.teamId : (prev ? prev.teamId : id); o.vState = f.verticalState || (lift > 0.05 ? 'AIRBORNE' : 'GROUNDED');
+    o.rad = f.localInfluenceRadius !== undefined ? Math.max(1.5, Math.min(SIZING.max_aoe_radius_m, +f.localInfluenceRadius || 3.2)) : (prev ? prev.rad : 3.2); o.tx = p[0]; o.tz = p[1]; o.lift = lift; o.target = insideZone(z, wp.x, wp.z, 1.5) ? 1 : 0; return o; }
+  function merge(z, list, fighters, replace) { var seen = {};
+    (fighters || []).forEach(function (f, i) { if (!f) return; var id = f.fighterId !== undefined ? f.fighterId : f.id, slot = null;
+      for (var j = 0; j < list.length; j++) if (list[j].fighterId === id && id !== undefined && id !== null) slot = list[j];
+      if (!slot && (id === undefined || id === null)) { var cls = String(f.classId || f.cls || '').toUpperCase(); slot = list.filter(function (s) { return s.classId === cls && !seen[list.indexOf(s)]; })[0] || null; }
+      if (slot) { norm(z, f, slot); seen[list.indexOf(slot)] = true; } else if (list.length < MAX_FIGHTERS) { var o = norm(z, f, null); if (o) { list.push(o); seen[list.length - 1] = true; } } });
+    if (replace) list.forEach(function (s, j) { if (!seen[j]) s.target = 0; }); }
+  function ease(list, dt) { var kp = Math.min(1, (dt || 0.016) / TIMING.presence_s), kf = Math.min(1, (dt || 0.016) / TIMING.follow_s);
+    list.forEach(function (s) { s.pres += (s.target - s.pres) * kp; s.lx += (s.tx - s.lx) * kf; s.lz += (s.tz - s.lz) * kf; }); }
+  function stateOf(z) { var d = z.duel; return duelPhase(clock, { occupied: z.occ.some(function (s) { return s.target > 0; }), tStart: d ? d.tStart : null, tResolve: d ? d.tResolve : null }); }
+  function write(z) { var i = z.index * 4, d = z.duel, ph = stateOf(z);
+    A.iK[i + 1] = ph.split; A.iK[i + 2] = ph.surge; A.iK[i + 3] = ph.live; A.iK2[i] = z.readyV; A.iK2[i + 1] = ph.reset;
+    var slots = d ? d.f : z.occ, coloured = !!d && ph.live > 0;   /* outside a live duel every slot is written WHITE: no class colour can reach the floor */
+    for (var s = 0; s < MAX_FIGHTERS; s++) { var F = slots[s], P = A['iP' + s], C = A['iC' + s]; if (F) { P[i] = F.lx; P[i + 1] = F.lz; P[i + 2] = F.lift; P[i + 3] = F.pres; var c = coloured && F.part ? F.col : WHITE; C[i] = c.r; C[i + 1] = c.g; C[i + 2] = c.b; C[i + 3] = F.rad; } else { P[i + 3] = 0; C[i] = C[i + 1] = C[i + 2] = 1; } }
     if (ph.phase !== z.lastPhase) { var prev = z.lastPhase; z.lastPhase = ph.phase; listeners.forEach(function (fn) { try { fn({ zone: z.id, phase: ph.phase, from: prev || null, t: clock }); } catch (e) { } }); }
-    if (ph.phase === 'DORMANT' && d && d.tEnd !== null && !demo) z.duel = null;
+    if (d && d.tResolve !== null && (ph.phase === 'DORMANT' || ph.phase === 'READY') && !demo) z.duel = null;
     return ph; }
-  function fighter(z, f, seed) { var p = zoneLocal(z, f.x, f.z); return { id: f.id, cls: String(f.cls || '').toUpperCase(), col: colorOf(f.cls), lx: p[0], lz: p[1], lift: Math.max(0, f.y || 0), pres: 0, target: insideZone(z, f.x, f.z, 1.5) ? 1 : 0, seed: seed }; }
-  /* API — fighters are { id, cls, x, z, y (height above the zone floor) } in world metres */
-  function begin(id, a, b, opts) { var z = byId[id]; if (!z || !a || !b) return null; opts = opts || {};
-    var d = { tStart: opts.t !== undefined ? opts.t : clock, tEnd: null, a: fighter(z, a, 0.13), b: fighter(z, b, 0.61) }; d.a.pres = d.a.target; d.b.pres = d.b.target;
-    var ax = d.a.lx - d.b.lx, az = d.a.lz - d.b.lz, al = Math.hypot(ax, az); d.axis = al > 0.5 ? [ax / al, az / al] : [1, 0];   /* A's colour holds A's side of the seam */
-    z.duel = d; write(z); flag(); return phaseOf(id); }
-  function update(id, fighters, dt) { var z = byId[id]; if (!z || !z.duel) return null; var d = z.duel, k = Math.min(1, (dt || 0.016) / TIMING.presence_s);
-    (fighters || []).forEach(function (f) { var slot = f.id !== undefined && d.b.id === f.id ? d.b : (f.id !== undefined && d.a.id === f.id ? d.a : (f.cls && String(f.cls).toUpperCase() === d.b.cls && d.a.cls !== d.b.cls ? d.b : d.a)); var n = fighter(z, f, slot.seed); slot.lx = n.lx; slot.lz = n.lz; slot.lift = n.lift; slot.target = n.target; });
-    [d.a, d.b].forEach(function (F) { F.pres += (F.target - F.pres) * k; }); write(z); flag(); return phaseOf(id); }
-  function end(id, opts) { var z = byId[id]; if (!z || !z.duel) return null; z.duel.tEnd = opts && opts.t !== undefined ? opts.t : clock; write(z); flag(); return phaseOf(id); }
-  function phaseOf(id) { var z = byId[id]; if (!z) return null; var d = z.duel, ph = d ? duelPhase(clock, d.tStart, d.tEnd) : duelPhase(clock, null, null);
-    return { zone: id, phase: ph.phase, split: +ph.split.toFixed(3), live: +ph.live.toFixed(3), fighters: d ? [d.a, d.b].map(function (F) { return { id: F.id, cls: F.cls, local: [+F.lx.toFixed(2), +F.lz.toFixed(2)], presence: +F.pres.toFixed(2), control: +(F.lx * d.axis[0] + F.lz * d.axis[1]).toFixed(2) }; }) : [] }; }   /* control: the fighter's position along the duel axis (their side of pressure) */
+  /* API */
+  function setOccupants(id, fighters, dt) { var z = byId[id]; if (!z) return null; if (z.duel && z.duel.tResolve === null) return update(id, fighters, dt); merge(z, z.occ, fighters, true); if (dt !== undefined) ease(z.occ, dt); z.occ = z.occ.filter(function (s) { return s.target > 0 || s.pres > 0.01; }); write(z); flag(); return phaseOf(id); }
+  function begin(id, fighters, b, opts) { var z = byId[id]; if (!z) return null; if (!Array.isArray(fighters)) { fighters = [fighters, b]; } else opts = b; opts = opts || {};   /* begin(zone, [f…], opts) — or the M15 begin(zone, a, b, opts) */
+    fighters = (fighters || []).filter(Boolean); if (!fighters.length) return null;
+    var list = []; merge(z, list, fighters, false); list.forEach(function (s) { s.pres = s.target; s.lx = s.tx; s.lz = s.tz; });
+    z.duel = { tStart: opts.t !== undefined ? opts.t : clock, tResolve: null, f: list }; z.occ = list; write(z); flag(); return phaseOf(id); }
+  function update(id, fighters, dt) { var z = byId[id]; if (!z) return null; if (!z.duel) return setOccupants(id, fighters, dt); merge(z, z.duel.f, fighters, false); if (dt !== undefined) ease(z.duel.f, dt); write(z); flag(); return phaseOf(id); }
+  function resolve(id, opts) { var z = byId[id]; if (!z || !z.duel) return null; z.duel.tResolve = opts && opts.t !== undefined ? opts.t : clock; write(z); flag(); return phaseOf(id); }
+  function phaseOf(id) { var z = byId[id]; if (!z) return null; var d = z.duel, ph = stateOf(z), h = z.playable_m / 2, slots = d ? d.f : z.occ;
+    return { zone: id, phase: ph.phase, live: +ph.live.toFixed(3), split: +ph.split.toFixed(3), ready: ph.ready, reset: +ph.reset.toFixed(3), classColourShown: ph.live > 0 && CLASS_PHASES.indexOf(ph.phase) >= 0 && slots.some(function (s) { return s.part && s.pres > 0.01; }),
+      fighters: slots.map(function (F) { return { fighterId: F.fighterId, classId: F.classId, teamId: F.teamId, isParticipant: F.part, local: [+F.tx.toFixed(2), +F.tz.toFixed(2)], presence: +F.pres.toFixed(2), verticalState: F.vState, airborne: F.lift > 0.05, influence: F.rad,
+        control: +(1 - Math.min(1, Math.max(Math.abs(F.tx), Math.abs(F.tz)) / h)).toFixed(2), id: F.fighterId, cls: F.classId }; }) }; }   /* control: how close the fighter holds the centre (1 = on it, 0 = at the edge) */
   function flag() { if (A && A.attrs) Object.keys(A.attrs).forEach(function (k) { A.attrs[k].needsUpdate = true; }); }
   function zoneAt(x, z) { for (var i = 0; i < zones.length; i++) if (insideZone(zones[i], x, z)) return zones[i].id; return null; }
-  function runDemo(t) { if (!demo) return; var list = demo.id === 'ALL' ? zones : zones.filter(function (z) { return z.id === demo.id; });
-    list.forEach(function (z, zi) { var h = z.size_m * 0.5, w = t * 0.55 + zi, P = function (s) { var ang = w + (s ? Math.PI : 0), rr = h * (0.42 + 0.12 * Math.sin(t * 0.9 + s * 2)); var lx = Math.cos(ang) * rr + (s ? 0.6 : -0.6), lz = Math.sin(ang) * rr * 0.7; var c = Math.cos((z.yaw_deg || 0) * Math.PI / 180), sn = Math.sin((z.yaw_deg || 0) * Math.PI / 180); return { id: s ? 'B' : 'A', cls: s ? demo.b : demo.a, x: z.x + lx * c - lz * sn, z: z.z + lx * sn + lz * c, y: s ? 0 : Math.max(0, Math.sin(t * 1.3) * 1.2) }; };
-      var off = demo.phase === 'ACTIVATION' ? 0.9 : (demo.phase === 'RELEASE' ? 20 : 12); if (!z.duel) begin(z.id, P(0), P(1), { t: t - off }); z.duel.tStart = t - off; z.duel.tEnd = demo.phase === 'RELEASE' ? t - 0.5 : null;   /* the staged phase stays anchored to the current clock (the preview pins the clock after load) */
-      update(z.id, [P(0), P(1)], 1); }); }
-  /* HOST ADAPTER (best effort; unverified until the runtime bridge lands): when the host snapshot reports a live duel whose local fighter
-     stands in a zone, the zone runs it — snap.duel.state / rules.match.state, snap.me.position + rules.me.class, the opponent from
-     snap.duel.opponent or rules.others. Missing fields simply leave every zone dormant. */
-  function P3(p) { if (!p) return null; if (Array.isArray(p)) return { x: +p[0], y: +(p[1] || 0), z: +p[2] }; if (isFinite(p.x) && isFinite(p.z)) return { x: +p.x, y: +(p.y || 0), z: +p.z }; return null; }
-  function hostDuel(dt) { var s = null; try { s = ctx.snapshot ? ctx.snapshot() : null; } catch (e) { } if (!s) return; var R = s.rules || {}, st = (s.duel && s.duel.state) || (R.match && R.match.state) || null, live = st === 'ACTIVE' || st === 'STARTING' || st === 'COUNTDOWN';
+  /* DEV PREVIEW: stage a phase on a court, anchored to the current clock (the preview pins the clock after load); with scale references
+     the fighters stand at the mannequins */
+  function demoFighters(z, t) { var c = Math.cos((z.yaw_deg || 0) * Math.PI / 180), s = Math.sin((z.yaw_deg || 0) * Math.PI / 180), N = demo.classes.length;
+    return demo.classes.map(function (cls, i) { var l; if (refs) { var r = REF_AT[i]; l = [r[0] + 0.4 * Math.sin(t * 0.7 + i), r[1] + 0.4 * Math.cos(t * 0.6 + i * 2)]; } else { var a = t * 0.25 + i * Math.PI * 2 / N, rr = z.playable_m * 0.5 * (0.42 + 0.06 * Math.sin(t * 0.9 + i * 2)); l = [Math.cos(a) * rr, Math.sin(a) * rr]; }
+      return { fighterId: 'demo_' + i, classId: cls, teamId: i, worldPosition: { x: z.x + l[0] * c - l[1] * s, y: (z.y || 0) + (i === 0 && !refs ? Math.max(0, Math.sin(t * 1.3) * 1.2) : 0), z: z.z + l[0] * s + l[1] * c }, isParticipant: true, localInfluenceRadius: 3.2 }; }); }
+  function runDemo(t, dt) { var list = demo.id === 'ALL' ? zones : zones.filter(function (z) { return z.id === demo.id; });
+    list.forEach(function (z) { var fs = demoFighters(z, t), P = demo.phase;
+      if (P === 'DORMANT') { z.duel = null; z.occ = []; return; }
+      if (P === 'READY') { z.duel = null; setOccupants(z.id, fs, 1); return; }
+      var off = P === 'ACTIVATION' ? 0.9 : 12; if (!z.duel) begin(z.id, fs, { t: t - off }); z.duel.tStart = t - off;
+      z.duel.tResolve = P === 'RESOLUTION' ? t - 0.5 : (P === 'RESET' ? t - (TIMING.resolution_s + TIMING.reset_s * 0.35) : null); update(z.id, fs, 1); }); }
+  /* HOST ADAPTER (best effort; unverified until the runtime bridge lands): the local player standing on a court makes it READY; when the
+     host snapshot reports a live duel (snap.duel.state / rules.match.state) and the opponent is known, that court runs it — me.position +
+     rules.me.class, the opponent from snap.duel.opponent or rules.others. Missing fields simply leave every court dormant. */
+  function hostDuel(dt) { var s = null; try { s = ctx.snapshot ? ctx.snapshot() : null; } catch (e) { } if (!s) return; var R = s.rules || {}, st = (s.duel && s.duel.state) || (R.match && R.match.state) || null, live = ['ACTIVE', 'STARTING', 'COUNTDOWN', 'ACTIVATION', 'ACTIVE_DUEL'].indexOf(st) >= 0;
     var mp = P3(s.me && (s.me.position || s.me.pos)), meCls = (R.me && R.me.class) || (s.me && s.me.class) || null, op = (s.duel && s.duel.opponent) || (R.others && R.others[0]) || null, opP = op && P3(op.position || op.pos || op), opCls = op && (op.class || op.class_id) || null;
     var zid = mp ? zoneAt(mp.x, mp.z) : null, cur = zones.filter(function (z) { return z.duel && z.duel.host; })[0];
-    if (live && zid && opP) { var me = { id: 'me', cls: meCls, x: mp.x, z: mp.z, y: 0 }, you = { id: 'op', cls: opCls, x: opP.x, z: opP.z, y: 0 }; if (!cur || cur.id !== zid) { if (cur) end(cur.id); begin(zid, me, you); byId[zid].duel.host = true; } update(zid, [me, you], dt); }
-    else if (cur && cur.duel.tEnd === null) end(cur.id); }
-  function tick(dt, t) { if (!zones.length) return; clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); uF.uTime.value = clock; if (demo) runDemo(clock); else hostDuel(dt);
-    var any = false; zones.forEach(function (z) { if (z.duel) { write(z); any = true; } }); if (any) flag(); }
-  function setNight(n) { night = !!n; if (uF) { uF.uGlobal.value = night ? 1.25 : 0.85; uF.uFill.value = night ? 0.16 : 0.22; } if (uS) uS.uGlobal.value = night ? 1.1 : 0.7; }
-  function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; zones = []; byId = {}; group = floor = shell = null; }
-  function debug() { return { zones: zones.map(function (z) { return { id: z.id, at: [z.x, z.z], y: z.y, size_m: z.size_m, yaw_deg: z.yaw_deg, phase: phaseOf(z.id).phase }; }), draw_calls: zones.length ? 2 : 0, demo: demo ? demo.id + ':' + demo.phase : null }; }
+    var me = mp ? { fighterId: 'me', classId: meCls, worldPosition: mp } : null, you = opP ? { fighterId: 'op', classId: opCls, worldPosition: opP } : null;
+    if (live && zid && you) { if (!cur || cur.id !== zid) { if (cur && cur.duel.tResolve === null) resolve(cur.id); begin(zid, [me, you]); byId[zid].duel.host = true; } update(zid, [me, you]); return; }
+    if (cur && cur.duel.tResolve === null) resolve(cur.id);
+    zones.forEach(function (z) { if (z.duel && z.duel.tResolve === null) return; if (z.id === zid && me) { setOccupants(z.id, [me]); z.hostOcc = true; } else if (z.hostOcc) { setOccupants(z.id, []); if (!z.occ.length) z.hostOcc = false; } }); }
+  function tick(dt, t) { if (!zones.length) return; var prev = clock; clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); var d = Math.max(0, Math.min(0.1, dt || (clock - prev) || 0.016)); uF.uTime.value = clock;
+    if (demo) runDemo(clock, d); else hostDuel(d);
+    var any = false; zones.forEach(function (z) { var tgt = stateOf(z).ready, busy = z.duel || z.occ.length || Math.abs(z.readyV - tgt) > 1e-3 || z.lastPhase !== 'DORMANT';
+      if (!busy) return; z.readyV += (tgt - z.readyV) * Math.min(1, d / TIMING.presence_s); if (Math.abs(z.readyV - tgt) < 1e-3) z.readyV = tgt; if (!demo) ease(z.duel ? z.duel.f : z.occ, d); if (!z.duel) z.occ = z.occ.filter(function (s) { return s.target > 0 || s.pres > 0.01; }); write(z); any = true; });
+    if (any) flag(); }
+  function setNight(n) { night = !!n; if (!uF) return; uF.uGlobal.value = night ? 1.0 : 0.72; uF.uFill.value = night ? 0.16 : 0.13; uF.uSheen.value = night ? 0.22 : 0.16; uF.uPres.value = night ? 1 : 1.7;
+    uF.uFillC.value.copy(rawRGB(THREE, night ? PALETTE.fill_night : PALETTE.fill_day)); uF.uSky.value.copy(rawRGB(THREE, night ? PALETTE.sky_night : PALETTE.sky_day)); }
+  function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; zones = []; byId = {}; group = floor = null; refs = null; }
+  function debug() { return { courts: zones.map(function (z) { return { id: z.id, at: [z.x, z.z], y: z.y, playable_m: z.playable_m, border_m: z.border_m, size_m: z.size_m, yaw_deg: z.yaw_deg, phase: phaseOf(z.id).phase }; }), draw_calls: zones.length ? 1 + (refs ? 2 : 0) : 0, demo: demo ? demo.id + ':' + demo.classes.join(',') + ':' + demo.phase : null, scale_refs: refs }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug,
-    zones: function () { return zones.map(function (z) { return { id: z.id, x: z.x, z: z.z, y: z.y, size_m: z.size_m, yaw_deg: z.yaw_deg }; }); },
-    zoneAt: zoneAt, begin: begin, update: update, end: end, phase: phaseOf, onPhase: function (fn) { listeners.push(fn); }, classColor: function (c) { return '#' + colorOf(c).getHexString(); },
+    zones: function () { return zones.map(function (z) { return { id: z.id, x: z.x, z: z.z, y: z.y, playable_m: z.playable_m, border_m: z.border_m, size_m: z.size_m, yaw_deg: z.yaw_deg }; }); },
+    zoneAt: zoneAt, setOccupants: setOccupants, begin: begin, update: update, resolve: resolve, end: resolve, phase: phaseOf, onPhase: function (fn) { listeners.push(fn); },
+    classColor: function (c) { return '#' + colorOf(c).getHexString(); },
     setClassColor: function (cls, hex) { classColor[String(cls).toUpperCase()] = new THREE.Color(hex); } };   /* a future class brings its own colour (colour law: one of the five families) */
 }
