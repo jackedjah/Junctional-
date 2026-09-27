@@ -45,20 +45,37 @@
        takes ONE sample (the body as a thickness map), no relief, no aura noise, the sky colour per vertex, and half the bodies (sky.js).
        The wind streaks on the tower flanks are the only atlas cards left. */
 
+/* M20 WEATHER, NOT FOG (owner 2026-09-27: "continuous elongated masses, soft edges, extinction, underside, horizon integration; phone-safe";
+   open items: the aerials over the highland — F4, V12, HA — read through a strong white sheet that hides the district and the massifs, and
+   gl_FragDepth is untested on phones). Measured first (layers toggled one by one): the sheet is the MID layer (177–225 m) met nearly level
+   from the 200–247 m aerial cameras plus the horizon ring (tops at 236 m) — not the stratus. So:
+     · BREAK FROM ABOVE: a body looked down upon — steeply, or at all from at / above its top — raises its field threshold (uBreak 0.75), so its
+       cells shrink into broken fragments with the ground readable between them; the uniform milky thinning drops to a residual (uVeilDown);
+     · the stratus deck (115–171 m) never stood inside the district in the frames measured (clocks 40 and 1395, when one body drifts across
+       the plateau edge): from the plateau (146–175 m) the break from above already opens it — a clear-zone variant showed no difference
+       and was dropped (no unproven per-step cost);
+     · PHONE-SAFE DEPTH: gl_FragDepth (the exact depth of the body along its ray) stays on HIGH only; MED / LOW (the phone tiers) compile
+       CLOUD_DEPTH 0 — no fragment depth, so the early depth test stays on — and rasterise each box by its FAR faces: terrain or a peak
+       inside a box hides the cloud there (so a cloud never paints over a ridge it sits behind; the price: a body straddling a ridge is also
+       cut where it passes in front of it — the error reads as "behind the mountain", the natural one), and a far face past the far plane is
+       pulled in along its own view ray;
+     · the per-pixel march offset keeps a fifth of its spread (a thin deck met at a grazing angle read as a diagonal dotted screen); the replica
+       follows the dome's per-time zenith cast (uSkyCast). */
+
 /* M19 SKY REPLICA: the dome's own scattering (atmosphere.js, the same uniforms shared by reference through sky.shareSky), evaluated along the
    view ray — aerial perspective pulls a distant cloud toward the sky behind it, so far bodies dissolve into the horizon haze instead of
    standing in front of it. Includes the dome's Henyey-Greenstein glare, halo and aureole (a cloud near the Sun fades into the glare, not into
    a darker sky). Below the horizon the airlight is the horizon haze (what the scene fog paints over the terrain), not the dome's graphite
    ground colour, which is never seen. Per fragment on HIGH / MED, per vertex on LOW. */
 var SKY_FN = [
-  'uniform vec3 uSkyZ, uSkyH, uSkyHz, uSkyT, uSkyL, uSkyS; uniform float uSkyMie, uSkyLavK, uSkyHazeK, uSkyOn;',
+  'uniform vec3 uSkyZ, uSkyH, uSkyHz, uSkyT, uSkyL, uSkyS; uniform float uSkyMie, uSkyLavK, uSkyHazeK, uSkyOn, uSkyCast;',
   'vec3 skyAt(vec3 d) {',
   '  float hp = max(d.y, 0.0), mu = dot(d, normalize(uSkyS)), mp = max(mu, 0.0), od = 1.0 / (hp * 4.0 + 0.22);',
   '  float t = clamp(0.62 * pow(1.0 - hp, 2.2) + 0.38 * (1.0 - exp(-od * 0.55)), 0.0, 1.0); vec3 c = mix(uSkyZ, uSkyH, t) * mix(0.9, 1.1, (0.5 + 0.5 * mu) * (0.35 + 0.65 * t));',
   '  c = mix(c, mix(uSkyHz, uSkyT, 0.55 * pow(mp, 4.0)), clamp((exp(-hp * 16.0) + 0.38 * exp(-hp * 3.6)) * uSkyHazeK, 0.0, 1.0));',
   '  c = mix(c, uSkyL, clamp(pow(max(-mu, 0.0), 1.4) * exp(-hp * 7.0) * uSkyLavK, 0.0, 1.0)) + uSkyT * pow(mp, 3.0) * exp(-hp * 3.0) * 0.16 * uSkyMie;',
   '  c += uSkyT * (0.0039312 / pow(1.6724 - 1.64 * mu, 1.5) * uSkyMie + pow(mp, 10.0) * 0.1 * max(uSkyMie, 0.25) + pow(mp, 56.0) * 0.28 * uSkyMie);',   /* the dome's HG glare (g 0.82) + soft halo + tight aureole */
-  '  return mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, d.y)); }'].join('\n');
+  '  return mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, d.y) * uSkyCast); }'].join('\n');   /* M20: the dome's zenith cast, scaled per time of day (atmosphere cast_k) */
 
 var VERT = [
   'attribute vec4 aPuff;',              /* x: height inside the cloud 0..1 · y: atlas shape (integer part 0..3) + seed (fraction) · z: alpha · w: kind (0.5 wind-streak card · 3 the body VOLUME) */
@@ -83,7 +100,16 @@ var VERT = [
      shaded once, from the entry face); with the viewer inside (a stratus deck met on the highland), every face is kept and the march starts at the eye */
   '    world = (modelMatrix * instanceMatrix * vec4(position, 1.0)).xyz; vec3 nW = mat3(modelMatrix * instanceMatrix) * normal, dc = cameraPosition - aCentre.xyz;',
   '    vec3 lc = vec3(dot(dc.xz, aBody.xy) / bX, (cameraPosition.y - aCloud.x) / bH * 2.0 - 1.0, dot(dc.xz, vec2(-aBody.y, aBody.x)) / bZ);',
+  '#if CLOUD_DEPTH',
   '    if (max(abs(lc.x), max(abs(lc.y), abs(lc.z))) > 1.0 && dot(nW, cameraPosition - (modelMatrix * instanceMatrix * vec4(normal * 0.5, 1.0)).xyz) < 0.0) fade = 0.0;',   /* decided at the FACE centre, so all four corners of a face agree (a face seen edge-on never splits into a sliver) */
+  '#else',
+  /* M20 PHONE-SAFE PATH (MED / LOW: no gl_FragDepth, so the early depth test stays on): the box is rasterised by its FAR faces, whose
+     depth is behind the whole body — terrain, a peak or the highland standing inside a box now HIDE the cloud there (the benign error:
+     a cloud never paints over a mountain it sits behind). A far face beyond the 1400 m far plane is pulled in along its own view ray,
+     which keeps its screen coverage exactly (only its depth changes) */
+  '    if (max(abs(lc.x), max(abs(lc.y), abs(lc.z))) > 1.0 && dot(nW, cameraPosition - (modelMatrix * instanceMatrix * vec4(normal * 0.5, 1.0)).xyz) > 0.0) fade = 0.0;',
+  '    { vec3 dv = world - cameraPosition; float L = length(dv); if (L > 1300.0) world = cameraPosition + dv * (1300.0 / L); }',
+  '#endif',
   '    vRel = vec3(0.0); vLs = vec2(0.0); vH = 0.5;',
   '  } else {',
   /* a WIND STREAK card (the only cards left): camera-facing, upright near the horizon, drawn on the box's front face only */
@@ -111,6 +137,7 @@ var VERT = [
 var FRAG = [
   'uniform sampler2D uMap, uField; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor; uniform float uDiffuse, uAuraK; uniform vec3 uAuraA, uAuraB, uAuraC;',
   'uniform vec2 uAerial; uniform float uErode, uSig, uFieldN, uAmb; uniform mat4 projectionMatrix;',   /* M19: aerial extinction (start m, e-folding m) · field erosion · extinction per metre · field texture size · the camera projection (for the fragment's own depth) */
+  'uniform float uBreak, uVeilDown;',   /* M20: the break-up from above · the residual thinning from above */
   SKY_FN,
   'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vFade;',
   'varying vec3 vView; varying vec3 vCtr; varying vec4 vBodyK; varying vec4 vSlab; varying float vKind;',
@@ -121,7 +148,7 @@ var FRAG = [
   'float cH(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
   'float cN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(cH(i), cH(i + vec2(1.0, 0.0)), f.x), mix(cH(i + vec2(0.0, 1.0)), cH(i + vec2(1.0, 1.0)), f.x), f.y); }',
   /* M19 the body FIELD at one point of the footprint (body frame, metres): x the local TOP height, y the BASE height, z the footprint weight */
-  'float gHx, gHz, gH, gForm, gThr, gBil, gEIn; vec2 gFsc, gOff;',
+  'float gHx, gHz, gH, gForm, gThr, gBil, gEIn, gUp; vec2 gFsc, gOff;',
   'vec3 slabField(vec2 q, float lod) {',
   '  vec4 f = textureLod(uField, q * gFsc + gOff, lod); vec2 e = q / vec2(gHx, gHz); float r = max(abs(e.x), abs(e.y)) * 0.35 + length(e) * 0.65 + f.a * 0.2, kl = max(r - gEIn, 0.0) * 2.2, E = max(1.0 - kl, 0.0);',   /* a wide, soft rounded-rectangle footprint: toward its edge the threshold rises, so cells shrink into scattered fragments (never an outline; nothing reaches the box walls) */
   '  float c = mix(f.r, f.g, gBil) + (f.b - 0.5) * uErode * 0.55 + (gForm > 0.5 && gForm < 1.5 ? 0.15 * cos(e.y * 6.0 + (f.a - 0.5) * 4.0) : 0.0);',   /* streets: parallel rolls along the axis, clear lanes between */
@@ -139,12 +166,13 @@ var FRAG = [
   '    vec3 dn = vec3(abs(dl.x) < 1e-4 ? 1e-4 : dl.x, abs(dl.y) < 1e-4 ? 1e-4 : dl.y, abs(dl.z) < 1e-4 ? 1e-4 : dl.z), ta = (vec3(-hx, 0.0, -hz) - ol) / dn, tb = (vec3(hx, H, hz) - ol) / dn, tn = min(ta, tb), tf = max(ta, tb);',
   '    float t0 = max(max(tn.x, tn.y), max(tn.z, 0.0)), t1 = min(min(tf.x, tf.y), tf.z); if (t1 <= t0) discard;',
   '    float fan = form < 0.5 ? 0.6 : (form < 1.5 ? 0.35 : (form < 2.5 ? 0.8 : 1.0)), thr = form < 0.5 ? 0.14 : (form < 1.5 ? 0.24 : (form < 2.5 ? 0.24 : 0.12)), bil = form < 0.5 ? 0.7 : (form < 1.5 ? 0.6 : (form < 2.5 ? 0.5 : 0.6)), eIn = form < 0.5 ? 0.55 : (form < 1.5 ? 0.5 : (form < 2.5 ? 0.62 : 0.72));',
-  '    float fs = min((form < 0.5 ? 0.71 : (form < 1.5 ? 0.62 : (form < 2.5 ? 0.5 : 0.7))) * (0.8 + 0.4 * sd) / hx, 0.0079); vec2 fsc = vec2(fs * fan, fs), off = vec2(sd * 7.31 + uTime * 0.0005, sd * 3.17); gHx = hx; gHz = hz; gH = H; gForm = form; gThr = thr; gBil = bil; gEIn = eIn; gFsc = fsc; gOff = off;',   /* cells scale with the body (a deck has 6–8 across its length, never under 18 m): big banks keep big, soft cells; the field never repeats inside a body */
+  '    gUp = max(smoothstep(0.06, 0.45, -rd.y), smoothstep(-15.0, 25.0, cameraPosition.y - vSlab.x - H) * smoothstep(0.0, 0.12, -rd.y));',   /* M20: looked down upon = a steep look, OR any downward look from at / above the body top (the HALO rim and the highland aerials meet the mid layer nearly level) */
+  '    float fs = min((form < 0.5 ? 0.71 : (form < 1.5 ? 0.62 : (form < 2.5 ? 0.5 : 0.7))) * (0.8 + 0.4 * sd) / hx, 0.0079); vec2 fsc = vec2(fs * fan, fs), off = vec2(sd * 7.31 + uTime * 0.0005, sd * 3.17); gHx = hx; gHz = hz; gH = H; gForm = form; gThr = mix(thr, 0.95, uBreak * gUp); gBil = bil; gEIn = eIn; gFsc = fsc; gOff = off;',   /* M20 BREAK FROM ABOVE: looked down upon (the HALO rim, the highland aerials) a body's cells shrink into broken fragments with the ground readable between them, instead of a uniform milky veil over the district */   /* cells scale with the body (a deck has 6–8 across its length, never under 18 m): big banks keep big, soft cells; the field never repeats inside a body */
   '    float pathL = t1 - t0, nE = floor(min(max(pathL * fs * (form > 2.5 ? 20.0 : 12.0), float(SLAB_MIN)), float(SLAB_STEPS))), ds = pathL / nE, lod = clamp(log2(max(ds * length(dl.xz) * (CLOUD_TAPS == 0 ? 0.08 : 0.8), (t0 + t1) * 0.0008) * fs * uFieldN), 0.0, 4.0);',   /* steps of about half a cell along the ray (a steep look through a thin deck takes 3–5, a grazing one up to the tier cap); the mip level follows the step's horizontal travel, so long grazing paths read a pre-filtered field instead of aliasing into spikes */
   '#if CLOUD_TAPS == 0',
   '    float jit = 0.5, kY = max(Lw.y, 0.3);',   /* LOW: one sample at the middle of the path, its height span integrated (the body as a thickness map) */
   '#else',
-  '    float jit = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))), kY = max(Lw.y, 0.3);',
+  '    float jit = 0.5 + (fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) - 0.5) * float(CLOUD_JIT), kY = max(Lw.y, 0.3);',   /* M20: the per-pixel start offset at a fifth of its old spread (CLOUD_JIT) — the interleaved-gradient pattern read as a diagonal dotted screen over every thin deck met at a grazing angle; measured A/B: no step banding appears without it */
   '#endif',
   '    vec2 kx = normalize(vec2(dot(Lw.xz, ax), dot(Lw.xz, px)) + 1e-4); float kH = max(length(Lw.xz), 0.3); float T = 1.0, tAcc = 0.0, lAcc = 0.0, tS = -1.0; vec3 C = vec3(0.0), ps = vec3(0.0);',
   '    for (int i = 0; i < SLAB_STEPS; i++) { if (float(i) >= nE) break;',
@@ -165,7 +193,7 @@ var FRAG = [
   '#endif',
   '    vec3 pm = ol + dl * dist; hN = clamp(pm.y / H, 0.0, 1.0); thin = 1.0 - smoothstep(0.12, 0.85, a); fw = max(dot(rd, Lw), 0.0);',
   '    vec3 wr = vec3(ax.x * pm.x + px.x * pm.z, pm.y - H * 0.45, ax.y * pm.x + px.y * pm.z) / max(hx, 1.0); sunK = clamp(0.5 + 0.5 * dot(normalize(wr + vec3(0.0, 0.2, 0.0)), Lw), 0.0, 1.0); sunK = sunK * sunK * (3.0 - 2.0 * sunK);',
-  '    a *= uOpacity * 0.94 * vFade * (1.0 - 0.68 * smoothstep(0.08, 0.5, -rd.y)); bodyCol = mix(uShade, uTop, clamp(0.42 + 0.3 * sunK + 0.18 * hN, 0.0, 1.0)); an = CLOUD_TAPS == 0 ? sd : cN((cameraPosition.xz + rd.xz * dist) * 0.011 + sd * 9.0);',   /* never an opaque core · looked DOWN upon (the HALO rim, the highland) a body thins to a veil of mist, so the districts below stay readable through it */
+  '    a *= uOpacity * 0.94 * vFade * (1.0 - uVeilDown * gUp); bodyCol = mix(uShade, uTop, clamp(0.42 + 0.3 * sunK + 0.18 * hN, 0.0, 1.0)); an = CLOUD_TAPS == 0 ? sd : cN((cameraPosition.xz + rd.xz * dist) * 0.011 + sd * 9.0);',   /* never an opaque core · looked DOWN upon (the HALO rim, the highland) a body thins to a veil of mist, so the districts below stay readable through it */
   '  } else {',
   /* a WIND STREAK card: the M8D atlas cloudlet with its own thickness self-shadow (tiered taps) */
   '    vec2 u = vUv; float dens = cellTex(u).a;',
@@ -209,7 +237,10 @@ var FRAG = [
   '  col = mix(col, bodyCol, clamp(ext * 1.2, 0.0, 0.75));',
   '  col = mix(col, sc, clamp(ext * 0.9 + horK * (0.3 + 0.45 * (1.0 - hN)) * (1.0 - ext), 0.0, 0.94));',
   '  a *= (1.0 - horK * (0.22 + 0.38 * (1.0 - hN)) * uDiffuse) * (1.0 - ext * 0.4);',   /* the far base dissolves into the haze first */
-  '  gl_FragColor = vec4(col, a); gl_FragDepth = zf;',   /* (writing the depth turns off the early depth test for the cloud draws: accepted, one shaded fragment per covered pixel per body) */
+  '  gl_FragColor = vec4(col, a);',
+  '#if CLOUD_DEPTH',
+  '  gl_FragDepth = zf;',   /* (writing the depth turns off the early depth test for the cloud draws: accepted on HIGH, one shaded fragment per covered pixel per body; M20: MED / LOW take the far-face path instead, see VERT) */
+  '#endif',
   '  #include <colorspace_fragment>',
   '}'].join('\n');
 
@@ -367,12 +398,13 @@ export function createCloudBodies(ctx, L, opts) {
   var aCentre = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aCentre.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCentre', aCentre);
   var aBody = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aBody.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aBody', aBody);   /* M19: the body's long axis + envelope */
   var taps = opts.taps === undefined ? 2 : opts.taps, tex = puffAtlas(THREE, opts.cell || 256), fieldN = (opts.cell || 256) >= 256 ? 256 : 128, field = fieldTexture(THREE, fieldN);
-  var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, depthTest: true, fog: false, side: THREE.DoubleSide, toneMapped: true, defines: { CLOUD_TAPS: taps, SLAB_STEPS: taps === 0 ? 1 : (taps === 1 ? 10 : 20), SLAB_MIN: taps === 0 ? 1 : (taps === 1 ? 4 : 5) },   /* M19: march steps per tier (HIGH 5–20 · MED 4–10 · LOW 1); the shader takes about two per field cell along the ray */
+  var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, depthTest: true, fog: false, side: THREE.DoubleSide, toneMapped: true, defines: { CLOUD_TAPS: taps, SLAB_STEPS: taps === 0 ? 1 : (taps === 1 ? 10 : 20), SLAB_MIN: taps === 0 ? 1 : (taps === 1 ? 4 : 5), CLOUD_JIT: 0.2, CLOUD_DEPTH: opts.fragDepth === undefined ? (taps > 1 ? 1 : 0) : (opts.fragDepth ? 1 : 0) },   /* M19: march steps per tier (HIGH 5–20 · MED 4–10 · LOW 1); the shader takes about two per field cell along the ray · M20: gl_FragDepth on HIGH only (MED / LOW: the far-face path) */
     uniforms: { uMap: { value: tex }, uTop: { value: new THREE.Color() }, uShade: { value: new THREE.Color() }, uRim: { value: new THREE.Color() }, uHaze: { value: new THREE.Color() }, uLightWorld: { value: new THREE.Vector3(0, 1, 0) }, uOpacity: { value: 1 }, uRimK: { value: 0.6 },
       uHazeNear: { value: 260 }, uHazeFar: { value: 1250 }, uHazeMax: { value: 0.7 }, uHor: { value: new THREE.Vector2(0.0, 0.16) }, uBaseDark: { value: 0.18 }, uShadowK: { value: 0.55 }, uTime: { value: 0 },
       uOblong: { value: 1 }, uDiffuse: { value: 1 }, uAuraK: { value: 0.2 }, uAuraA: { value: new THREE.Color(0xffe9b3) }, uAuraB: { value: new THREE.Color(0xb4c4ee) }, uAuraC: { value: new THREE.Color(0xf2b3dc) },
       uAerial: { value: new THREE.Vector2(160, 1100) }, uErode: { value: 0.9 }, uField: { value: field }, uFieldN: { value: fieldN }, uSig: { value: 0.06 }, uAmb: { value: 0.3 },   /* M19 */
-      uSkyZ: { value: new THREE.Color() }, uSkyH: { value: new THREE.Color() }, uSkyHz: { value: new THREE.Color() }, uSkyT: { value: new THREE.Color() }, uSkyL: { value: new THREE.Color() }, uSkyS: { value: new THREE.Vector3(0, 1, 0) }, uSkyMie: { value: 0 }, uSkyLavK: { value: 0 }, uSkyHazeK: { value: 0 }, uSkyOn: { value: 0 } } });   /* M19: replaced by the dome's own uniform objects (shareSky) */
+      uSkyZ: { value: new THREE.Color() }, uSkyH: { value: new THREE.Color() }, uSkyHz: { value: new THREE.Color() }, uSkyT: { value: new THREE.Color() }, uSkyL: { value: new THREE.Color() }, uSkyS: { value: new THREE.Vector3(0, 1, 0) }, uSkyMie: { value: 0 }, uSkyLavK: { value: 0 }, uSkyHazeK: { value: 0 }, uSkyOn: { value: 0 }, uSkyCast: { value: 1 },   /* M19: replaced by the dome's own uniform objects (shareSky) */
+      uBreak: { value: 0.75 }, uVeilDown: { value: 0.55 } } });   /* M20 */
   own.push(mat);
   var mesh = new THREE.InstancedMesh(geo, mat, puffs.length); mesh.name = 'SKY_' + L.id; mesh.frustumCulled = false; mesh.userData.noMerge = true; mesh.renderOrder = opts.renderOrder || 4; mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.userData.cloudSilhouette = { kind: tower ? 'LIT_TOWER_CLUSTER' : 'LIT_PUFF_CLUSTER', rectangular: false, feathered: true, clouds: clouds.length, puffs: puffs.length, tier_scale: tierScale, shapes: 'ATLAS_4_NOISE_ERODED', self_shadow_taps: taps, style: style, body: 'HEIGHTFIELD_VOLUME', card: 'BOX_PROXY + STREAK_CARDS', forms: clouds.map(function (c) { return c.form || 'TOWER'; }).join(',') };
@@ -383,18 +415,19 @@ export function createCloudBodies(ctx, L, opts) {
     for (var j = 0; j < order.length; j++) { var Q = puffs[order[j]]; _p.set(Q.wx, Q.wy, Q.wz); if (Q.slab) { _qp.setFromAxisAngle(_up, -Q.cloud.yaw); _s.set(Q.cloud.hx * 2, Q.cloud.extent, Q.cloud.hz * 2); _m.compose(_p, _qp, _s); } else { _s.set(Q.w, Q.h, 1); _m.compose(_p, _q, _s); } mesh.setMatrixAt(j, _m); aPuff.setXYZW(j, Q.height, Q.v + Q.seed * 0.998, Q.slab ? 1 : 0.5, Q.flat); aCloud.setXYZ(j, Q.cloud.y, Q.cloud.extent, Q.cloud.formI + Q.cloud.seed * 0.998); aCentre.setXYZW(j, Q.cloud.x, Q.cloud.y + Q.cloud.extent * 0.45, Q.cloud.z, Q.cloud.rad); aBody.setXYZW(j, Math.cos(Q.cloud.yaw), Math.sin(Q.cloud.yaw), Q.cloud.hx, Q.cloud.hz); }
     mesh.instanceMatrix.needsUpdate = true; aPuff.needsUpdate = true; aCloud.needsUpdate = true; aCentre.needsUpdate = true; aBody.needsUpdate = true; }
   write(null);
-  function setLook(look) { var U = mat.uniforms; U.uTop.value.set(look.top); U.uShade.value.set(look.shade); U.uRim.value.set(look.rim); U.uHaze.value.set(look.haze); U.uOpacity.value = look.opacity; U.uRimK.value = look.rimK;
+  function setLook(look) { var U = mat.uniforms, gain = look.gain !== undefined ? +look.gain : 1; U.uTop.value.set(look.top).multiplyScalar(gain); U.uShade.value.set(look.shade); U.uRim.value.set(look.rim).multiplyScalar(gain);   /* M20: gain lifts the lit crowns / rims above 1 before the filmic curve — under a silver sky a lit cloud top must still out-shine the (untonemapped) dome behind it, or the masses read as grey smoke */ U.uHaze.value.set(look.haze); U.uOpacity.value = look.opacity; U.uRimK.value = look.rimK;
     U.uHazeNear.value = look.hazeNear !== undefined ? look.hazeNear : 260; U.uHazeFar.value = look.hazeFar !== undefined ? look.hazeFar : 1250; U.uHazeMax.value = look.hazeMax !== undefined ? look.hazeMax : 0.7;
     U.uHor.value.set(look.hor ? look.hor[0] : 0.0, look.hor ? look.hor[1] : 0.16); U.uBaseDark.value = look.baseDark !== undefined ? look.baseDark : 0.18; U.uShadowK.value = look.shadowK !== undefined ? look.shadowK : 0.55;
     U.uOblong.value = look.oblong !== undefined ? look.oblong : 1; U.uDiffuse.value = look.diffuse !== undefined ? look.diffuse : 1; U.uAuraK.value = look.auraK !== undefined ? look.auraK : 0.2;   /* M14 */
     if (look.auraA) U.uAuraA.value.set(look.auraA); if (look.auraB) U.uAuraB.value.set(look.auraB); if (look.auraC) U.uAuraC.value.set(look.auraC);
-    if (look.aerial) U.uAerial.value.set(look.aerial[0], look.aerial[1]); U.uErode.value = look.erode !== undefined ? look.erode : 0.9; U.uSig.value = look.sig !== undefined ? look.sig : 0.06; U.uAmb.value = look.amb !== undefined ? look.amb : 0.3; }   /* M19 */
+    if (look.aerial) U.uAerial.value.set(look.aerial[0], look.aerial[1]); U.uErode.value = look.erode !== undefined ? look.erode : 0.9; U.uSig.value = look.sig !== undefined ? look.sig : 0.06; U.uAmb.value = look.amb !== undefined ? look.amb : 0.3;   /* M19 */
+    U.uBreak.value = look.brk !== undefined ? look.brk : 0.75; U.uVeilDown.value = look.veilDown !== undefined ? look.veilDown : 0.55; }   /* M20 */
   /* M19: share the sky dome's scattering uniforms BY REFERENCE (atmosphere.js calls sky.shareSky once its shader exists), so day / night
      switches and the LOW tier's Mie-off reach the clouds' aerial perspective with no copy; null falls back to the flat haze colour.
      This swaps uniform OBJECTS inside mat.uniforms after the program may have compiled: it works because three.js resolves each uniform
      by name in material.uniforms on every upload (no cached reference to the old object). It relies on the build order sky → atmosphere
      (worldB.js); a module built later that calls shareSky again simply re-points the same entries. */
-  function shareSky(D) { var U = mat.uniforms; if (!D) { U.uSkyOn = { value: 0 }; return; } U.uSkyZ = D.uZenith; U.uSkyH = D.uHorizon; U.uSkyHz = D.uHaze; U.uSkyT = D.uSunTint; U.uSkyL = D.uLav; U.uSkyS = D.uSun; U.uSkyMie = D.uMie; U.uSkyLavK = D.uLavK; U.uSkyHazeK = D.uHazeK; U.uSkyOn = { value: 1 }; }
+  function shareSky(D) { var U = mat.uniforms; if (!D) { U.uSkyOn = { value: 0 }; return; } U.uSkyZ = D.uZenith; U.uSkyH = D.uHorizon; U.uSkyHz = D.uHaze; U.uSkyT = D.uSunTint; U.uSkyL = D.uLav; U.uSkyS = D.uSun; U.uSkyMie = D.uMie; U.uSkyLavK = D.uLavK; U.uSkyHazeK = D.uHazeK; if (D.uCastK) U.uSkyCast = D.uCastK; U.uSkyOn = { value: 1 }; }
   /* camPos: {x,y,z} (ctx.cameraPos()) for the back-to-front sort · lightDir: the world direction of the active key (Sun by day, Moon by night) */
   function tick(dt, t, camPos, lightDir) { mat.uniforms.uTime.value = t || 0; if (lightDir) mat.uniforms.uLightWorld.value.set(lightDir[0], lightDir[1], lightDir[2]).normalize();
     sortClock += dt || 0; var sortNow = sortClock > 0.25 && camPos; write(sortNow ? camPos : null); if (sortNow) sortClock = 0; }
