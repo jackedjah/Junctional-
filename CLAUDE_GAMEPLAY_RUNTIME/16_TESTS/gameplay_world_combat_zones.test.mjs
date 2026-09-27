@@ -7,9 +7,9 @@
    ONE court is placed until the owner verifies the footprint and the dormant look.  node 16_TESTS/gameplay_world_combat_zones.test.mjs */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
-import { createCombatZones, combatZoneList, combatZoneCircles, duelPhase, insideZone, CLASS_FAMILY, TIMING, SIZING, PALETTE, PHASES, CLASS_PHASES, MAX_FIGHTERS, territorySlots, assignSlots, splitAngle, FIVE_DIAMOND, IDENTITY_ORDER } from '../26_LOCAL_AUTHORITY/lab/world/combatZones.js';
+import { createCombatZones, combatZoneList, combatZoneCircles, duelPhase, insideZone, zoneLocal, CLASS_FAMILY, TIMING, SIZING, PALETTE, PHASES, CLASS_PHASES, MAX_FIGHTERS, territorySlots, assignSlots, splitAngle, FIVE_DIAMOND, IDENTITY_ORDER } from '../26_LOCAL_AUTHORITY/lab/world/combatZones.js';
 import { arrangeTerritories, bestColourScore } from '../26_LOCAL_AUTHORITY/lab/world/duelRoster.js';
-import { groundYAt } from '../26_LOCAL_AUTHORITY/lab/world/worldLayout.js';
+import { groundYAt, fixtureLayout } from '../26_LOCAL_AUTHORITY/lab/world/worldLayout.js';
 import { classify } from '../26_LOCAL_AUTHORITY/deploy/world_preview/colour_law_audit.mjs';
 var HERE = path.dirname(fileURLToPath(import.meta.url)), LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
@@ -33,8 +33,8 @@ ok('1. size from the rules: ' + PLm + ' m playable (owner target 18–24 m) — 
 /* 2. placement (M17 modest set, owner 2026-09-27: "place a modest set throughout underused open-world spaces" after the canonical court):
       2..5 courts, each clear of every collider (field base + district + world; the HALO deck at 240 m and walkable tops excepted) by ≥ 4 m
       beyond its circumradius (approach and exit space), off every path ribbon / spur and forecourt, off water, flat at its registered
-      height, clear of the official match court; spread out — no two within 90 m, and a pair closer than 120 m screened by a building at
-      eye height (no direct sightline) */
+      height, clear of the official match court, with no lamp or fixture inside it (+ 2 m); spread out — no two within 90 m, and no
+      court in open sight of more than one other (a pair closer than 120 m with no building between at eye height) */
 var L = RULES._runtime_mapping.field_colliders_district_v1;
 var shapes = [].concat(L.shapes || [], J('play/rules1723/world_v1_colliders.json').shapes, J('play/rules1723/district_v1_colliders.json').shapes).filter(function (s) { return !/^WALL_/.test(s.id || '') && !((s.y0 || 0) >= 2) && !/(_TOP|_RAMP(_[NSEW])?|_BED|_SHORE(_[NSEW])?)$/.test(s.id || ''); });
 function dShape(x, z, s) { if (s.type === 'CYLINDER') return Math.hypot(x - s.x, z - s.z) - (s.r || 0.5); if (s.x1 !== undefined) { var dx = Math.max(s.x1 - x, 0, x - s.x2), dz = Math.max(s.z1 - z, 0, z - s.z2); return (dx || dz) ? Math.hypot(dx, dz) : -1; } return 1e9; }
@@ -47,10 +47,11 @@ var place = Z.map(function (z) { var R = z.size_m * 0.7072, clear = Math.min.app
   return { id: z.id, x: z.x, z: z.z, clear: +clear.toFixed(2), pathGap: +pathGap.toFixed(2), fcGap: +fcGap.toFixed(2), water: water, flat: flat, yOk: Math.abs(y0 - (z.y || 0)) < 0.02, court: Math.hypot(z.x - 128, z.z - 50) - R - 30 }; });
 var eyeBlockers = [].concat(J('play/rules1723/world_v1_colliders.json').shapes, J('play/rules1723/district_v1_colliders.json').shapes, L.shapes || []).filter(function (s) { return (s.x1 !== undefined || s.type === 'CYLINDER') && s.type !== 'RAMP' && !s.walkable && (s.y0 || 0) <= 1.7 && (s.h || 0) >= 1.7 && /^BLD_|_HALL|_DOME|_SPIRE|_TOWER|_GYM|_TEMPLE|_MARKET/.test(s.id || ''); });
 function screened(a, b) { for (var q = 0; q < eyeBlockers.length; q++) { var S = eyeBlockers[q]; for (var t = 0.02; t < 0.98; t += 0.004) { var x = a.x + (b.x - a.x) * t, z = a.z + (b.z - a.z) * t; if (S.type === 'CYLINDER' ? Math.hypot(x - S.x, z - S.z) <= S.r : (x >= S.x1 && x <= S.x2 && z >= S.z1 && z <= S.z2)) return S.id; } } return null; }
+var FIXT = fixtureLayout(REG), fixIn = Z.map(function (z) { return FIXT.filter(function (f) { var p = zoneLocal(z, f.x, f.z); return Math.max(Math.abs(p[0]), Math.abs(p[1])) <= z.size_m / 2 + 2; }).length; });
 var pairs = []; for (var pa = 0; pa < Z.length; pa++) for (var pb = pa + 1; pb < Z.length; pb++) { var dd = Math.hypot(Z[pa].x - Z[pb].x, Z[pa].z - Z[pb].z); pairs.push({ a: Z[pa].id, b: Z[pb].id, d: +dd.toFixed(1), screen: screened(Z[pa], Z[pb]) }); }
-ok('2. placement: a modest set of ' + Z.length + ' courts (' + Z.map(function (z) { return z.id; }).join(', ') + ') — each clear of every collider by ≥ 4 m beyond its circumradius, off every path / spur and forecourt, off water, flat at its registered height, clear of the match court; pairs ' + pairs.map(function (p) { return p.a.replace('CZ_', '') + '–' + p.b.replace('CZ_', '') + ' ' + p.d + ' m' + (p.screen ? ' (screened by ' + p.screen + ')' : ''); }).join(', '),
+ok('2. placement: a modest set of ' + Z.length + ' courts (' + Z.map(function (z) { return z.id; }).join(', ') + ') — each clear of every collider by ≥ 4 m beyond its circumradius, no lamp / fixture inside (+ 2 m), off every path / spur and forecourt, off water, flat at its registered height, clear of the match court; pairs ' + pairs.map(function (p) { return p.a.replace('CZ_', '') + '–' + p.b.replace('CZ_', '') + ' ' + p.d + ' m' + (p.screen ? ' (screened by ' + p.screen + ')' : ''); }).join(', '),
   Z.length >= 2 && Z.length <= 5 && Z.some(function (z) { return z.id === 'CZ_ELEVATOR_GROVE'; }) && CZ.placement && /modest/.test(CZ.placement.rule) && place.every(function (p) { return p.clear >= 4 && p.pathGap >= 1 && p.fcGap >= 1 && !p.water && p.flat && p.yOk && p.court > 0; }) &&
-  pairs.every(function (p) { return p.d >= 90 && (p.d >= 120 || p.screen); }), { place: place, pairs: pairs });
+  fixIn.every(function (n) { return n === 0; }) && pairs.every(function (p) { return p.d >= 90; }) && Z.every(function (z) { return pairs.filter(function (p) { return (p.a === z.id || p.b === z.id) && p.d < 120 && !p.screen; }).length <= 1; }), { place: place, pairs: pairs, fixIn: fixIn });
 
 /* 3. the phase machine: the six states, and live (class colour) is exactly 0 in DORMANT, READY and RESET */
 var T0 = 10, P = { dorm: duelPhase(5, {}), ready: duelPhase(5, { occupied: true }), act0: duelPhase(T0 + 0.5, { tStart: T0 }), act1: duelPhase(T0 + (TIMING.split_hold_s + TIMING.activation_s) / 2, { tStart: T0 }), duel: duelPhase(T0 + TIMING.activation_s + 0.1, { tStart: T0 }),

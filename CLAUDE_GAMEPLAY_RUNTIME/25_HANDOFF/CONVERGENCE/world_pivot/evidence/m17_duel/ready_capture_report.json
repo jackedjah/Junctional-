@@ -1,0 +1,140 @@
+{
+ "started": "2026-09-27T05:04:19.607Z",
+ "size": [
+  960,
+  540
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "CK",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "CK_DAY_t40.jpg",
+   "pos": [
+    68,
+    22,
+    84
+   ],
+   "look": [
+    45,
+    0,
+    111
+   ],
+   "stats": {
+    "calls": 163,
+    "triangles": 1836160,
+    "geometries": 261,
+    "textures": 53,
+    "programs": 166
+   },
+   "frames_in_600ms": 0,
+   "ms": 31896
+  },
+  {
+   "id": "CK",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "CK_NIGHT_t40.jpg",
+   "pos": [
+    68,
+    22,
+    84
+   ],
+   "look": [
+    45,
+    0,
+    111
+   ],
+   "stats": {
+    "calls": 167,
+    "triangles": 1849440,
+    "geometries": 266,
+    "textures": 58,
+    "programs": 166
+   },
+   "frames_in_600ms": 0,
+   "ms": 17211
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 10,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (910 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (90 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (13 ms)",
+   "combatZones: 3 courts (CZ_ELEVATOR_GROVE 24 m, CZ_PLAZA_SOUTH 24 m, CZ_WEST_LAWN 24 m) in 1 draw; roster authority LOCAL",
+   "worldB combatZones ready (2 ms)",
+   "aura: 65 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
+   "worldB aura ready (3 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 10977.1,
+  "error": null
+ },
+ "finished": "2026-09-27T05:06:00.120Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 23,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (910 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (90 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (13 ms)",
+   "combatZones: 3 courts (CZ_ELEVATOR_GROVE 24 m, CZ_PLAZA_SOUTH 24 m, CZ_WEST_LAWN 24 m) in 1 draw; roster authority LOCAL",
+   "worldB combatZones ready (2 ms)",
+   "aura: 65 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
+   "worldB aura ready (3 ms)"
+  ]
+ }
+}
