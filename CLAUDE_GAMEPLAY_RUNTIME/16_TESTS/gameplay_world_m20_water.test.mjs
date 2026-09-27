@@ -68,4 +68,23 @@ var acc = /float ya = sqrt\(max\(y, 0\.0\) \+ 0\.015\) \* 2\.0;/.test(VF) && /vf
 function dya(y) { return 1 / Math.sqrt(y + 0.015); } var stretch = dya(0.05) / dya(0.95);
 ok('7. free fall: the curtain streak field accelerates (feature length ratio base / lip ' + stretch.toFixed(2) + ')', acc && stretch > 2.5 && stretch < 5, { acc: acc, stretch: stretch });
 
+/* 8. THE FILM (owner: "waterfall-to-water transition"): below the curtain's 3.6 m foot the water continues down the rock to the sea as a film
+      made of the ridge's own triangles, 3 cm proud. Built for real (macro ridge + Veil) on HIGH / MED: every film triangle's centre and
+      corners below 3.4 m sit within 5 cm of the ridge along that triangle's normal (the host's ≤ 5 cm rule); the curtain itself still stops
+      at 3.6 m; LOW has no film (no draw added there). */
+globalThis.document = globalThis.document || { createElement: function () { return { width: 0, height: 0, getContext: function () { return { createRadialGradient: function () { return { addColorStop: function () { } }; }, fillRect: function () { }, fillStyle: '' }; } }; } };
+var { createMacro } = await import('../26_LOCAL_AUTHORITY/lab/world/macro.js'); var { createVeilFalls } = await import('../26_LOCAL_AUTHORITY/lab/world/veilFalls.js');
+var REGW = JSON.parse(fs.readFileSync(path.join(LA, 'lab/assets/world/world_registry_v1.json'), 'utf8')), res8 = {}, warn8 = console.warn; console.warn = function () { };
+for (var T8 of ['HIGH', 'MED', 'LOW']) { var g8 = new THREE.Group(), c8 = { THREE: THREE, registry: REGW, group: g8, quality: { tier: function () { return T8; } }, auraRequests: [], auraForms: [], log: function () { }, mods: {} };
+  var mc8 = createMacro(c8); await mc8.build(); var vf8 = createVeilFalls(c8); vf8.build(); g8.updateMatrixWorld(true);
+  var film8 = g8.getObjectByName('VEIL_FALLS_FILM'), cur8 = g8.getObjectByName('VEIL_FALLS_CURTAIN'), rn8 = g8.getObjectByName('MACRO_RIDGE_RIDGE_NEAR'), r8 = { film: !!film8, tris: 0, worst: 0, over: 0, curtainMinY: 1e9 };
+  var cp8 = cur8.geometry.attributes.position; for (var q8 = 0; q8 < cp8.count; q8++) r8.curtainMinY = Math.min(r8.curtainMinY, cp8.getY(q8));
+  if (film8) { rn8.material.side = THREE.DoubleSide; var fp8 = film8.geometry.attributes.position, rc8 = new THREE.Raycaster(), A8 = new THREE.Vector3(), B8 = new THREE.Vector3(), C8 = new THREE.Vector3(), n8 = new THREE.Vector3(), e8 = new THREE.Vector3(), f8 = new THREE.Vector3();
+    for (var t8 = 0; t8 < fp8.count; t8 += 3) { A8.fromBufferAttribute(fp8, t8); B8.fromBufferAttribute(fp8, t8 + 1); C8.fromBufferAttribute(fp8, t8 + 2); r8.tris++; n8.crossVectors(e8.subVectors(B8, A8), f8.subVectors(C8, A8)).normalize();
+      var M8 = A8.clone().add(B8).add(C8).multiplyScalar(1 / 3); [M8, M8.clone().lerp(A8, 0.8), M8.clone().lerp(B8, 0.8), M8.clone().lerp(C8, 0.8)].forEach(function (P8) {   /* the centre and 80 % toward each corner (a ray aimed exactly at a rock vertex can slip between its triangles) */ if (P8.y >= 3.4) return; var best = 1e9; [n8.clone(), n8.clone().negate()].forEach(function (d8) { rc8.set(P8.clone().addScaledVector(d8, -0.001), d8); rc8.far = 0.5; var h8 = rc8.intersectObject(rn8, false)[0]; if (h8) best = Math.min(best, h8.distance); }); r8.worst = Math.max(r8.worst, best); if (best > 0.05) r8.over++; }); } }
+  res8[T8] = r8; vf8.dispose(); }
+console.warn = warn8;
+ok('8. the fall reaches the sea as a flush film on the rock: HIGH ' + res8.HIGH.tris + ' / MED ' + res8.MED.tris + ' triangles, worst ' + (res8.HIGH.worst * 100).toFixed(1) + ' / ' + (res8.MED.worst * 100).toFixed(1) + ' cm off the ridge below 3.4 m; the curtain still stops at ' + res8.HIGH.curtainMinY.toFixed(1) + ' m; LOW has none',
+  res8.HIGH.film && res8.MED.film && !res8.LOW.film && res8.HIGH.tris > 40 && res8.HIGH.over === 0 && res8.MED.over === 0 && res8.HIGH.worst <= 0.05 && res8.MED.worst <= 0.05 && res8.HIGH.curtainMinY >= 3.4 && /film\.name = 'VEIL_FALLS_FILM'/.test(VF), res8);
+
 console.log('RESULT world m20 water: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
