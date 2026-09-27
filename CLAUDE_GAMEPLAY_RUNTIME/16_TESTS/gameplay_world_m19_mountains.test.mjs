@@ -16,7 +16,7 @@ var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; co
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
 var R = JSON.parse(src('lab/assets/world/world_registry_v1.json')), MAC = src('lab/world/macro.js'), FARW = src('lab/farWorld.js');
 function mn(x, z) { return Math.max(Math.abs(x), Math.abs(z)); }
-globalThis.document = globalThis.document || { createElement: function () { return { width: 0, height: 0, getContext: function () { return { createRadialGradient: function () { return { addColorStop: function () { } }; }, fillRect: function () { }, fillStyle: '' }; } }; } };
+globalThis.document = globalThis.document || { createElement: function () { return { width: 0, height: 0, getContext: function () { return { createRadialGradient: function () { return { addColorStop: function () { } }; }, fillRect: function () { }, clearRect: function () { }, fillStyle: '' }; } }; } };
 
 /* 1. strip mode on the authored ribbon (the host-safety test's four triangles per station span, tagged with their row edges): every warp
       call that starts inside REACH_IN returns the point unchanged, nothing moved lands inside REACH_FLOOR, triangles wholly inside REACH_IN come
@@ -41,9 +41,10 @@ ok('1. strip-mode sculpt: nothing inside ' + REACH_IN + ' m moves, nothing lands
 
 /* 2. the REAL build (macro.js in Node, every tier): watertight the same way, and the tier budgets — LOW ridges no heavier than M18 (2 712
       tris), MED within 15 % of M18 (21 456), the far massif ring cheaper on LOW than M18 (24 408) and unchanged on MED / HIGH.
-      M20 (owner 2026-09-27, distant world: "fewer crude shapes"): the six world-scale spires (a 6-sided cone under an octahedron) are rock horns
-      built like the massif peaks, so the far ring grows on MED (44 280 → 45 600, +3 %) and HIGH (85 128 → 87 780, +3 %) and gets CHEAPER on
-      LOW (16 680 → 16 668: 6 × 2 horns) — pinned exactly again, LOW against its M19 count. */
+      M20 (owner 2026-09-27, distant world: "fewer crude shapes … the final world can have FEWER elements"): the six world-scale spires (a
+      6-sided cone under an octahedron, 20 tris each) are removed — the review read their first replacement (rock horns) as grey stumps — so
+      the far ring is the M19 ring minus 120 tris on every tier (HIGH 85 128 → 85 008, MED 44 280 → 44 160, LOW 16 680 → 16 560): pinned
+      exactly, the massifs themselves unchanged. */
 var { createMacro } = await import('../26_LOCAL_AUTHORITY/lab/world/macro.js'); var { createFarWorld } = await import('../26_LOCAL_AUTHORITY/lab/farWorld.js');
 var s2 = {}, watertight = true;
 ['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(); var M = createMacro({ THREE: THREE, group: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); M.build(); var ridge = 0;
@@ -56,7 +57,7 @@ var s2 = {}, watertight = true;
       if (!fine) watertight = false; }); });
   var fw = createFarWorld(THREE, { tier: T }), far = 0; fw.traverse(function (o) { if (o.name === 'FAR_MASSIFS') far = o.geometry.attributes.position.count / 3; });
   s2[T] = { ridge: ridge, far: far, draws: fw.userData.info.draw_calls, macro_draws: M.debug().draw_calls }; });
-ok('2. real ridges watertight on every tier; LOW ridges ' + s2.LOW.ridge + ' ≤ 2712 and far ring ' + s2.LOW.far + ' < 24408; MED ridges ' + s2.MED.ridge + ' ≤ 24674; far ring MED / HIGH unchanged; draw calls unchanged', watertight && s2.LOW.ridge <= 2712 && s2.LOW.far < 24408 && s2.MED.ridge <= 24674 && s2.LOW.far <= 16680 && s2.MED.far === 45600 && s2.HIGH.far === 87780 && s2.HIGH.draws === 3 && s2.HIGH.macro_draws === 15 && s2.MED.macro_draws === 15 && s2.LOW.macro_draws === 9, s2);   /* M18 macro draws: 2 ridges + 2 falls × 3 + 6 mist (not LOW) + 1 beam set */
+ok('2. real ridges watertight on every tier; LOW ridges ' + s2.LOW.ridge + ' ≤ 2712 and far ring ' + s2.LOW.far + ' < 24408; MED ridges ' + s2.MED.ridge + ' ≤ 24674; far ring = the M19 massifs without the six spires on every tier (' + [s2.HIGH.far, s2.MED.far, s2.LOW.far].join(' / ') + '); draw calls unchanged', watertight && s2.LOW.ridge <= 2712 && s2.LOW.far < 24408 && s2.MED.ridge <= 24674 && s2.LOW.far === 16560 && s2.MED.far === 44160 && s2.HIGH.far === 85008 && s2.HIGH.draws === 3 && s2.HIGH.macro_draws === 15 && s2.MED.macro_draws === 15 && s2.LOW.macro_draws === 9, s2);   /* M18 macro draws: 2 ridges + 2 falls × 3 + 6 mist (not LOW) + 1 beam set */
 
 /* 3. the geology options are OPT-IN: the Veil mesa cliffs ({ strata: 2.2 }) and the coast islands compile no M19 token; the ridge spec that
       macro.js passes carries every one of them (dip + faults, lithology, couloir streaks, alpine snow, scree, varnish, height-thinned haze, the moonlit-snow uniform the time switch drives). */
@@ -126,5 +127,31 @@ var s8 = {};
     for (var q = 0; q < p.length; q += 9) { var ax = p[q + 3] - p[q], ay = p[q + 4] - p[q + 1], az = p[q + 5] - p[q + 2], bx = p[q + 6] - p[q], by = p[q + 7] - p[q + 1], bz = p[q + 8] - p[q + 2], nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx; n++; if (ny > 0) up++; if (nx * N[q] + ny * N[q + 1] + nz * N[q + 2] <= 0) dis++; } });
   s8[T] = { tris: n, up: +(up / Math.max(1, n)).toFixed(3), normal_disagree: dis }; });
 ok('8. the ridge ribbon faces out of the rock on every tier (share facing up: ' + ['HIGH', 'MED', 'LOW'].map(function (T) { return T + ' ' + s8[T].up; }).join(', ') + '; lit normal against winding: ' + ['HIGH', 'MED', 'LOW'].map(function (T) { return s8[T].normal_disagree; }).join(' / ') + ')', ['HIGH', 'MED', 'LOW'].every(function (T) { return s8[T].tris > 1000 && s8[T].up >= 0.95 && s8[T].normal_disagree === 0; }), s8);
+
+/* 9. M20 review fix — HOST SAFETY (hard rule 4) on the reachable islets: they share the island tree mesh (ISLAND_TREES), whose first M20 canopy
+      clump hung a side mass to local y 1.05 (a 3.12 m canopy on ISLET_LUMEN). The REAL coast build on every tier: every canopy vertex of every
+      tree on a reachable islet clears 3.4 m + 1 m margin over the island ground under it (raycast down onto ISLAND_LAND / ISLAND_SHORES). */
+var { createCoast } = await import('../26_LOCAL_AUTHORITY/lab/world/coast.js'); var s9 = {}, isl9 = (R.coast.islands || []).filter(function (I) { return I.reachable; });
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(), C = createCoast({ THREE: THREE, group: g, scene: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); C.build(); g.updateMatrixWorld(true);
+  var trees = g.getObjectByName('ISLAND_TREES'), ground = ['ISLAND_LAND', 'ISLAND_SHORES'].map(function (n) { return g.getObjectByName(n); }), P = trees.geometry.attributes.position, m4 = new THREE.Matrix4(), v = new THREE.Vector3(), rc = new THREE.Raycaster(), dn = new THREE.Vector3(0, -1, 0), n = 0, minC = 1e9;
+  for (var i = 0; i < trees.count; i++) { trees.getMatrixAt(i, m4); var px = m4.elements[12], pz = m4.elements[14]; if (!isl9.some(function (I) { return Math.hypot((px - I.x) / I.rx, (pz - I.z) / I.rz) < 1.3; })) continue; n++;
+    for (var k = 0; k < P.count; k++) { v.fromBufferAttribute(P, k); if (v.y < 1.2) continue; v.applyMatrix4(m4); rc.set(new THREE.Vector3(v.x, 300, v.z), dn); var h = rc.intersectObjects(ground, false); minC = Math.min(minC, v.y - (h.length ? h[0].point.y : -0.3)); } }   /* local y < 1.2: the trunk (inside the canopy's footprint, as in M9) */
+  s9[T] = { islet_trees: n, min_canopy_clearance_m: +minC.toFixed(2), land: g.getObjectByName('ISLAND_LAND').material }; });
+ok('9. reachable-islet trees clear 3.4 m + 1 m on every tier (' + ['HIGH', 'MED', 'LOW'].map(function (T) { return T + ' ' + s9[T].islet_trees + ' trees, min ' + s9[T].min_canopy_clearance_m + ' m'; }).join('; ') + ')', ['HIGH', 'MED', 'LOW'].every(function (T) { return s9[T].islet_trees >= isl9.length && s9[T].min_canopy_clearance_m >= 4.4; }), ['HIGH', 'MED', 'LOW'].map(function (T) { return [T, s9[T].islet_trees, s9[T].min_canopy_clearance_m]; }));
+
+/* 10. M20 review fix — continuous rock coordinates and the tier law with the REAL M20 specs: the islands (HIGH / MED) map their rock on the
+      ground plane (the along-face axis switched x ↔ z per triangle on their gentle crowns: a quilt of light / dark triangles), the far ring
+      (MED / HIGH) on the ring bearing, the facet tilt rides Frisvad's frame (no cross(up, n), which flipped on level rock); LOW compiles no
+      M20 token on the ridges, the far ring or the islands; the real NEAR-ridge shader costs MED ≤ HIGH (noise-hash equivalents, a facet
+      lookup = 23), and the spray-wet zone is on the NEAR ridge only, never on LOW. */
+function cost10(fs) { function n(k) { return fs.split(k).length - 1; } return n('sdHash(') + 4 * n('geoN(') + 12 * n('geoFbm(') + 18 * n('geoVor(') + 23 * n('geoFacet('); }
+var s10 = {}, M20T = ['geoFacet', 'gWet', 'gRiv', 'gUV = vSdW.xz', 'gFq'];
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(); var M = createMacro({ THREE: THREE, group: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); M.build();
+  var near = compiled(g.getObjectByName('MACRO_RIDGE_RIDGE_NEAR').material), mid = compiled(g.getObjectByName('MACRO_RIDGE_RIDGE_MID').material), fw = createFarWorld(THREE, { tier: T }), far = null; fw.traverse(function (o) { if (o.name === 'FAR_MASSIFS') far = compiled(o.material); });
+  var isl = compiled(s9[T].land), main = function (fs) { return fs.slice(fs.indexOf('void main')); };
+  s10[T] = { nearCost: cost10(main(near)), wetNear: near.indexOf('float gWet') >= 0, wetMid: mid.indexOf('float gWet') >= 0, islandGround: isl.indexOf('gUV = vSdW.xz;') >= 0, farPolar: far.indexOf('gUV = vec2(atan(vSdW.x - 0.0000, vSdW.z - 0.0000) * 740.0000') >= 0, frisvad: near.indexOf('cross(vec3(0.0, 1.0, 0.0), gWn)') < 0 && (T === 'LOW' || near.indexOf('1.0 / max(1.0 + gWn.y, 0.001)') >= 0),
+    lowClean: T !== 'LOW' || [near, mid, far, isl].every(function (fs) { return M20T.every(function (t) { return main(fs).indexOf(t) < 0; }); }) }; });
+var ok10 = s10.HIGH.islandGround && s10.MED.islandGround && !s10.LOW.islandGround && s10.HIGH.farPolar && s10.MED.farPolar && !s10.LOW.farPolar && s10.HIGH.frisvad && s10.MED.frisvad && s10.LOW.lowClean && s10.MED.nearCost <= s10.HIGH.nearCost && s10.HIGH.wetNear && s10.MED.wetNear && !s10.LOW.wetNear && !s10.HIGH.wetMid;
+ok('10. continuous rock coordinates (islands on the ground plane, far ring on the bearing, Frisvad facet frame), LOW free of M20 terms, NEAR ridge MED ' + s10.MED.nearCost + ' ≤ HIGH ' + s10.HIGH.nearCost + ' (LOW ' + s10.LOW.nearCost + ')', ok10, s10);
 
 console.log('RESULT world M19 mountains: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
