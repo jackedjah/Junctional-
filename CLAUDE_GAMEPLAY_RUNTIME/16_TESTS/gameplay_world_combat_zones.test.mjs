@@ -1,27 +1,34 @@
-/* M15b (owner 2026-09-27 correction; five classes on one court, owner follow-up): duel courts are large, ground-integrated square-diamond courts — dormant world infrastructure with
-   ZERO class colour while inactive (white / cool white-blue / pale ice only), no walls / cage / raised arena / spectator structure. Size is
-   validated from the rules (four fighters' largest area effects must fit without stacking). Six states: DORMANT → READY (neutral) →
-   ACTIVATION (class territories, up to four fighters) → ACTIVE_DUEL (neutral court, local class presence fields) → RESOLUTION → RESET.
+/* M15b → M17 (owner 2026-09-27: duel courts; five classes; "PIVOTAL DUEL RULE — 2 TO 5 PLAYERS"): duel courts are large, ground-integrated
+   square-diamond courts — dormant world infrastructure with ZERO class ownership colour while inactive (white / cool white-blue / pale
+   ice, plus five tiny permanent class gems), no walls / cage / raised arena / spectator structure. Size is validated from the rules
+   (M17: 24 m — lock-on, dash, strike, area and five-fighter spacing). The match comes from the roster engine (duelRoster.js; its own
+   property tests are gameplay_world_duel_roster): DORMANT → READY (the 30 s WAITING window, neutral) → ACTIVATION (one territory per
+   participant) → ACTIVE_DUEL (neutral court, local class fields) → RESOLUTION → RESET → DORMANT.
    ONE court is placed until the owner verifies the footprint and the dormant look.  node 16_TESTS/gameplay_world_combat_zones.test.mjs */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { createCombatZones, combatZoneList, combatZoneCircles, duelPhase, insideZone, CLASS_FAMILY, TIMING, SIZING, PALETTE, PHASES, CLASS_PHASES, MAX_FIGHTERS, territorySlots, assignSlots, splitAngle, FIVE_DIAMOND, IDENTITY_ORDER } from '../26_LOCAL_AUTHORITY/lab/world/combatZones.js';
+import { arrangeTerritories, bestColourScore } from '../26_LOCAL_AUTHORITY/lab/world/duelRoster.js';
 import { groundYAt } from '../26_LOCAL_AUTHORITY/lab/world/worldLayout.js';
 import { classify } from '../26_LOCAL_AUTHORITY/deploy/world_preview/colour_law_audit.mjs';
 var HERE = path.dirname(fileURLToPath(import.meta.url)), LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function J(p) { return JSON.parse(fs.readFileSync(path.join(LA, p), 'utf8')); } function src(p) { return fs.readFileSync(path.join(LA, p), 'utf8'); }
-var REG = J('lab/assets/world/world_registry_v1.json'), CZ = REG.combat_zones, Z = combatZoneList(REG), RULES = J('play/rules1723/rules_17_23.dev.json');
+var REG = J('lab/assets/world/world_registry_v1.json'), CZ = REG.combat_zones, Z = combatZoneList(REG), RULES = J('play/rules1723/rules_17_23.dev.json'), DT = JSON.parse(fs.readFileSync(path.join(HERE, '..', '00_CORE', 'dev_tuning.dev.json'), 'utf8'));
 
-/* 1. size, derived from the rules: the largest area effect in the skill catalogue (radius in melee units × melee_unit_m). All FIVE classes
-      can meet on one court, and the tightest square holding five such areas without stacking is the dice-five pattern, R·(2 + 2√2)
-      (four fighters: 2 × 2 = 4R); the court's playable width covers that, and the owner's 18 m floor */
-var MU = RULES._runtime_mapping.melee_unit_m, maxR = 0; (RULES.skills || []).forEach(function (s) { var e = s.effect || {}; if (isFinite(e.radius_melee_units)) maxR = Math.max(maxR, e.radius_melee_units); });
-var R1 = maxR * MU, pack4 = 4 * R1, pack5 = R1 * (2 + 2 * Math.SQRT2), fams = Object.keys(REG.crystal_families).filter(function (k) { return k[0] !== '_'; });
-ok('1. size from the rules: the largest area effect is ' + maxR + ' units × ' + MU + ' m = ' + R1 + ' m radius → five fighters (one per class) pack into ' + pack5.toFixed(1) + ' m (four: ' + pack4 + ' m); the court gives ' + CZ.playable_m + ' m playable (≥ that, ≥ the owner\'s 18 m, ≤ 36 m) + a ' + CZ.border_m + ' m border; ground-only square-diamond, no spectators; the five classes map onto the crystal families',
-  MAX_FIGHTERS === 5 && CZ.sizing.max_fighters === 5 && CZ.playable_m >= pack5 && CZ.playable_m >= 18 && CZ.playable_m <= 36 && SIZING.playable_m === CZ.playable_m && SIZING.max_aoe_radius_m === R1 && CZ.sizing.four_fighter_packing_m === pack4 && Math.abs(CZ.sizing.five_fighter_packing_m - pack5) < 0.01 && CZ.border_m > 0.5 && CZ.border_m <= 2 &&
+/* 1. size (M17), validated from the rules — the owner's target is 18–24 m, combat usability first: lock-on holds a target to 34 m and the
+      court's diagonal stays inside it (nobody on the court drops lock); the longest dash plus a body fits from the centre; five fighters'
+      dice-five starts sit beyond the longest strike (+ hit radius + body), the largest area effect (+ body) and a dash plus two bodies; the
+      host's 1v1 duel boundary is the same 12 m radius; PvP flight is off. All five classes map onto the crystal families. */
+var MU = RULES._runtime_mapping.melee_unit_m, maxR = 0, maxStrike = 0; (RULES.skills || []).forEach(function (s) { var e = s.effect || {}; if (isFinite(e.radius_melee_units)) maxR = Math.max(maxR, e.radius_melee_units); if (e.type === 'BODY_STRIKE' && isFinite(e.range_melee_units)) maxStrike = Math.max(maxStrike, e.range_melee_units); });
+var R1 = maxR * MU, reach = maxStrike * MU + RULES._runtime_mapping.hit_radius_m, body = RULES._runtime_mapping.field_colliders.body_radius_m, lockHold = RULES._runtime_mapping.lock.max_m, hostR = DT.duel.boundary_radius_m;
+var dash = Math.max.apply(Math, Object.keys(DT.local_authority.play.dash.profiles).map(function (k) { return DT.local_authority.play.dash.profiles[k].distance_m; })), PLm = CZ.playable_m, hh1 = PLm / 2, spacing = hh1 * Math.sqrt(0.8), fams = Object.keys(REG.crystal_families).filter(function (k) { return k[0] !== '_'; });
+ok('1. size from the rules: ' + PLm + ' m playable (owner target 18–24 m) — diagonal ' + (PLm * Math.SQRT2).toFixed(1) + ' m ≤ lock-on hold ' + lockHold + ' m; half-width ' + hh1 + ' m ≥ longest dash ' + dash + ' m + body ' + body + ' m; dice-five starts ' + spacing.toFixed(2) + ' m apart > strike ' + reach.toFixed(3) + ' m + body, > area ' + R1 + ' m + body, > dash + two bodies; = the host duel boundary (r ' + hostR + ' m); PvP flight off; + ' + CZ.border_m + ' m border; ground-only square-diamond, no spectators; 2..5 fighters',
+  PLm >= 18 && PLm <= 24 && PLm * Math.SQRT2 <= lockHold && hh1 >= dash + body && spacing > reach + body && spacing > R1 + body && spacing > dash + 2 * body && PLm === 2 * hostR && RULES.teams.pvp_flight === false &&
+  SIZING.playable_m === PLm && CZ.sizing.max_fighters === 5 && CZ.sizing.min_fighters === 2 && MAX_FIGHTERS === 5 && Math.abs(CZ.sizing.dice_five_spacing_m - spacing) < 0.01 && Math.abs(CZ.sizing.max_strike_reach_m - reach) < 1e-9 && CZ.sizing.max_dash_m === dash && CZ.sizing.lock_on_hold_m === lockHold && CZ.sizing.max_aoe_radius_m === R1 && SIZING.max_aoe_radius_m === R1 &&
   CZ.ground_only === true && CZ.spectators === false && CZ.shape === 'SQUARE_DIAMOND' && Z.every(function (z) { return z.playable_m === CZ.playable_m && Math.abs(z.size_m - (CZ.playable_m + 2 * CZ.border_m)) < 1e-9 && /^CZ_/.test(z.id); }) &&
-  ['ATHLETE', 'TITAN', 'LEAN', 'VISIONARY', 'BAGE'].every(function (c) { return CZ.class_family[c] === CLASS_FAMILY[c] && fams.indexOf(CLASS_FAMILY[c]) >= 0; }), { playable: CZ.playable_m, pack5: pack5, maxR: maxR });
+  CZ.roster && CZ.roster.min_fighters === 2 && CZ.roster.max_fighters === 5 && CZ.roster.wait_s === 30 && CZ.roster.duplicate_classes === true &&
+  ['ATHLETE', 'TITAN', 'LEAN', 'VISIONARY', 'BAGE'].every(function (c) { return CZ.class_family[c] === CLASS_FAMILY[c] && fams.indexOf(CLASS_FAMILY[c]) >= 0; }), { playable: PLm, spacing: spacing, reach: reach, dash: dash, lockHold: lockHold, hostR: hostR });
 
 /* 2. placement: ONE court until the owner verifies it (the M15 sites wait in pending_sites); it is clear of every collider (field base +
       district + world; the HALO deck at 240 m and walkable tops excepted), off every path ribbon / spur / forecourt, off water, on flat
@@ -55,11 +62,11 @@ ok('3b. territory template: five fighters split the court into four corner terri
   sh5.every(function (v) { return Math.abs(v - 0.2) < 0.006; }) && sh4.every(function (v) { return Math.abs(v - 0.25) < 0.006; }) && sh2.every(function (v) { return Math.abs(v - 0.5) < 0.01; }) && Math.abs(FIVE_DIAMOND - Math.sqrt(0.4)) < 1e-12 &&
   perm5.join() === '4,0,2,1,3' && Math.abs(splitAngle([-6, -5], [6, 6]) - Math.PI / 4) < 1e-9 && Math.abs(splitAngle([-6, 0.5], [6, 0]) - 0) < 1e-9 && Math.abs(splitAngle([6, 6], [-6, -5]) - Math.PI / 4) < 1e-9, { sh5: sh5, sh4: sh4, sh2: sh2, perm5: perm5 });
 
-/* 4. the live module in a bare scene: dormant and READY write no class colour at all (every fighter slot WHITE); a FIVE-fighter duel, one of
-      each class, listed in scrambled order, runs through its API: every fighter lands in the territory nearest them (the dice-five: four
-      corners + the central diamond) with its class colour — ATHLETE gold, TITAN blue, LEAN crimson, BAGE pink, VISIONARY purple — then
-      local presence fields that follow their fighters, an airborne fighter, a fighter who leaves fades out; RESOLUTION → RESET → READY →
-      DORMANT, with phase events in order */
+/* 4. the live module in a bare scene: DORMANT and READY (the WAITING window) write no class colour at all (every fighter slot WHITE); the
+      host starts a FIVE-fighter match, one of each class listed in scrambled order: the territories are the roster engine's deterministic
+      arrangement (dice-five, colour-contrast first), each slot k carries territory k's participant in its class colour; ACTIVE_DUEL
+      presence follows its fighter, the airborne fighter reports AIRBORNE, a fighter who leaves the court fades out; RESOLUTION → RESET
+      (white again) → DORMANT (REENTER: nobody still standing there is pulled into another match); events in order */
 var parent = new THREE.Group(), cz = createCombatZones({ THREE: THREE, registry: REG, group: parent, night: true, quality: { tier: function () { return 'HIGH'; } } }); cz.build();
 var zA = Z[0], c = Math.cos(zA.yaw_deg * Math.PI / 180), s = Math.sin(zA.yaw_deg * Math.PI / 180); function W(lx, lz, y) { return { x: zA.x + lx * c - lz * s, y: (zA.y || 0) + (y || 0), z: zA.z + lx * s + lz * c }; }
 var floor = parent.getObjectByName('COMBAT_ZONE_FLOORS'), GA = floor.geometry.attributes;
@@ -68,23 +75,26 @@ function allWhite() { return slotRGB().every(function (v) { return v[0] === 1 &&
 function fam(f) { return new THREE.Color(REG.crystal_families[f].glow); } function same(v, col) { return Math.abs(v[0] - col.r) < 1e-6 && Math.abs(v[1] - col.g) < 1e-6 && Math.abs(v[2] - col.b) < 1e-6; }
 var events = []; cz.onPhase(function (e) { events.push(e.phase); });
 cz.tick(0.016, 100); var d0 = cz.phase(zA.id), d0White = allWhite() && GA.iK.getW(0) === 0;
-var F = [{ fighterId: 'v', classId: 'VISIONARY', worldPosition: W(0.5, -0.5), teamId: 'C' }, { fighterId: 'l', classId: 'LEAN', worldPosition: W(8.5, 9) }, { fighterId: 'a', classId: 'ATHLETE', worldPosition: W(-9, -8.5), teamId: 'A', localInfluenceRadius: 3.5 },
-  { fighterId: 'b', classId: 'BAGE', worldPosition: W(-9, 9) }, { fighterId: 't', classId: 'TITAN', worldPosition: W(9, -9), verticalState: 'AIRBORNE', airborneHeight: 1.6 }];
-cz.setOccupants(zA.id, F.slice(0, 2), 1); cz.tick(0.016, 101); var r0 = cz.phase(zA.id), rWhite = allWhite() && GA.iK.getW(0) === 0 && GA.iK2.getX(0) > 0;
+var F = [{ fighterId: 'v', classId: 'VISIONARY', worldPosition: W(0.5, -0.5), teamId: 'C' }, { fighterId: 'l', classId: 'LEAN', worldPosition: W(6.5, 7) }, { fighterId: 'a', classId: 'ATHLETE', worldPosition: W(-7, -6.5), teamId: 'A', localInfluenceRadius: 3.5 },
+  { fighterId: 'b', classId: 'BAGE', worldPosition: W(-7, 7) }, { fighterId: 't', classId: 'TITAN', worldPosition: W(7, -7), verticalState: 'AIRBORNE', airborneHeight: 1.6 }];
+cz.setOccupants(zA.id, F.slice(0, 2), 1); cz.tick(0.016, 101); var r0 = cz.phase(zA.id), rWhite = allWhite() && GA.iK.getW(0) === 0 && GA.iK2.getX(0) > 0 && r0.wait > 0 && r0.wait < 1;
 var b0 = cz.begin(zA.id, F, { t: 102 }); cz.tick(0.016, 102.5); var act = cz.phase(zA.id), rgbAct = slotRGB();
-var terrOk = GA.iK2.getW(0) % 10 === 5 && act.territories === 5 && act.fighters.map(function (f) { return f.classId + '@' + f.territory; }).join() === 'ATHLETE@0,TITAN@1,LEAN@2,BAGE@3,VISIONARY@4';
-var colOk = same(rgbAct[0], fam('gold')) && same(rgbAct[1], fam('blue')) && same(rgbAct[2], fam('red')) && same(rgbAct[3], fam('pink')) && same(rgbAct[4], fam('purple')) && GA.iK.getY(0) === 1;
-cz.tick(0.016, 102 + TIMING.activation_s + 0.5); cz.update(zA.id, [{ fighterId: 'a', worldPosition: W(-2, 3) }], 1); var duel = cz.phase(zA.id), fa = duel.fighters[0], ft = duel.fighters[1];
+var want = arrangeTerritories(act.roster.participants.map(function (p) { return { fighterId: p.fighterId, slotId: p.slotId, classId: p.classId, local: p.local }; }), zA.playable_m / 2);
+var famOf = { ATHLETE: 'gold', TITAN: 'blue', LEAN: 'red', VISIONARY: 'purple', BAGE: 'pink' };
+var terrOk = GA.iK2.getW(0) % 10 === 5 && act.territories === 5 && act.template === 'DICE_FIVE' && act.fighters.every(function (f, k) { return f.territory === k && want.territoryOf[f.fighterId] === k; }) && Math.abs(want.colourScore - bestColourScore(act.fighters.map(function (f) { return f.classId; }))) < 1e-9;
+var colOk = act.fighters.every(function (f, k) { return same(rgbAct[k], fam(famOf[f.classId])); }) && GA.iK.getY(0) === 1;
+cz.tick(0.016, 102 + TIMING.activation_s + 0.5); cz.update(zA.id, [{ fighterId: 'a', worldPosition: W(-2, 3) }], 1); var duel = cz.phase(zA.id), byId = function (p, id) { return p.fighters.filter(function (f) { return f.fighterId === id; })[0]; }, fa = byId(duel, 'a'), ft = byId(duel, 't');
 var out = W(30, 0); cz.update(zA.id, [{ fighterId: 'l', worldPosition: out }], 1); var left = cz.phase(zA.id);
 cz.resolve(zA.id); cz.tick(0.016, 102 + TIMING.activation_s + 1.0); var res = cz.phase(zA.id);
 cz.tick(0.016, 102 + TIMING.activation_s + 0.5 + TIMING.resolution_s + 0.4); var rst = cz.phase(zA.id), rstWhite = allWhite();
 cz.tick(0.016, 102 + TIMING.activation_s + 0.5 + TIMING.resolution_s + TIMING.reset_s + 0.2); var after = cz.phase(zA.id);
+cz.setOccupants(zA.id, F.slice(0, 2), 1); var still = cz.phase(zA.id);   /* still standing after the match: REENTER — no new window until they step off */
 cz.setOccupants(zA.id, [], 1); for (var q = 0; q < 40; q++) cz.tick(0.05, 110 + q * 0.05); var end = cz.phase(zA.id), endWhite = allWhite();
-ok('4. live module: DORMANT and READY write no class colour (every slot white, live 0); a five-fighter duel, one per class in scrambled order: each lands in its nearest dice-five territory (ATHLETE gold, TITAN blue, LEAN crimson, BAGE pink at the corners, VISIONARY purple in the central diamond); ACTIVE_DUEL presence follows its fighter, the airborne fighter reports AIRBORNE, a fighter who leaves fades out; RESOLUTION → RESET (white again) → READY → DORMANT; events in order',
+ok('4. live module: DORMANT and READY (the waiting window) write no class colour (every slot white, live 0); a five-fighter match, one per class in scrambled order, takes the roster engine\'s deterministic dice-five arrangement (' + act.fighters.map(function (f) { return f.classId + '@' + f.territory; }).join(' ') + ') with each slot in its fighter\'s class colour; ACTIVE_DUEL presence follows its fighter, the airborne fighter reports AIRBORNE, a fighter who leaves fades out; RESOLUTION → RESET (white again) → DORMANT (REENTER); events in order',
   d0.phase === 'DORMANT' && !d0.classColourShown && d0White && r0.phase === 'READY' && !r0.classColourShown && rWhite && b0.phase === 'ACTIVATION' && act.phase === 'ACTIVATION' && act.classColourShown && terrOk && colOk && act.fighters.length === 5 &&
-  duel.phase === 'ACTIVE_DUEL' && fa.classId === 'ATHLETE' && Math.abs(fa.local[0] + 2) < 0.01 && Math.abs(fa.local[1] - 3) < 0.01 && fa.presence === 1 && fa.teamId === 'A' && fa.influence === 3.5 && fa.territory === 0 && ft.verticalState === 'AIRBORNE' && ft.airborne &&
-  left.fighters[2].classId === 'LEAN' && left.fighters[2].presence === 0 && res.phase === 'RESOLUTION' && rst.phase === 'RESET' && !rst.classColourShown && rstWhite && after.phase === 'READY' && end.phase === 'DORMANT' && endWhite &&
-  events.join('>') === 'READY>ACTIVATION>ACTIVE_DUEL>RESOLUTION>RESET>READY>DORMANT', { d0: d0.phase, r0: r0.phase, act: act, terr: terrOk, col: colOk, duel: duel.fighters.map(function (f) { return f.classId + '@' + f.territory; }), left: left.fighters[2], events: events, rgbAct: rgbAct });
+  duel.phase === 'ACTIVE_DUEL' && fa.classId === 'ATHLETE' && Math.abs(fa.local[0] + 2) < 0.01 && Math.abs(fa.local[1] - 3) < 0.01 && fa.presence === 1 && fa.teamId === 'A' && fa.influence === 3.5 && ft.verticalState === 'AIRBORNE' && ft.airborne &&
+  byId(left, 'l').presence === 0 && res.phase === 'RESOLUTION' && rst.phase === 'RESET' && !rst.classColourShown && rstWhite && after.phase === 'DORMANT' && still.phase === 'DORMANT' && end.phase === 'DORMANT' && endWhite &&
+  events.join('>') === 'READY>ACTIVATION>ACTIVE_DUEL>RESOLUTION>RESET>DORMANT', { d0: d0.phase, r0: r0.phase, wait: r0.wait, terr: terrOk, col: colOk, act: act.fighters.map(function (f) { return f.classId + '@' + f.territory; }), still: still.phase, events: events, rgbAct: rgbAct });
 
 /* 5. host safety and the dormant look: one flush inlay draw (2.5 cm, no depth write), NO vertical shell / wall / cage / spectator mesh,
       nothing interactable, no collider; shards and meadow cover keep out of the footprint; the neutral palette is white or pale ice
@@ -95,17 +105,17 @@ var nAttr = (CS.match(/attribute vec4 i[A-Z][A-Za-z0-9]*;/g) || []).length + 1, 
 ok('5. host safety: one flush inlay (iZ.y + 0.025, no depth write) within the phone shader budget (' + nAttr + ' vertex attributes of WebGL2\'s guaranteed 16, ' + nVary + ' varyings of 15, per-court data flat), no shell / wall mesh (meshes: ' + meshes.join() + '), non-interactable, no collider or spectator structure; shards / meadow excluded from the footprint; the neutral palette is white / pale ice',
   nAttr <= 13 && nVary <= 12 && /flat varying vec4 vF0/.test(CS) && /iZ\.y \+ 0\.025/.test(CS) && /transparent: true, depthWrite: false, depthTest: true, blending: THREE\.CustomBlending/.test(CS) && meshes.length === 1 && meshes[0] === 'COMBAT_ZONE_FLOORS' && !/SHELL|shellGeometry/.test(CS) && floor.userData.nonInteractable &&
   !/colliders\.push|walls\.push|solids|spectator_r|tiers\.push/.test(CS) && /combatZoneCircles\(reg, 1\.5\)/.test(TERR) && /combatZoneCircles\(reg, 1\.5\)/.test(MEAD) &&
-  pal.every(function (p) { return (p.verdict === 'NEUTRAL' || p.family === 'BLUE') && p.chroma <= 0.32; }) && Z.every(function (z) { return insideZone(z, z.x, z.z) && !insideZone(z, z.x + z.size_m, z.z); }) && combatZoneCircles(REG).length === Z.length && combatZoneCircles(REG, 0)[0].r > 20, { meshes: meshes, pal: pal });
+  pal.every(function (p) { return (p.verdict === 'NEUTRAL' || p.family === 'BLUE') && p.chroma <= 0.32; }) && Z.every(function (z) { return insideZone(z, z.x, z.z) && !insideZone(z, z.x + z.size_m, z.z); }) && combatZoneCircles(REG).length === Z.length && combatZoneCircles(REG, 0)[0].r > Z[0].size_m * 0.7, { meshes: meshes, pal: pal });
 
 /* 6. future-ready hooks: the fighter contract (fighterId, classId, classColor, worldPosition, isParticipant, teamId, localInfluenceRadius,
       verticalState, airborneHeight) and the M15 shape both work; worldB.combatZones() exposes the API; the host adapter reads the
       snapshot's duel / match state; a new class can bring its own colour; the dev preview stages any phase with scale references */
-var WB = src('lab/world/worldB.js'); cz.setClassColor('NEWCLASS', 0x8f6ad8);
+var WB = src('lab/world/worldB.js'), RS = src('lab/world/duelRoster.js'); cz.setClassColor('NEWCLASS', 0x8f6ad8);
 var legacy = cz.begin(zA.id, { id: 'a', cls: 'VISIONARY', x: W(-3, 0).x, z: W(-3, 0).z }, { id: 'b', cls: 'TITAN', x: W(3, 0).x, z: W(3, 0).z }), lg = legacy && legacy.fighters;
 var np = cz.update(zA.id, [{ fighterId: 'x', classId: 'BAGE', worldPosition: W(0, 5), isParticipant: false }], 1), npF = np.fighters.filter(function (f) { return f.fighterId === 'x'; })[0], npWhite = slotRGB()[2].every(function (v) { return v === 1; });
-ok('6. hooks: the fighter contract and the M15 { id, cls, x, z } shape both work; API setOccupants / begin / update / resolve / phase / onPhase / zoneAt via worldB.combatZones(); the host adapter reads snap.duel.state / rules.match.state, me.position, rules.me.class, the opponent; setClassColor extends the class map; ?duelDemo stages any of the six phases, ?scaleRefs places full-size references',
-  ['fighterId', 'classId', 'classColor', 'worldPosition', 'isParticipant', 'teamId', 'localInfluenceRadius', 'verticalState', 'airborneHeight'].every(function (k) { return CS.indexOf('f.' + k) >= 0; }) && lg && lg.length === 2 && lg[0].classId === 'VISIONARY' && Math.abs(lg[0].local[0] + 3) < 0.01 && np.territories === 2 && npF && npF.isParticipant === false && npF.territory === null && npWhite &&
-  ['setOccupants', 'begin', 'update', 'resolve', 'phase', 'onPhase', 'zoneAt'].every(function (k) { return typeof cz[k] === 'function'; }) && /combatZones: function \(\) \{ return mods\.combatZones && mods\.combatZones\.begin/.test(WB) && /\['combatZones', createCombatZones\], \['aura', createAura\]/.test(WB) &&
+ok('6. hooks: the fighter contract (classColor is derived from the class, never the slot) and the M15 { id, cls, x, z } shape both work; API setOccupants / begin / update / resolve / phase / onPhase / zoneAt via worldB.combatZones(); the host adapter reads snap.duel.state / rules.match.state, me.position, rules.me.class, the opponent; setClassColor extends the class map; ?duelDemo stages any of the six phases, ?scaleRefs places full-size references',
+  ['fighterId', 'classId', 'worldPosition', 'isParticipant', 'teamId', 'localInfluenceRadius', 'verticalState', 'airborneHeight', 'airborneState'].every(function (k) { return (CS + RS).indexOf('f.' + k) >= 0; }) && lg && lg[0].classColor === '#b99cff' && lg[1].classColor === '#5c8cff' && lg && lg.length === 2 && lg[0].classId === 'VISIONARY' && Math.abs(lg[0].local[0] + 3) < 0.01 && np.territories === 2 && npF && npF.isParticipant === false && npF.territory === null && npWhite &&
+  ['setOccupants', 'begin', 'update', 'resolve', 'join', 'leave', 'roster', 'snapshot', 'phase', 'onPhase', 'zoneAt'].every(function (k) { return typeof cz[k] === 'function'; }) && /combatZones: function \(\) \{ return mods\.combatZones && mods\.combatZones\.begin/.test(WB) && /\['combatZones', createCombatZones\], \['aura', createAura\]/.test(WB) &&
   /s\.duel && s\.duel\.state\) \|\| \(R\.match && R\.match\.state\)/.test(CS) && /R\.me && R\.me\.class/.test(CS) && cz.classColor('NEWCLASS') === '#8f6ad8' && /duelDemo=/.test(CS) && /scaleRefs=/.test(CS) && cz.zoneAt(zA.x, zA.z) === zA.id && cz.zoneAt(zA.x + 40, zA.z) === null && cz.debug().draw_calls === 1, null);
 cz.dispose();
 

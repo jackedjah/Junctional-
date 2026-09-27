@@ -10263,24 +10263,29 @@
   "review": "QR_FIVE_SANCTUARY_NIGHT_CIRCUIT"
  },
  "combat_zones": {
-  "_doc": "M15b owner 2026-09-27 correction (supersedes the M15 12 m ring): DUEL COURTS are dormant world infrastructure drawn into the ground — a large square-diamond court (crystalline inlay, faint faceted seams, diamond anchors, low ground-bound energy); no cage, walls, raised arena or spectator structure; no collider. States: DORMANT (white / cool white-blue / pale ice — no class OWNERSHIP colour; M16: five tiny permanent class gems in a centre rosette, gold / blue / crimson / violet / pink, say all five classes may duel here — world identity, kept apart from the combat state, never colouring the surface), READY (someone on it: a neutral response, white presence, still no ownership colour), ACTIVATION (~2.8 s: the court splits into equal class territories by its own symmetry — five fighters, one of each class, take four corner territories and a central diamond, each one fifth; seams through white; then it lets go), ACTIVE_DUEL (neutral court; each fighter carries a local class-colour presence field and square-diamond footprint that move with them; the other classes do not light the court), RESOLUTION (~1.4 s drain), RESET (~1.2 s neutral sweep) → DORMANT. ONE court is placed until the owner verifies the footprint and the dormant look; the M15 sites wait in pending_sites for a re-survey at the new footprint. Runtime: lab/world/combatZones.js (world module 'combatZones'; worldB.combatZones() is the host API).",
-  "playable_m": 31,
+  "_doc": "M15b owner 2026-09-27 correction (supersedes the M15 12 m ring): DUEL COURTS are dormant world infrastructure drawn into the ground — a large square-diamond court (crystalline inlay, faint faceted seams, diamond anchors, low ground-bound energy); no cage, walls, raised arena or spectator structure; no collider. States: DORMANT (white / cool white-blue / pale ice — no class OWNERSHIP colour; M16: five tiny permanent class gems in a centre rosette, gold / blue / crimson / violet / pink, say all five classes may duel here — world identity, kept apart from the combat state, never colouring the surface), READY (someone on it: a neutral response, white presence, still no ownership colour), ACTIVATION (~2.8 s: the court splits into equal class territories by its own symmetry — five fighters, one of each class, take four corner territories and a central diamond, each one fifth; seams through white; then it lets go), ACTIVE_DUEL (neutral court; each fighter carries a local class-colour presence field and square-diamond footprint that move with them; the other classes do not light the court), RESOLUTION (~1.4 s drain), RESET (~1.2 s neutral sweep) → DORMANT. ONE court is placed until the owner verifies the footprint and the dormant look; the M15 sites wait in pending_sites for a re-survey at the new footprint. Runtime: lab/world/combatZones.js (world module 'combatZones'; worldB.combatZones() is the host API). M17 (owner 2026-09-27, 2..5 fighters): the court is 24 m playable; a roster engine (lab/world/duelRoster.js) drives it - a 30 s WAITING window opened by the first fighter, 2..5 fighters, duplicate classes legal (fighterId != classId), OD-29 disconnects; activation territories come from the locked roster; local fields blend hue-safely (pearl seams, no sixth colour).",
+  "playable_m": 24,
   "border_m": 1.2,
   "shape": "SQUARE_DIAMOND",
   "ground_only": true,
   "spectators": false,
   "sizing": {
+   "basis": "M17 (owner 2026-09-27: 2..5 fighters, target 18-24 m, combat usability first) - validated from rules_17_23 + dev_tuning",
    "melee_unit_m": 2.5,
    "max_aoe_radius_m": 6.25,
+   "max_strike_reach_m": 3.475,
+   "max_dash_m": 7.4,
+   "body_radius_m": 0.4,
+   "lock_on_hold_m": 34,
+   "host_duel_boundary_radius_m": 12,
+   "min_fighters": 2,
    "max_fighters": 5,
-   "four_fighter_packing_m": 25,
-   "five_fighter_packing_m": 30.18,
-   "owner_min_m": 18,
+   "dice_five_spacing_m": 10.73,
    "owner_range_m": [
     18,
     24
    ],
-   "note": "rules_17_23: the largest area effect is 2.5 melee units (6.25 m radius). All five classes can meet on one court (owner 2026-09-27: 'they also have a fifth class that is purple'); the tightest square holding five such areas without stacking is the dice-five pattern, R(2 + 2*sqrt(2)) = 30.2 m (four fighters would need 2 x 2 = 25 m). So the court gives 31 m of clear playable width (about 102 ft), plus a 1.2 m inlaid border (33.4 m across). Projectiles reach 12 units (30 m): ranged play may run past the court edge; the court marks the duel, it does not contain it."
+   "note": "24 m playable: the diagonal (33.9 m) stays inside the 34 m lock-on hold, so nobody on the court drops lock; the longest dash (LEAN 7.4 m) plus a body fits from the centre with room to spare; five fighters' dice-five starts sit 10.7 m apart, beyond the longest strike (2.875 m + 0.6 m hit radius), the largest area effect (6.25 m) and a dash plus two bodies; the host 1v1 duel boundary is the same 12 m radius. PvP flight is off (rules teams.pvp_flight). The M15d 31 m court let two fighters stand 43.8 m apart, past lock-on. If Character integration shows 24 m cramped for five, the court grows."
   },
   "class_family": {
    "ATHLETE": "gold",
@@ -10303,7 +10308,7 @@
     "y": 0,
     "yaw_deg": 45,
     "district": "athlete",
-    "note": "the first court: open paved ground between the HALO trunk and the north-east forest, off the temple causeway; 35.7 m clear of every collider from its centre (circumradius 23.6 m at the five-fighter footprint), flat across the footprint"
+    "note": "the canonical court: open paved ground between the HALO trunk and the north-east forest, off the temple causeway; circumradius 18.7 m at the M17 26.4 m footprint, clear of every collider, flat across the footprint"
    }
   ],
   "pending_sites": [
@@ -10319,7 +10324,7 @@
      -30
     ],
     "note": "the quiet south apron between the Arena Dome and the Mentor Spire; on the NPC spar spot",
-    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the M17 26.4 m footprint (24 m playable + border)"
    },
    {
     "id": "CZ_VISIONARY_HIGHLAND",
@@ -10329,7 +10334,7 @@
     "yaw_deg": 45,
     "district": "visionary",
     "note": "on the Visionary highland plateau, south of the overlook",
-    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the M17 26.4 m footprint (24 m playable + border)"
    },
    {
     "id": "CZ_MATCH_EAST",
@@ -10339,7 +10344,7 @@
     "yaw_deg": 45,
     "district": "match",
     "note": "behind MAH MATCH, hidden from the plaza by the hall",
-    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the M17 26.4 m footprint (24 m playable + border)"
    },
    {
     "id": "CZ_LEAN_GLADE",
@@ -10349,7 +10354,7 @@
     "yaw_deg": 45,
     "district": "lean",
     "note": "a clearing in the north-west forest",
-    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the M17 26.4 m footprint (24 m playable + border)"
    },
    {
     "id": "CZ_GYM_WEST",
@@ -10359,11 +10364,11 @@
     "yaw_deg": 45,
     "district": "gym",
     "note": "an open field west of the gym causeway, at the edge of the west forest",
-    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the M17 26.4 m footprint (24 m playable + border)"
    }
   ],
   "territories": {
-   "rule": "the court's own symmetry, equal shares: 5 = four corner territories + a central diamond |x|+|z| <= h*sqrt(0.4) (each one fifth); 4 = corner quadrants; 3 = 120-degree sectors, mirror-symmetric; 2 = halves on the court symmetry line nearest the fighters; fighters take the territory nearest them (least total travel)"
+   "rule": "generated from the LOCKED roster, one territory per participant (never per class), on the court symmetry with equal shares: 2 = halves on the symmetry line nearest the fighters, 3 = 120-degree sectors, 4 = corner quadrants, 5 = four corners + a central diamond |x|+|z| <= h*sqrt(0.4); arranged deterministically: duplicate classes as far apart as the geometry allows, then the strongest local colour contrast, then least travel, then slot order (presentation only)"
   },
   "identity_markers": {
    "classes": [
@@ -10375,6 +10380,21 @@
    ],
    "layout": "centre rosette, radius 2.1 m, one gem (about 0.27 m) per class, 72 degrees apart",
    "rule": "permanent world identity in every state; combat colour comes only from the actual participants"
+  },
+  "roster": {
+   "min_fighters": 2,
+   "max_fighters": 5,
+   "wait_s": 30,
+   "duplicate_classes": true,
+   "identity_rule": "fighterId != classId: one participant per fighter, never one per class",
+   "one_fighter": "never starts a match; a second arrival after the window has passed starts it at once",
+   "rearm": "REENTER: fighters still on the court after a match step off and back on to queue again",
+   "disconnect": "OD-29 (dev_tuning local_authority): PAUSE_AND_WAIT, reconnect_window_s 10 per fighter, first expiry = NO_CONTEST",
+   "voluntary_exit": "CONCEDE; the last fighter standing wins",
+   "abandon_s": 10,
+   "engine": "lab/world/duelRoster.js",
+   "spec": "25_HANDOFF/CONVERGENCE/world_pivot/DUEL_ZONE_SPEC.md",
+   "host": "PENDING - the host duel (DuelHost) is 1v1; the engine is host-shareable and the client mirrors snap.duelZones"
   }
  }
 }
