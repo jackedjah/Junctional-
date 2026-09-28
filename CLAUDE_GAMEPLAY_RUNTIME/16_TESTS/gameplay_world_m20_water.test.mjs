@@ -121,4 +121,8 @@ s10.northRetired = !!NF10 && !!NF10.retired && !g10.getObjectByName('MACRO_FALL_
 ok('10. the small falls: TITAN leaves the ledge deck lip level (y ' + LG10.h + ', z ' + LG10.z1 + ') on a falling arc into the lake\'s open water, fed by a flush flume inside the deck footprint, foam ≤ 5 cm on the water; the NORTH sheet retired', s10.lipOnDeck && s10.landsInOpenWater && s10.fallsMonotone && s10.feedInFootprint && s10.feedFlush && s10.foamOnWater && s10.northRetired, s10);
 M10.dispose();
 
+/* 11. the strands' lip whitening is a band of world HEIGHT, and the flume runs at that height: unconfined it whitened the whole flume into a
+   blown-out field (camera FK, found at the M20 self-review). It is confined to the falling water and the last metres of the flume. */
+ok('11. the strand lip whitening stays off the flume (falling water + the last metres before the brink only)', /aer = max\(aer, stL \* 0\.85 \* smoothstep\(-0\.03, 0\.0, y\)\)/.test(VF) && !/aer = max\(aer, stL \* 0\.85\);/.test(VF));
+
 console.log('RESULT world m20 water: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
