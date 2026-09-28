@@ -19,10 +19,10 @@ function src(p) { return fs.readFileSync(path.join(LA, p), 'utf8'); }
 var REG = JSON.parse(src('lab/assets/world/world_registry_v1.json')), ARCH = src('lab/world/architecture.js'), FIX = src('lab/world/fixtures.js'), TER = src('lab/world/terrain.js'), FOR = src('lab/world/forest.js'), CITY = src('lab/cityScene.js'), BR = src('deploy/jobb/build_registry.mjs');
 var FAMILY = { gold: 'GOLD', red: 'RED', pink: 'PINK', blue: 'BLUE', purple: 'PURPLE' }, WARM = ['gold', 'red', 'pink'];
 
-/* the renderer's ACES filmic (three r185, exposure 1.15 as in the preview / field) + sRGB encode: what a linear light colour renders as */
+/* the renderer's ACES filmic (three r185, exposure 1.28 as in the preview / field since M21) + sRGB encode: what a linear light colour renders as */
 function s2l(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); } function l2s(c) { return c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; }
 function rrt(v) { return (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081); }
-function aces(r, g, b) { var k = 1.15 / 0.6; r *= k; g *= k; b *= k; var i0 = rrt(0.59719 * r + 0.35458 * g + 0.04823 * b), i1 = rrt(0.07600 * r + 0.90834 * g + 0.01566 * b), i2 = rrt(0.02840 * r + 0.13383 * g + 0.83777 * b);
+function aces(r, g, b) { var k = 1.28 / 0.6; r *= k; g *= k; b *= k; var i0 = rrt(0.59719 * r + 0.35458 * g + 0.04823 * b), i1 = rrt(0.07600 * r + 0.90834 * g + 0.01566 * b), i2 = rrt(0.02840 * r + 0.13383 * g + 0.83777 * b);
   return [1.60475 * i0 - 0.53108 * i1 - 0.07367 * i2, -0.10208 * i0 + 1.10813 * i1 - 0.00605 * i2, -0.00327 * i0 - 0.07276 * i1 + 1.07602 * i2].map(function (c) { return Math.min(1, Math.max(0, c)); }); }
 function rgb(hex) { return [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255].map(function (c) { return c / 255; }); }
 function toHex(c) { return (Math.round(c[0] * 255) << 16) | (Math.round(c[1] * 255) << 8) | Math.round(c[2] * 255); }
