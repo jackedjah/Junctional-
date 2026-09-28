@@ -125,4 +125,10 @@ M10.dispose();
    blown-out field (camera FK, found at the M20 self-review). It is confined to the falling water and the last metres of the flume. */
 ok('11. the strand lip whitening stays off the flume (falling water + the last metres before the brink only)', /aer = max\(aer, stL \* 0\.85 \* smoothstep\(-0\.03, 0\.0, y\)\)/.test(VF) && !/aer = max\(aer, stL \* 0\.85\);/.test(VF));
 
+/* 12. the base and the close read (M20 owner pass: "the transition from the waterfall base into the lower water looks poor", close up the
+   curtain read as glass slabs): the plunge foam is flow-mapped lace advected outward (the M19 concentric sine rings drew a target on the
+   sea), and the curtain, the front veil and the small falls fade edge-on / dissolve near the eye (VEIL_FACING, with real vertex normals). */
+var MAC12 = src('lab/world/macro.js');
+ok('12. plunge foam flow-mapped (no concentric sine rings); curtain, front veil and small falls fade edge-on and dissolve near the eye', !/sin\(\(r \* 7\.0 - uTime/.test(VF) && /fw = abs\(2\.0 \* p0 - 1\.0\)/.test(VF) && /ribs: true, strands: STR, strandBase: yBot, facing: true/.test(VF) && /front: true, seed: 7\.3, strands: STR, strandBase: yBot, facing: true/.test(VF) && /spill: true, facing: true/.test(MAC12) && /smoothstep\(3\.0, 18\.0, fD\)/.test(VF) && (VF.match(/computeVertexNormals\(\)/g) || []).length >= 2);
+
 console.log('RESULT world m20 water: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
