@@ -8,6 +8,55 @@ import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
 import { createAuraField, CRYSTAL_TINT } from './world/aura.js'; import { toLacquer, taperShaft, orb, energyTip, tipMaterial, softBox, plumeMaterial } from './world/formKit.js';   /* M12 owner pivot: the spectral aura language */
 import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal, applyRadialDeck } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
+/* M20 CIVIC LIGHT MASTS — the adoption of the field builder's light columns and the mast's parts (pure: THREE + numbers in, world-space
+   geometries out; the area test builds them in node and checks every vertex against the collider envelope). See the note in createCityScene. */
+export var LIGHT_MAST = { plinth_h: 0.46, plinth_out: 0.02, head_drop: 0.8 };
+export function adoptLightColumns(group) { var kids = group.children.slice(), cols = [], out = [];
+  kids.forEach(function (o) { var p = o.isMesh && !o.isInstancedMesh && o.geometry && o.geometry.type === 'CylinderGeometry' ? o.geometry.parameters : null; if (p && Math.abs(p.height - 0.9) < 1e-6 && Math.abs(o.position.y - 0.45) < 1e-6 && Math.abs(p.radiusBottom - p.radiusTop - 0.02) < 1e-6) cols.push({ x: o.position.x, z: o.position.z, r: p.radiusTop - 0.03, parts: [] }); });
+  cols.forEach(function (C) { kids.forEach(function (o) { if (o.isMesh && !o.isInstancedMesh && !o.name && Math.abs(o.position.x - C.x) < 1e-6 && Math.abs(o.position.z - C.z) < 1e-6) C.parts.push(o); }); });
+  cols.filter(function (C) { return C.parts.some(function (o) { return o.geometry.type === 'LatheGeometry' && o.material && o.material.transparent; }); }).forEach(function (C) { var top = 0;
+    C.parts.forEach(function (o) { top = Math.max(top, o.position.y); group.remove(o); o.geometry.dispose(); }); out.push({ x: C.x, z: C.z, r: C.r, h: Math.round((top + 0.02) * 100) / 100, removed: C.parts.length }); });   /* the spike stands at h − 2 cm: the column's height */
+  return out; }
+/* M20 RAMP NOSINGS (V32: a glowing white bar floated at eye height across the plaza hub). The field builder lays one trim bar along each
+   plaza ramp at the ramp's TOP height over its whole length (hi + 3 cm, on the low side too), so at the low end it hangs 1.5 m in the air.
+   adoptRampEdges() finds each field ramp (an 8-vertex wedge at the origin) with its bar (a 4 cm trim box at hi + 3 cm on the ramp's
+   footprint), removes the bar and returns the ramp's top quad; rampNosings() lays a brushed-platinum nosing ON the walking surface along
+   every sloped side and the high edge (2 cm proud, 0.5 cm inside the footprint: the host law's collision-surface rule), none at the foot. */
+export function adoptRampEdges(group) { var kids = group.children.slice(), out = [];
+  kids.forEach(function (rm) { var gm = rm.isMesh && !rm.isInstancedMesh && !rm.name && rm.geometry, p = gm && rm.geometry.attributes.position; if (!gm || rm.geometry.type !== 'BufferGeometry' || !rm.geometry.index || rm.geometry.index.count !== 36 || !p || p.count !== 8 || rm.position.lengthSq() !== 0) return;
+    var v = [], x1 = 1e9, x2 = -1e9, z1 = 1e9, z2 = -1e9, hi = 0; for (var i = 0; i < 8; i++) { v.push([p.getX(i), p.getY(i), p.getZ(i)]); x1 = Math.min(x1, v[i][0]); x2 = Math.max(x2, v[i][0]); z1 = Math.min(z1, v[i][2]); z2 = Math.max(z2, v[i][2]); hi = Math.max(hi, v[i][1]); }
+    if (v.slice(4).some(function (q) { return Math.abs(q[1]) > 1e-6; })) return;   /* the field wedge: top quad first, its floor quad at 0 */
+    var bars = kids.filter(function (o) { var q = o.isMesh && o.geometry && o.geometry.type === 'BoxGeometry' ? o.geometry.parameters : null; return q && Math.abs(q.height - 0.04) < 1e-6 && (Math.abs(q.width - 0.05) < 1e-6 || Math.abs(q.depth - 0.05) < 1e-6) && Math.abs(o.position.y - (hi + 0.03)) < 1e-6 && o.position.x >= x1 - 1e-6 && o.position.x <= x2 + 1e-6 && o.position.z >= z1 - 1e-6 && o.position.z <= z2 + 1e-6; });
+    if (bars.length !== 1) return; group.remove(bars[0]); bars[0].geometry.dispose(); out.push({ top: v.slice(0, 4), hi: hi }); });
+  return out; }
+export function rampNosings(THREE, R) { var out = [], T = R.top.map(function (q) { return new THREE.Vector3(q[0], q[1], q[2]); }), C = new THREE.Vector3(); T.forEach(function (q) { C.addScaledVector(q, 0.25); });
+  var N = new THREE.Vector3().crossVectors(new THREE.Vector3().subVectors(T[1], T[0]), new THREE.Vector3().subVectors(T[3], T[0])).normalize(); if (N.y < 0) N.negate();   /* the walking plane's normal */
+  for (var i = 0; i < 4; i++) { var a = T[i], b = T[(i + 1) % 4], slope = Math.abs(a.y - b.y) > 1e-3, high = !slope && a.y >= R.hi - 1e-6 && R.hi > 0.05; if (!slope && !high) continue;
+    var X = new THREE.Vector3().subVectors(b, a), L = X.length(); X.normalize(); var mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5), Z = new THREE.Vector3().crossVectors(N, X).normalize(); if (Z.dot(new THREE.Vector3().subVectors(C, mid)) < 0) Z.negate();
+    X.crossVectors(N, Z).normalize();   /* a right-handed frame (X, N, Z): a mirrored basis would flip the winding and cull the strip */
+    var g = new THREE.BoxGeometry(L - 0.03, 0.02, 0.06); g.applyMatrix4(new THREE.Matrix4().makeBasis(X, N, Z)); g.translate(mid.x + Z.x * 0.035 + N.x * 0.01, mid.y + Z.y * 0.035 + N.y * 0.01, mid.z + Z.z * 0.035 + N.z * 0.01); out.push(g); }
+  return out; }
+export function lightMastParts(THREE, C, tier) { var LOW = tier === 'LOW', HI = tier === 'HIGH', SEG = LOW ? 6 : (HI ? 24 : 14), P = { stone: [], dark: [], metal: [], lit: [], pool: { x: C.x, z: C.z, s: 2.1 } };
+  var R = C.r, PH = LIGHT_MAST.plinth_h, Y0 = PH + 0.3, Y1 = C.h - LIGHT_MAST.head_drop, J = Math.min(2.55, (Y0 + Y1) / 2), rB = 0.118, rT = 0.072, bel = 0.012, RO = R + LIGHT_MAST.plinth_out;
+  function lathe(pts, seg) { return new THREE.LatheGeometry(pts.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), seg || SEG); }
+  function put(list, g) { g.translate(C.x, 0, C.z); list.push(g); }
+  var plin = LOW ? [[0.0001, 0], [R - 0.02, 0], [R - 0.02, 0.03], [RO, 0.06], [RO, PH - 0.03], [R - 0.04, PH], [0.0001, PH + 0.012]] : [[0.0001, 0], [R - 0.02, 0], [R - 0.02, 0.03], [R + 0.004, 0.04], [RO, 0.06], [RO, PH - 0.1], [RO - 0.012, PH - 0.092], [RO - 0.012, PH - 0.078], [RO, PH - 0.07], [RO, PH - 0.03], [RO - 0.008, PH - 0.01], [R - 0.012, PH - 0.001], [R - 0.04, PH], [0.27, PH + 0.012], [0.0001, PH + 0.012]];   /* LOW: the same drum without the cap reveal */
+  put(P.stone, lathe(plin, LOW ? 12 : (HI ? 44 : 28)));   /* seat plinth: a shadow reveal at the foot, the drum, a cap-stone reveal under the rolled arris, a faint fall to the flange */
+  if (!LOW) put(P.metal, lathe([[0.0001, PH], [0.25, PH], [0.256, PH + 0.008], [0.256, PH + 0.018], [0.247, PH + 0.028], [0.0001, PH + 0.028]]));   /* platinum base flange */
+  if (HI) for (var bi = 0; bi < 6; bi++) { var ba = bi / 6 * Math.PI * 2 + 0.26, bolt = new THREE.CylinderGeometry(0.016, 0.018, 0.026, 8); bolt.translate(Math.cos(ba) * 0.222, PH + 0.04, Math.sin(ba) * 0.222); put(P.metal, bolt); }
+  put(P.dark, lathe(LOW ? [[0.0001, PH], [0.19, PH], [0.17, PH + 0.1], [0.146, PH + 0.3], [0.0001, PH + 0.32]] : [[0.0001, PH + 0.028], [0.19, PH + 0.028], [0.188, PH + 0.05], [0.172, PH + 0.1], [0.152, PH + 0.24], [0.146, PH + 0.3], [0.128, PH + 0.32], [0.0001, PH + 0.32]]));   /* cast anthracite shoe */
+  var sh = taperShaft(THREE, rB, rT, Y1 - Y0, tier, LOW ? { flare: 1, belly: bel, radial: 6, rows: 3 } : { flare: 1, belly: bel }); sh.translate(0, Y0, 0); put(P.dark, sh);   /* the mast */
+  var tj = (J - Y0) / (Y1 - Y0), rJ = rB + (rT - rB) * Math.pow(tj, 0.85) + Math.sin(tj * Math.PI) * bel * rB;
+  if (!LOW) put(P.dark, lathe([[rJ - 0.004, J - 0.05], [rJ + 0.008, J - 0.046], [rJ + 0.012, J - 0.034], [rJ + 0.012, J + 0.034], [rJ + 0.008, J + 0.046], [rJ - 0.004, J + 0.05]]));   /* section joint: a sleeve 1.2 cm proud */
+  put(P.dark, lathe(LOW ? [[0.0001, Y1 - 0.14], [rT + 0.016, Y1 - 0.03], [0.118, Y1 + 0.1], [0.0001, Y1 + 0.125]] : [[0.0001, Y1 - 0.14], [rT + 0.012, Y1 - 0.14], [rT + 0.016, Y1 - 0.03], [0.095, Y1 + 0.04], [0.118, Y1 + 0.1], [0.122, Y1 + 0.125], [0.0001, Y1 + 0.125]]));   /* neck flaring to the lantern */
+  if (!LOW) put(P.metal, lathe([[0.0001, Y1 + 0.118], [0.128, Y1 + 0.118], [0.136, Y1 + 0.13], [0.136, Y1 + 0.145], [0.126, Y1 + 0.156], [0.0001, Y1 + 0.156]]));   /* platinum lantern ring */
+  var gl = [[0.0001, Y1 + 0.15], [0.118, Y1 + 0.15], [0.128, Y1 + 0.22], [0.146, Y1 + 0.34], [0.17, Y1 + 0.47], [0.192, Y1 + 0.57], [0.2, Y1 + 0.62], [0.0001, Y1 + 0.62]];
+  put(P.lit, lathe(LOW ? [gl[0], gl[1], gl[3], gl[5], gl[6], gl[7]] : gl));   /* the opal diffuser — a gently flared glass, the one lit element */
+  if (!LOW) for (var mi = 0; mi < 4; mi++) { var ma = mi * Math.PI / 2 + Math.PI / 4, cv = new THREE.CatmullRomCurve3(gl.slice(1, 7).map(function (q) { return new THREE.Vector3(Math.cos(ma) * (q[0] + 0.006), q[1], Math.sin(ma) * (q[0] + 0.006)); })); put(P.metal, new THREE.TubeGeometry(cv, 8, 0.008, HI ? 5 : 4, false)); }   /* platinum ribs that follow the glass */
+  put(P.dark, lathe(LOW ? [[0.0001, Y1 + 0.615], [0.26, Y1 + 0.622], [0.296, Y1 + 0.652], [0.2, Y1 + 0.688], [0.0001, Y1 + 0.73]] : [[0.0001, Y1 + 0.615], [0.19, Y1 + 0.615], [0.26, Y1 + 0.622], [0.292, Y1 + 0.638], [0.296, Y1 + 0.652], [0.28, Y1 + 0.666], [0.2, Y1 + 0.688], [0.11, Y1 + 0.712], [0.05, Y1 + 0.726], [0.0001, Y1 + 0.73]]));   /* a low anthracite hood with a rolled eave over the glass */
+  if (!LOW) { var stem = new THREE.CylinderGeometry(0.012, 0.018, 0.06, 8); stem.translate(0, Y1 + 0.745, 0); put(P.metal, stem); }
+  if (!LOW) { var cr = orb(THREE, 0.042, tier, HI ? 12 : 8); cr.translate(0, Y1 + 0.775, 0); put(P.metal, cr); }   /* crest orb (the roster's orb, not the old spike); LOW: the hood alone (the four masts are one merged, jointly culled draw — LOW must stay no heavier than the columns in any view) */
+  return P; }
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
   var M = {
@@ -128,6 +177,31 @@ export function createCityScene(THREE, group, helpers) {
       sign.renderOrder = 3; sign.userData.dayNight = function (n) { sm.color.setHex(n ? 0xf2f3f6 : 0xaeb4bd); }; g.add(sign); } }
   var THRESH = { stone: [], drain: [], edge: [] };
   var haloTicks = [];   /* M11: HALO pieces animated from the city tick (garden motes) */   /* M10: entrance aprons / slot drains, merged once in dress() */
+  /* M20 CIVIC LIGHT MASTS (owner 2026-09-27: "reduce smooth primitive shells", SOFTENED PRECISION, "Do not solve weak architecture with neon",
+     "people actually exist here"; lead review of c25fb59: the plaza's four big white faceted light pylons read as plastic lighthouses and
+     dominate every eye-level plaza view). They are the host colliders PILLAR_NW / NE / SW / SE (CYLINDER r 0.6 m × 5 m at (±7, ±7)); the
+     field's collider-proxy builder (fieldScene.js — not this module) draws each as a stone drum, a flat-shaded white shaft, a glass bulb, a
+     chrome bell and a white spike, straight under `group`. Before the static merge, dress() ADOPTS them (adoptLightColumns above: a 0.9 m
+     drum r + 0.03 / r + 0.05 centred at 0.45 m with a transparent lantern lathe at the same x / z; every piece at that x / z goes) and builds a
+     CIVIC LIGHT MAST from the drum's radius and the column's height, in the plaza's platinum / graphite construction language: a honed
+     coursed-stone SEAT PLINTH that is the collider footprint (r + 2 cm, a shadow reveal at the foot, a cap-stone reveal, a rolled arris) so a
+     player meets stone where the collider stops them; a cast anthracite SHOE on a bolted platinum FLANGE; a slim tapered satin-anthracite MAST
+     with a section-joint sleeve; and above head height a real LUMINAIRE — the neck flaring into a platinum ring, a gently flared opal glass
+     (the one lit element: neutral white, a pearl glass by day, lit at night, live with the time of day) caged by four platinum ribs that
+     follow it, a low anthracite hood with a rolled eave and a small crest orb (the roster's orb, not the spike). At night each throws a soft
+     neutral pool on the paving (two instances of the bollard pool draw). Below 3.4 m every part stays inside the collider radius + 5 cm; the
+     luminaire starts above 4 m. The four masts merge per material into 4 draws (the columns cost 12 exclusive draws: the faceted shaft, the
+     glass bulb and the spike are materials of their own). The same pass swaps the plaza ramps' floating trim bars for nosings on the ramp
+     (adoptRampEdges / rampNosings above; they ride in the masts' metal draw). */
+  var mastInfo = { columns: 0, pieces_removed: 0, ramp_bars_removed: 0, draws: 0 };
+  function buildLightMasts() { var cols = adoptLightColumns(group), ramps = adoptRampEdges(group), P = { stone: [], dark: [], metal: [], lit: [] }; mastInfo.columns = cols.length; mastInfo.ramp_bars_removed = ramps.length; if (!cols.length && !ramps.length) return; ramps.forEach(function (R) { P.metal = P.metal.concat(rampNosings(THREE, R)); });   /* M20: the floating ramp bars become nosings on the ramp (same metal draw) */
+    cols.forEach(function (C) { mastInfo.pieces_removed += C.removed; var L = lightMastParts(THREE, C, SDT); ['stone', 'dark', 'metal', 'lit'].forEach(function (k) { P[k] = P[k].concat(L[k]); }); ENT_POOLS.push(L.pool, { x: L.pool.x, z: L.pool.z, s: 1.3 }); });   /* its night pool (a broad one + a brighter core) rides in the bollard pool draw */
+    var stoneM = M.cladding.clone(); stoneM.color.setHex(0x6c7078); applySurface(THREE, stoneM, 'STONE', SDT);   /* honed coursed stone, a shade lighter than the graphite plinths */
+    var anthM = M.dark.clone(); anthM.color.setHex(0x3c4048); anthM.roughness = 0.42; anthM.metalness = 0.6; applySurface(THREE, anthM, 'BRUSHED', SDT);   /* satin anthracite (the facade graphite read as a black pipe on a 5 m mast) */
+    var litM = new THREE.MeshStandardMaterial({ color: 0xc6c7ca, emissive: 0xffffff, emissiveIntensity: DAY ? 0.12 : 1.5, roughness: 0.42, metalness: 0 });   /* colour law: civic light is equal-channel white; by day a pearl opal glass, not a white lamp */
+    [[P.stone, stoneM, 'CITY_LIGHT_MAST_PLINTHS'], [P.dark, anthM, 'CITY_LIGHT_MAST_SHAFTS'], [P.metal, M.chrome, 'CITY_PLAZA_FURNITURE_METAL'], [P.lit, litM, 'CITY_LIGHT_MAST_DIFFUSERS']].forEach(function (T) { if (!T[0].length) return;
+      var mg = mergeGeometries(T[0].map(function (q) { var nq = q.index ? q.toNonIndexed() : q; if (!nq.attributes.uv) nq.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(nq.attributes.position.count * 2), 2)); return nq; }), false); T[0].forEach(function (q) { q.dispose(); }); if (!mg) return;
+      var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; mm.receiveShadow = true; if (T[1] === litM) mm.userData.dayNight = function (n) { litM.emissiveIntensity = n ? 1.5 : 0.12; }; group.add(mm); mastInfo.draws++; }); }
   var api = {
     /* one authored building from its collider (BOX or CYLINDER) + `building` block */
     building: function (s) {
@@ -188,6 +262,7 @@ export function createCityScene(THREE, group, helpers) {
     },
     /* ground and dressing: chrome floor with diamond inlays, puddle accents, laser plants; nothing blocks movement */
     dress: function (size) {
+      try { buildLightMasts(); } catch (e) { if (helpers.log) helpers.log('light masts failed: ' + (e && e.message || e)); } api.lightMasts = mastInfo;   /* M20: the field's light columns become civic light masts (before the static merge) */
       if (!kitBuilt) { kitBuilt = true; try { kit.build(group); } catch (e) { if (helpers.log) helpers.log('facade kit failed: ' + (e && e.message || e)); } }
       if (THRESH.stone.length) { var tStone = M.cladding.clone(); tStone.color.setHex(0x4c525c); tStone.roughness = 0.58; tStone.polygonOffset = true; tStone.polygonOffsetFactor = -1; var tDrain = new THREE.MeshStandardMaterial({ color: 0x101318, roughness: 0.85, metalness: 0.2 });
         [[THRESH.stone, tStone, 'CITY_ENTRANCE_APRONS'], [THRESH.drain, tDrain, 'CITY_SLOT_DRAINS'], [THRESH.edge, M.chrome, 'CITY_DRAIN_EDGES']].filter(function (T) { if (SDT === 'LOW' && T[2] === 'CITY_DRAIN_EDGES') { T[0].forEach(function (q) { q.dispose(); }); return false; } return true; }).forEach(function (T) { var mg = mergeGeometries(T[0].map(function (q) { return q.toNonIndexed(); }), false); T[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; mm.receiveShadow = true; group.add(mm); }); THRESH.stone = []; THRESH.drain = []; THRESH.edge = []; }
