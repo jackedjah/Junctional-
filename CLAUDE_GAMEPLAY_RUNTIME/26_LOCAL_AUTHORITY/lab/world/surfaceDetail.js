@@ -89,8 +89,8 @@ export var SURFACE = {
   BRUSHED: { kind: 'BRUSHED', toneVar: 0.05, roughVar: 0.55, macro: 0.03, grain: 0, lod: [12, 60], foot: [1.4, 0.16] },
   TOWER: { kind: 'PANELS', cell: [3.2, 7.2], seam: 0.04, seamDark: 0.6, bevel: 0.3, toneVar: 0.05, roughVar: 0.26, macro: 0.04, grain: 0.03, band: [3.6, 0.16], bandTone: 0.84, lod: [40, 220], metalSeam: 0.5, foot: [3.0, 0.2], micro: [1.2, 0.007] },
   CONCRETE: { kind: 'HARDSCAPE', cell: [4, 4], seamless: true, toneVar: 0, roughVar: 0, macro: 0.07, grain: 0.08, lod: [30, 120], foot: [1.6, 0.18], micro: [3.0, 0.01] },
-  PAVER: { kind: 'HARDSCAPE', cell: [4.0, 2.0], seam: 0.03, seamDark: 0.76, bevel: 0.2, toneVar: 0.06, roughVar: 0.2, macro: 0.06, grain: 0.08, stagger: 0.5, lod: [30, 120], metalSeam: 0.5, micro: [2.6, 0.008] },
-  KERB: { kind: 'PANELS', cell: [1.0, 1.0], seam: 0.02, seamDark: 0.62, bevel: 0.3, toneVar: 0.06, roughVar: 0.22, macro: 0.03, grain: 0.04, lod: [24, 100], metalSeam: 0.5, foot: [0.5, 0.15], micro: [3.5, 0.008] },
+  PAVER: { kind: 'HARDSCAPE', cell: [4.0, 2.0], seamless: true, toneVar: 0, roughVar: 0, macro: 0.05, grain: 0, lod: [30, 120] },   /* M20: the road cores lay their stone in ROAD space (terrain.js): the world-grid 4 × 2 m pavers ran diagonally across the 45° causeways — macro only here (the road shader carries its own anti-aliased grain and joint chamfer: this family's 23 /m grain and derivative micro relief beat into dot patterns at 4–20 m) */
+  KERB: { kind: 'PANELS', cell: [1.0, 1.0], seamless: true, toneVar: 0, roughVar: 0, macro: 0.03, grain: 0, lod: [24, 100], foot: [0.5, 0.15], micro: [3.5, 0.008] },   /* M20: kerb stones cut along the road in terrain.js (the world grid cut them askew on diagonal roads) */
   GLAZING: { kind: 'PANELS', cell: [1.5, 1.2], seam: 0.07, seamDark: 0.32, bevel: 0, toneVar: 0.05, roughVar: 0.35, macro: 0.03, grain: 0, band: [3.6, 0.34], bandTone: 0.5, lod: [40, 180], metalSeam: 0, foot: [1.2, 0.12], glass: 0.6 },   /* M8B: curtain wall — mullions / transoms, a spandrel per storey, per-pane reflection variation */
   SAND: { kind: 'HARDSCAPE', cell: [4, 4], seamless: true, toneVar: 0, roughVar: 0, macro: 0.08, grain: 0.1, lod: [20, 90] },   /* M8B: dry-sand grain + drift breakup on the shore band */
   FACADE_PLAIN: { kind: 'PANELS', cell: [1.8, 1.2], seam: 0.024, seamDark: 0.66, bevel: 0.3, toneVar: 0.08, roughVar: 0.3, macro: 0.05, grain: 0.035, lod: [30, 140], metalSeam: 0.5, foot: [2.2, 0.2], micro: [1.6, 0.006] },   /* M8E: platinum skin between real windows (the storey band now comes from the slab edges) */
@@ -114,6 +114,7 @@ export function applySurface(THREE, mat, family, tier) { var S = SURFACE[family]
    the registry after it loads (the pattern starts as the civic default). Value / roughness only — never hue. */
 var ZONED_FUNCS = [
   'uniform vec4 uZR[16]; uniform float uZRT[16]; uniform float uZRS[16]; uniform vec4 uZC[6]; uniform float uZCS[6]; uniform vec4 uZS[8]; uniform float uZDefSoft; uniform sampler2D uZWear; uniform vec4 uZWearB;',
+  'float zNz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); vec2 a = mod(i, 256.0), b = mod(i + vec2(1.0, 0.0), 256.0), c = mod(i + vec2(0.0, 1.0), 256.0), d = mod(i + 1.0, 256.0); return mix(mix(sdHash(a), sdHash(b), f.x), mix(sdHash(c), sdHash(d), f.x), f.y); }',   /* M20: value noise on a 256-cell periodic lattice — sdHash of a raw world lattice index (thousands of cells at 20–70 /m) runs out of float precision and beats into a line / dot moire */
   'void pBond(vec2 p, vec2 cell, float stag, out float d, out vec2 id, out vec2 cc) { vec2 g = p / cell; float row = floor(g.y); float sh = stag * mod(row, 2.0); g.x += sh; vec2 i = floor(g), f = fract(g); vec2 e = min(f, 1.0 - f) * cell; d = min(e.x, e.y); id = i; cc = vec2(i.x + 0.5 - sh, i.y + 0.5) * cell; }',
   'void pRings(vec2 q, float w, float jl, out float d, out vec2 id, out vec2 cc) { float r = length(q); float ri = floor(r / w), fr = fract(r / w); float n = max(3.0, floor(6.2831853 * (ri + 0.5) * w / jl)); float a = (atan(q.y, q.x) + 3.14159265) / 6.2831853 * n; float ai = floor(a), fa = fract(a); d = min(min(fr, 1.0 - fr) * w, min(fa, 1.0 - fa) * 6.2831853 * max(r, 0.2) / n); id = vec2(ri, ai); float ac = (ai + 0.5) / n * 6.2831853 - 3.14159265; cc = vec2(cos(ac), sin(ac)) * (ri + 0.5) * w; }',
   'void pHex(vec2 p, float s, out float d, out vec2 id, out vec2 cc) { vec2 r = vec2(1.0, 1.7320508), h = r * 0.5; vec2 P = p / s; vec2 a = mod(P, r) - h, b = mod(P - h, r) - h; vec2 gv = dot(a, a) < dot(b, b) ? a : b; vec2 c = P - gv; vec2 ag = abs(gv); float hd = max(dot(ag, vec2(0.5, 0.8660254)), ag.x); d = (0.5 - hd) * s; id = vec2(floor(c.x * 2.0 + 0.5), floor(c.y / 0.8660254 + 0.5)); cc = c * s; }',
@@ -125,23 +126,50 @@ var ZONED_FUNCS = [
    One soft WEAR field baked once from the registry's paths: the centre band of every causeway / regional road / trail, the forecourt spurs
    to each door (worn hardest) and the desire lines the causeways draw across the plaza to its centre. The ground paving and the path cores
    sample it: foot-polished where people walk (smoother, a touch lighter, joints packed with grit), grimier joints in the untrodden margins.
-   A 512² single-channel texture (≈ 1.3 m texels), built by rasterising each segment only inside its own bounds; shared, never re-built. */
+   A 512² single-channel texture (≈ 1.3 m texels), built by rasterising each segment only inside its own bounds; shared, never re-built.
+   M20 (owner 2026-09-27, surface polish: "material realism, humanized transitions, lived-in variation"; the lead's review: vast featureless,
+   uniform, clean-render floors): the field is RGBA now and covers the whole mainland (the coast outline, not only the paths' bounds), so the
+   ground can read MACRO zones over tens of metres. R = WEAR (unchanged: the road cores still read .r), G = DAMP — the ground within ~9 m
+   of a canal bank or a pond stays damp (darker, a sheen, joints filled), A = the SEA EDGE — the last ~15 m of paving before the beach takes
+   wind-blown sand in its joints and a salt-dull finish, B = the KERB HALO — the 1.8 m of district paving
+   just outside every road frame / forecourt collects grit and run-off from the kerb (a soft gutter band, darker joints). Still one 512²
+   texture (1 MB), built once. */
 var WEAR = null;
 export function wearField(THREE, reg) {
   if (WEAR && WEAR.reg === reg) return WEAR;
-  var PW = (reg && reg.paths) || {}, L = PW.list || [], segs = [], W = { CAUSEWAY: PW.causeway_w || 20, REGIONAL: PW.regional_w || 8, TRAIL: PW.trail_w || 3 }, K = { CAUSEWAY: 0.75, REGIONAL: 0.65, TRAIL: 0.5 };
-  L.forEach(function (P) { var pts = P.pts || [], w = P.width_m || W[P.tier] || 6, k = K[P.tier] || 0.5; for (var i = 1; i < pts.length; i++) segs.push([pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], w, k]);
-    if (P.forecourt) [P.spur, P.spur2].forEach(function (S) { if (S && S.to) segs.push([P.forecourt.x, P.forecourt.z, S.to[0], S.to[1], (PW.spur_w || 6) * 1.2, 1.0]); }); });
+  var PW = (reg && reg.paths) || {}, L = PW.list || [], segs = [], W = { CAUSEWAY: PW.causeway_w || 20, REGIONAL: PW.regional_w || 8, TRAIL: PW.trail_w || 3 }, K = { CAUSEWAY: 0.75, REGIONAL: 0.65, TRAIL: 0.5 }, discs = [];
+  L.forEach(function (P) { var pts = P.pts || [], w = P.width_m || W[P.tier] || 6, k = K[P.tier] || 0.5; for (var i = 1; i < pts.length; i++) segs.push([pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], w, k, w]);
+    if (P.forecourt) { discs.push([P.forecourt.x, P.forecourt.z, P.forecourt.r || PW.forecourt_r || 12]); [P.spur, P.spur2].forEach(function (S) { if (S && S.to) segs.push([P.forecourt.x, P.forecourt.z, S.to[0], S.to[1], (PW.spur_w || 6) * 1.2, 1.0, PW.spur_w || 6]); }); } });
   var x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9; segs.forEach(function (s) { x0 = Math.min(x0, s[0], s[2]); x1 = Math.max(x1, s[0], s[2]); z0 = Math.min(z0, s[1], s[3]); z1 = Math.max(z1, s[1], s[3]); });
   if (!segs.length) { x0 = z0 = -1; x1 = z1 = 1; } x0 -= 24; z0 -= 24; x1 += 24; z1 += 24;
-  var N = 512, data = new Uint8Array(N * N), sx = (x1 - x0) / N, sz = (z1 - z0) / N;
-  segs.forEach(function (s) { var ax = s[0], az = s[1], bx = s[2], bz = s[3], w = s[4], k = s[5], reach = w * 0.5 + 1, dx = bx - ax, dz = bz - az, L2 = dx * dx + dz * dz || 1;
-    var i0 = Math.max(0, Math.floor((Math.min(ax, bx) - reach - x0) / sx)), i1 = Math.min(N - 1, Math.ceil((Math.max(ax, bx) + reach - x0) / sx)), j0 = Math.max(0, Math.floor((Math.min(az, bz) - reach - z0) / sz)), j1 = Math.min(N - 1, Math.ceil((Math.max(az, bz) + reach - z0) / sz));
-    for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) { var px = x0 + (i + 0.5) * sx, pz = z0 + (j + 0.5) * sz, t = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / L2)), ex = px - ax - dx * t, ez = pz - az - dz * t, u = (Math.sqrt(ex * ex + ez * ez) - w * 0.12) / (w * 0.36);
-      var v = u <= 0 ? 1 : (u >= 1 ? 0 : 1 - u * u * (3 - 2 * u)), c = Math.round(v * k * 255), o = j * N + i; if (c > data[o]) data[o] = c; } });   /* full wear in the centre 24 % of the width, easing out to 96 % */
-  var tex = new THREE.DataTexture(data, N, N, THREE.RedFormat, THREE.UnsignedByteType); tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping; tex.needsUpdate = true;
-  WEAR = { reg: reg, tex: tex, bounds: new THREE.Vector4(x0, z0, 1 / (x1 - x0), 1 / (z1 - z0)), segs: segs.length }; return WEAR;
+  var CO = reg && reg.coast && reg.coast.outline; if (CO) { x0 = Math.min(x0, CO.x1 - 4); z0 = Math.min(z0, CO.z1 - 4); x1 = Math.max(x1, CO.x2 + 4); z1 = Math.max(z1, CO.z2 + 4); }
+  var N = 512, data = new Uint8Array(N * N * 4), sx = (x1 - x0) / N, sz = (z1 - z0) / N;
+  function put(o, ch, v) { var c = Math.round(Math.max(0, Math.min(1, v)) * 255); if (c > data[o * 4 + ch]) data[o * 4 + ch] = c; }
+  function box(xa, za, xb, zb, fn) { var i0 = Math.max(0, Math.floor((xa - x0) / sx)), i1 = Math.min(N - 1, Math.ceil((xb - x0) / sx)), j0 = Math.max(0, Math.floor((za - z0) / sz)), j1 = Math.min(N - 1, Math.ceil((zb - z0) / sz)); for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) fn(j * N + i, x0 + (i + 0.5) * sx, z0 + (j + 0.5) * sz); }
+  function ease(u) { return u <= 0 ? 1 : (u >= 1 ? 0 : 1 - u * u * (3 - 2 * u)); }
+  segs.forEach(function (s) { var ax = s[0], az = s[1], bx = s[2], bz = s[3], w = s[4], k = s[5], fw = s[6] * 0.5, reach = Math.max(w * 0.5 + 1, fw + 2.2), dx = bx - ax, dz = bz - az, L2 = dx * dx + dz * dz || 1;
+    box(Math.min(ax, bx) - reach, Math.min(az, bz) - reach, Math.max(ax, bx) + reach, Math.max(az, bz) + reach, function (o, px, pz) { var t = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / L2)), ex = px - ax - dx * t, ez = pz - az - dz * t, dd = Math.sqrt(ex * ex + ez * ez);
+      put(o, 0, ease((dd - w * 0.12) / (w * 0.36)) * k);   /* full wear in the centre 24 % of the width, easing out to 96 % */
+      if (dd > fw - 0.6) put(o, 2, ease((dd - fw) / 1.8) * (dd < fw ? (dd - fw + 0.6) / 0.6 : 1)); }); });   /* the kerb halo: just outside the frame */
+  discs.forEach(function (D) { box(D[0] - D[2] - 2.2, D[1] - D[2] - 2.2, D[0] + D[2] + 2.2, D[1] + D[2] + 2.2, function (o, px, pz) { var dd = Math.hypot(px - D[0], pz - D[1]); if (dd > D[2] - 0.6) put(o, 2, ease((dd - D[2]) / 1.8) * (dd < D[2] ? (dd - D[2] + 0.6) / 0.6 : 1)); }); });
+  /* the sea edge (the coast outline: the district floor is cut to this rounded rectangle) and the damp round every canal / pond rectangle */
+  var DW = 9;
+  if (CO) { var cr = CO.corner_r || 0, hx = (CO.x2 - CO.x1) / 2, hz = (CO.z2 - CO.z1) / 2, cx = (CO.x1 + CO.x2) / 2, cz = (CO.z1 + CO.z2) / 2;
+    box(x0, z0, x1, z1, function (o, px, pz) { var qx = Math.abs(px - cx) - hx + cr, qz = Math.abs(pz - cz) - hz + cr, sd = Math.hypot(Math.max(qx, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qz), 0) - cr; if (sd > -18) put(o, 3, ease((-sd - 0.5) / 15)); }); }   /* A = the SEA EDGE: the last ~15 m of paving before the beach (wind-blown sand, a salt-dull finish) */
+  ((reg && reg.water && reg.water.rivers) || []).forEach(function (R) { box(R.x1 - DW - 1, R.z1 - DW - 1, R.x2 + DW + 1, R.z2 + DW + 1, function (o, px, pz) { var qx = Math.max(R.x1 - px, 0, px - R.x2), qz = Math.max(R.z1 - pz, 0, pz - R.z2), sd = Math.hypot(qx, qz); put(o, 1, ease((sd - 0.5) / (DW * 0.8)) * 0.85); }); });
+  var tex = new THREE.DataTexture(data, N, N, THREE.RGBAFormat, THREE.UnsignedByteType); tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping; tex.needsUpdate = true;
+  WEAR = { reg: reg, tex: tex, bounds: new THREE.Vector4(x0, z0, 1 / (x1 - x0), 1 / (z1 - z0)), segs: segs.length, channels: 'R wear · G damp · B kerb halo · A sea edge' }; return WEAR;
 }
+
+/* M20 PLANTED BEDS (surface polish: "humanized transitions … grass: maintained vs wild zones, tufts at edges"; the audit's grove frames: the
+   paving broke up tile by tile into a pixel-square loam — a ruin, not a planted grove). A grove's ground is now a DESIGNED BED: its edge runs
+   3.2 m inside the FOREST zone rectangle, swinging ±1.4 m in long easy curves, and it is laid in bands the eye reads as someone's care — a
+   stone EDGE COURSE (0.3 m), a raked gravel MARGIN (0.7–1.4 m, maintained), then the grove's soil (wild deeper in). One analytic function,
+   mirrored in GLSL (zonedPaving) and here (the meadow and the region shards keep to the bed). Returns metres inside the bed edge (< 0 on the
+   paving side) and the along-edge coordinate. */
+export var BED = { inset_m: 3.2, swing_m: 1.4, course_m: 0.3, margin_m: [0.7, 1.4] };
+export function bedEdge(zones, x, z) { var best = -1e9, along = x; for (var i = 0; i < zones.length; i++) { var r = zones[i], cx = (r.x1 + r.x2) / 2, cz = (r.z1 + r.z2) / 2, qx = Math.abs(x - cx) - (r.x2 - r.x1) / 2, qz = Math.abs(z - cz) - (r.z2 - r.z1) / 2, sdo = Math.hypot(Math.max(qx, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qz), 0); if (-sdo > best) { best = -sdo; along = qx > qz ? z : x; } }
+  var wob = BED.swing_m * 0.5 * (Math.sin(x * 0.21 + 1.7 * Math.sin(z * 0.093)) + Math.sin(z * 0.17 + 1.3 * Math.sin(x * 0.081))); return { d: best - BED.inset_m - wob, along: along, inside: best }; }
 
 export var PAVING_TYPES = { BOND: 0, RINGS: 1, HEX: 2, DIAMOND: 3, TRI: 4, PLANKS: 5, SQUARE: 6, MOSAIC: 7, FINE_RINGS: 8 };
 var CLASS_PAVING = { ATHLETE: ['DIAMOND', 0.1], TITAN: ['HEX', 0.15], LEAN: ['PLANKS', 0.35], VISIONARY: ['TRI', 0.5], BAGE: ['MOSAIC', 0.2] };
@@ -163,58 +191,88 @@ export function createPavingZones(THREE) {
   return Z;
 }
 
+/* M20 SURFACE POLISH (owner 2026-09-27: "material realism, humanized transitions, lived-in variation"; reinforcement: "premium, believable,
+   people actually exist here — bias away from empty or too-clean civic space"; the lead's review: V25 / TS1 / V03 / V13 / V32 floors read as
+   uniform clean-render paving, the grove ground as a pixel-square sheet, every transition a hard line). The ground reads at three scales:
+     MACRO  stone LOTS — the slabs are grouped (by their own centres, so the change always runs along a joint) into ~7 m lots of a slightly
+            different quarry batch; a broad 70 m value drift; the ground field's DAMP round canals / ponds (darker, a sheen, fuller joints),
+            its SEA EDGE (sand in the joints, a salt-dull finish, a little drift) and its KERB HALO (the gutter band just outside every road);
+     MESO   finer joints (2.2 cm, were 3.5), the plaza's concentric courses broken every fourth ring by a band of small dark SETTS, and the
+            grove's PLANTED BED (bedEdge above): stone edge course → raked gravel margin (maintained) → soil with pebbles (wild deeper in);
+     MICRO  a figure in each slab (the stone's own cloudiness), a fine aggregate speckle that fades before it can shimmer, and on HIGH a
+            honed micro relief near the eye. The per-slab tilt / roughness scatter now fades by 30 m (from the air it printed the MATCH
+            district as a checkerboard). The authored floor canvases' thin decorative lines (pale arcs, blue route strokes, the brushed
+            streaks) are read through a blurred, mostly neutral sample: their broad value gradient stays, the lines no longer float on the
+            stone as translucent bands. Value / roughness only — never hue. LOW keeps its old shader (pattern + per-slab tone; the finer joints,
+   and the canvas read is blurred, at the same texture cost); MED drops the pebbles, the second speckle octave, the drift and the noise on damp / kerb halo. */
 export function zonedPaving(THREE, mat, Z, spec) {
   if (!mat || !mat.isMeshStandardMaterial || (PATCHED ? PATCHED.has(mat) : mat.userData.surfaceDetail)) return mat;
-  var S = Object.assign({ seam: 0.035, seamDark: 0.7, bevel: 0.26, toneVar: 0.08, roughVar: 0.24, macro: 0.05, grain: 0.06, lod: [28, 120], band: 0.7, tier: 'HIGH' }, spec || {}); var LOW = S.tier === 'LOW';
+  var S = Object.assign({ seam: 0.022, seamDark: 0.6, bevel: 0.26, toneVar: 0.14, roughVar: 0.16, macro: 0.05, grain: 0.06, lod: [28, 120], band: 0.7, tier: 'HIGH' }, spec || {}); var LOW = S.tier === 'LOW', HIGH = !LOW && S.tier !== 'MED';
   var body = ['#include <color_fragment>',
-    'vec2 zp = vSdW.xz; float sdDist = length(cameraPosition - vSdW); float sdNear = 1.0 - smoothstep(' + f(S.lod[0]) + ', ' + f(S.lod[1]) + ', sdDist);',
+    'vec2 zp = vSdW.xz; float sdDist = length(cameraPosition - vSdW); float sdNear = 1.0 - smoothstep(' + f(S.lod[0]) + ', ' + f(S.lod[1]) + ', sdDist); float zFp = sdDist * length(dFdx(normalize(vViewPosition))) / sqrt(max(abs(cameraPosition.y - vSdW.y) / max(sdDist, 1e-3), 0.06));',   /* M20: the pixel footprint (m) — distance × the pixel's angle (the view ray's own derivative: smooth, resolution-aware) ÷ √(grazing cosine), between the across- and along-view footprints; the coverage / fade factors use it (fwidth-based amplitude factors change per 2 x 2 quad and stitched joints and grain into dots) */
     'float zType = 0.0, zEdge = 1e5, zSoftBase = uZDefSoft; vec2 zC = vec2(0.0);',
     'for (int i = 0; i < 16; i++) { vec4 R = uZR[i]; if (zp.x > R.x && zp.x < R.z && zp.y > R.y && zp.y < R.w) { zType = uZRT[i]; zSoftBase = uZRS[i]; zEdge = min(min(zp.x - R.x, R.z - zp.x), min(zp.y - R.y, R.w - zp.y)); } }',
     'for (int i = 0; i < 6; i++) { vec4 C = uZC[i]; float cr = length(zp - C.xy); if (C.z > 0.0 && cr < C.z) { zType = C.w; zSoftBase = uZCS[i]; zEdge = C.z - cr; zC = C.xy; } }',
-    'float sdD; vec2 sdId, sdCC;',
+    'float sdD; vec2 sdId, sdCC; float zSett = 0.0, zCourse = 0.0, zNatK = 0.0, zBed = -1e4, zAlong = 0.0, zSe = -1e4;',
     'if (zType < 0.5) pBond(zp, vec2(3.2, 1.6), 0.5, sdD, sdId, sdCC);',
-    'else if (zType < 1.5) { pRings(zp - zC, 1.8, 2.6, sdD, sdId, sdCC); sdCC += zC; }',
+    'else if (zType < 1.5) { pRings(zp - zC, 1.8, 2.6, sdD, sdId, sdCC); sdCC += zC;' + (LOW ? '' : ' float zRq = length(zp - zC); if (zRq > 5.2 && mod(floor(zRq / 1.8), 4.0) > 2.5) { pRings(zp - zC, 0.45, 0.6, sdD, sdId, sdCC); sdCC += zC; sdId += vec2(311.0, 17.0); zSett = 1.0; }') + ' }',   /* M20: every fourth plaza course is a band of small dark setts (not on LOW: no heavier there) */
     'else if (zType < 2.5) pHex(zp, 1.6, sdD, sdId, sdCC);',
     'else if (zType < 3.5) pDiamond(zp, 2.0, sdD, sdId, sdCC);',
     'else if (zType < 4.5) pTri(zp, 2.6, sdD, sdId, sdCC);',
     'else if (zType < 5.5) pBond(zp, vec2(3.6, 0.6), 0.5, sdD, sdId, sdCC);',
     'else if (zType < 6.5) pBond(zp, vec2(2.4, 2.4), 0.0, sdD, sdId, sdCC);',
     'else if (zType < 7.5) pBond(zp, vec2(0.9, 0.9), 0.5, sdD, sdId, sdCC);',
-    'else { pRings(zp - zC, 1.2, 1.8, sdD, sdId, sdCC); sdCC += zC; }',
-    'float zBand = 0.0; if (zEdge < ' + f(S.band) + ') { zBand = 1.0; sdD = min(zEdge, ' + f(S.band) + ' - zEdge); sdId = vec2(-7.0, zType); sdCC = zp; }',   /* the threshold course where two families meet */
-    'float sdAA = max(fwidth(sdD), 1e-4) * 1.25; float sdSeam = (1.0 - smoothstep(' + f(S.seam * 0.5) + ', ' + f(S.seam * 0.5) + ' + sdAA, sdD)) * sdNear * clamp(' + f(S.seam) + ' / sdAA, 0.0, 1.0);',   /* M11: a seam finer than the pixel footprint fades to its coverage instead of aliasing at grazing view */
+    'else { pRings(zp - zC, 1.2, 1.8, sdD, sdId, sdCC); sdCC += zC; }'];
+  if (!LOW) body.push(   /* M20 PLANTED BED (mirrors bedEdge): metres inside the grove's bed edge, and the stone edge course along it */
+    'for (int i = 0; i < 8; i++) { vec4 Sr = uZS[i]; if (Sr.z > Sr.x) { vec2 zq = abs(zp - (Sr.xy + Sr.zw) * 0.5) - (Sr.zw - Sr.xy) * 0.5; float se = -(length(max(zq, 0.0)) + min(max(zq.x, zq.y), 0.0)); if (se > zSe) { zSe = se; zAlong = zq.x > zq.y ? zp.y : zp.x; } } }',
+    'zBed = zSe - ' + f(BED.inset_m) + ' - ' + f(BED.swing_m * 0.5) + ' * (sin(zp.x * 0.21 + 1.7 * sin(zp.y * 0.093)) + sin(zp.y * 0.17 + 1.3 * sin(zp.x * 0.081)));',
+    'if (zBed > 0.0) { if (zBed < ' + f(BED.course_m) + ') { zCourse = 1.0; float zCa = zAlong / 0.5; float zCf = fract(zCa); sdD = min(min(zBed, ' + f(BED.course_m) + ' - zBed), min(zCf, 1.0 - zCf) * 0.5); sdId = vec2(floor(zCa), -41.0); sdCC = zp; } else { zNatK = 1.0; sdD = 1e3; } }');
+  body.push(
+    'float zBand = 0.0; if (zEdge < ' + f(S.band) + ') { if (zCourse + zNatK < 0.5) { zBand = 1.0; sdD = min(zEdge, ' + f(S.band) + ' - zEdge); sdId = vec2(-7.0, zType); sdCC = zp; } }',   /* the threshold course where two families meet */
+    'float sdAA = max(fwidth(sdD), 1e-4) * 1.25; float sdSeam = (1.0 - smoothstep(' + f(S.seam * 0.5) + ', ' + f(S.seam * 0.5) + ' + sdAA, sdD)) * sdNear * clamp(' + f(S.seam) + ' / (zFp * 1.25), 0.0, 1.0);',   /* M11: a seam finer than the pixel footprint fades to its coverage instead of aliasing at grazing view */
     'float sdH1 = sdHash(sdId + 17.0 + zType * 3.1), sdH2 = sdHash(sdId * 1.7 + 3.1 + zType);',
-    'float sdTone = (1.0 + (sdH1 - 0.5) * ' + f(S.toneVar) + ') * mix(1.0, 0.9, zBand); float sdRough = (1.0 + (sdH2 - 0.5) * ' + f(S.roughVar) + ') * mix(1.0, 1.15, zBand);',
-    'float zPatch = 0.0;'];
+    'float sdTone = (1.0 + (sdH1 - 0.5) * ' + f(S.toneVar) + ' * (1.0 + zSett + zCourse)) * mix(1.0, 0.9, zBand) * mix(1.0, 0.84, zSett) * mix(1.0, 0.72, zCourse); float sdRough = (1.0 + (sdH2 - 0.5) * ' + f(S.roughVar) + ') * mix(1.0, 1.15, zBand) * mix(1.0, 1.12, max(zSett, zCourse));',
+    'float zPatch = 0.0, zWear = 0.0, zGH = 0.0, zPeb = 0.0;');
+  if (!LOW) body.push('sdTone *= 1.0 + (sdHash(floor(sdCC / 7.0) + 91.7) - 0.5) * 0.09 * (1.0 - zNatK); sdRough = mix(1.0, sdRough, 1.0 - smoothstep(8.0, 30.0, sdDist));');   /* M20 stone lots (the change runs along the joints); the per-slab roughness scatter only near the eye (at range it printed a checkerboard of sky reflections) */
   if (!LOW) body.push(
-    'float zSoftRect = 0.0; for (int i = 0; i < 8; i++) { vec4 Sr = uZS[i]; if (Sr.z > Sr.x) { float se = min(min(zp.x - Sr.x, Sr.z - zp.x), min(zp.y - Sr.y, Sr.w - zp.y)); zSoftRect = max(zSoftRect, smoothstep(0.0, 10.0, se)); } }',
-    'float zSoft = max(zSoftBase, zSoftRect * 0.85); float zN = sdNoise(zp * 0.07) * 0.7 + sdNoise(zp * 0.23) * 0.3; zPatch = zSoft * smoothstep(0.42, 0.7, zN) * (1.0 - zBand);',
-    'sdSeam *= 1.0 - 0.9 * zPatch; sdTone *= 1.0 - 0.08 * zPatch; sdRough *= 1.0 + 0.25 * zPatch;',
-    /* M8C NATURAL GROUND: inside forest / garden zones and the ecology-leaning districts the paving DISSOLVES — tiles drop out one by one
-       along a noisy boundary (a sunken gap edge where each one is missing) until the ground is grown: dark loam with clods, pebbles and a
-       sparse crystal grit (the region tint colours it), fully matte, lit through its own bump. Hardscape stays constructed; nature stays grown. */
-    'float zNat0 = zSoftRect * 1.05 + (zSoftBase - 0.2) * 0.6 * step(0.3, zSoftBase); float zNat = clamp(zNat0 + (geoFbm(zp * 0.045) - 0.5) * 0.9 * smoothstep(0.03, 0.3, zNat0), 0.0, 1.0) * (1.0 - zBand);',   /* the noise only shapes the edge of a natural zone: plain hardscape never loses slabs */
-    'float zGone = step(sdH2, zNat * 1.2 - 0.12); float zNatK = max(zGone, smoothstep(0.82, 0.97, zNat));',
-    'float zGH = geoFbm(zp * 0.42) * 0.6 + geoN(zp * 2.6) * 0.3 + step(0.93, sdHash(floor(zp * 2.2))) * 0.35; float zGrit = step(0.994, sdHash(floor(zp * 7.0) + 3.3)) * zNatK;',
-    'float zGap = zGone * (1.0 - smoothstep(0.0, 0.12, sdD)) * (1.0 - smoothstep(0.82, 0.97, zNat));',   /* the broken edge of the paving around a missing tile */
-    'sdSeam = mix(sdSeam, 0.0, zNatK); sdTone = mix(sdTone, (0.46 + 0.2 * zGH) * (1.0 + zGrit * 1.4), zNatK) * (1.0 - zGap * 0.45); sdRough = mix(sdRough, 1.35 * (1.0 - zGrit * 0.6), zNatK);',
-    'float zWear = texture2D(uZWear, (zp - uZWearB.xy) * uZWearB.zw).r * (0.55 + 0.45 * sdNoise(zp * 0.13)) * (1.0 - zNatK);',   /* M14 LIVED-IN: foot-polished where people walk, joints packed with grit */
+    'float zSoftRect = smoothstep(0.0, 10.0, zSe);',
+    'float zSoft = max(zSoftBase, zSoftRect * 0.85); float zN = sdNoise(zp * 0.07) * 0.7 + sdNoise(zp * 0.23) * 0.3; zPatch = zSoft * smoothstep(0.42, 0.7, zN) * (1.0 - zBand) * (1.0 - zCourse);',
+    'sdSeam *= 1.0 - 0.6 * zPatch; sdTone *= 1.0 - 0.05 * zPatch; sdRough *= 1.0 + 0.2 * zPatch;',
+    'vec4 zF = texture2D(uZWear, (zp - uZWearB.xy) * uZWearB.zw); float zFwm = zFp;',   /* screen derivatives taken here, in uniform control flow */   /* the ground field: R wear · G damp · B kerb halo · A sea edge */
+    /* M8C → M20 NATURAL GROUND: inside the planted bed the ground is grown — a raked gravel MARGIN along the edge course (maintained), then the
+       grove's soil: humus drift, pebbles (HIGH), a darker, rougher floor deeper in (wild). The region tint colours it; fully matte. */
+    'float zNat0 = zSoftRect * 1.05; float zWild = smoothstep(0.03, 0.3, zNat0) * smoothstep(1.5, 9.0, zBed);',
+    'if (zNatK > 0.5) { float zMw = ' + f(BED.margin_m[0]) + ' + ' + f(BED.margin_m[1] - BED.margin_m[0]) + ' * sdNoise(vec2(zAlong * 0.09, 3.7)); float zMg = 1.0 - smoothstep(-0.12, 0.2, zBed - ' + f(BED.course_m) + ' - zMw + (zNz(zp * 2.3) - 0.5) * 0.5);',
+    '  zGH = geoFbm(zp * 0.35) * 0.7 + geoN(zp * 1.9) * 0.3;' + (HIGH ? ' vec2 zPi = floor(zp * 3.4), zPf = fract(zp * 3.4); float zPd = 8.0, zPh = 0.0; for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(float(x), float(y)); float d = length(g + vec2(sdHash(mod(zPi + g, 256.0)), sdHash(mod(zPi + g, 256.0) + 31.7)) - zPf); if (d < zPd) { zPd = d; zPh = sdHash(mod(zPi + g, 256.0) + 7.7); } } float zPr = 0.09 + 0.2 * zPh * zPh; zPeb = (1.0 - smoothstep(zPr - zFwm * 3.4, zPr + zFwm * 3.4, zPd)) * step(0.7 - 0.2 * zWild - 0.45 * (sdNoise(zp * 0.6 + 1.7) - 0.5), zPh) * (1.0 - zMg);' : ' float zPh = 0.0;'),
+    '  float zGrav = zNz(zp * 31.0) * 0.6 + zNz(zp * 73.0) * 0.4; float zRake = 0.5 + 0.5 * sin((zBed - ' + f(BED.course_m) + ') * 62.8318) * (1.0 - smoothstep(0.15, 0.45, zFwm * 10.0));',   /* raked lines along the edge (10 cm), gone before they can alias */
+    '  float zSoil = (0.4 + 0.26 * zGH) * (0.84 + 0.32 * sdNoise(zp * 0.15 + 6.1)) * mix(1.0, 0.82, zWild) * (1.0 + zPeb * (0.35 + 0.3 * zPh));',   /* drier and damper patches of soil; pebbles of mixed size, in drifts */
+    '  float zLit = smoothstep(0.52, 0.8, sdNoise(zp * 0.38 + 11.0)) * (1.0 - zMg); zSoil *= 1.0 + 0.45 * zLit * ' + (HIGH ? 'mix(0.3, smoothstep(0.58, 0.7, zNz(zp * vec2(13.0, 8.0) + 2.0)), 1.0 - smoothstep(0.25, 0.6, zFwm * 13.0))' : '0.3') + ';',   /* drifts of fallen leaf litter: pale flecks near the eye, a lighter patch at range */
+    '  sdTone = mix(zSoil, (1.3 + 0.24 * zGrav) * (0.94 + 0.06 * zRake), zMg); sdRough = mix(1.35 + 0.1 * zWild, 1.18, zMg) * (1.0 - 0.35 * zPeb); sdSeam = 0.0; }',
+    'else if (zBed > -0.9) { float zSp = (1.0 + zBed / 0.9) * (1.0 - zCourse); sdSeam = min(1.0, sdSeam * (1.0 + 0.8 * zSp)); sdTone *= (1.0 - 0.05 * zSp) * (1.0 + 0.35 * smoothstep(0.8, 0.9, zNz(zp * 17.0)) * zSp * zSp); }',   /* the paving beside the bed: a little soil in the joints, a few gravel stones kicked out */
+    'zWear = zF.r * (0.55 + 0.45 * sdNoise(zp * 0.13)) * (1.0 - zNatK);',   /* M14 LIVED-IN: foot-polished where people walk, joints packed with grit */
     'sdRough *= 1.0 - 0.36 * zWear; sdTone *= 1.0 + 0.05 * zWear; sdSeam *= 1.0 - 0.5 * zWear;',
-    'float sdMacro = sdNoise(zp * 0.045) - 0.5; sdTone *= 1.0 + sdMacro * ' + f(S.macro * 2) + '; sdRough *= 1.0 + sdMacro * ' + f(S.macro * 3) + ';',
-    'float sdGrain = sdNoise(zp * 7.3) * 0.6 + sdNoise(zp * 23.0) * 0.4 - 0.5; sdTone *= 1.0 + sdGrain * ' + f(S.grain) + ' * sdNear; sdRough *= 1.0 + sdGrain * ' + f(S.grain * 2.2) + ' * sdNear;');
+    'float zDamp = zF.g * ' + (HIGH ? '(0.55 + 0.45 * sdNoise(zp * 0.19 + 2.3))' : '0.78') + ' * (1.0 - zNatK * 0.5); sdTone *= 1.0 - 0.14 * zDamp; sdRough *= 1.0 - 0.45 * zDamp; sdSeam = min(1.0, sdSeam * (1.0 + 0.5 * zDamp));',
+    'float zKerb = zF.b * ' + (HIGH ? '(0.5 + 0.5 * sdNoise(zp * 0.7 + 5.1))' : '0.75') + ' * (1.0 - zNatK); sdTone *= 1.0 - 0.06 * zKerb; sdRough *= 1.0 + 0.1 * zKerb; sdSeam = min(1.0, sdSeam * (1.0 + 0.6 * zKerb));',
+    'float zSea = zF.a * (1.0 - zNatK); float zDrift = ' + (HIGH ? 'smoothstep(0.45, 0.8, sdNoise(zp * vec2(0.25, 0.7) + 9.1)) * zSea * zSea' : '0.0') + '; sdSeam *= 1.0 - 0.75 * zSea; sdTone *= (1.0 + 0.16 * zDrift) * (1.0 + 0.05 * zSea + 0.08 * smoothstep(0.75, 1.0, zSea)); sdRough *= 1.0 + 0.2 * zSea;',   /* sand fills the joints toward the sea; drifts lie on the stone (HIGH) */
+    'float sdMacro = sdNoise(zp * 0.045) - 0.5; sdTone *= 1.0 + sdMacro * ' + f(S.macro * 2) + ' + (sdNoise(zp * 0.013 + 4.1) - 0.5) * 0.1; sdRough *= 1.0 + sdMacro * ' + f(S.macro * 3) + ';',
+    'float sdGrain = (zNz(zp * 7.3) - 0.5) * 0.6 * (1.0 - smoothstep(0.25, 0.6, zFwm * 7.3)) + (zNz(zp * 23.0) - 0.5) * 0.4 * (1.0 - smoothstep(0.25, 0.6, zFwm * 23.0)); sdTone *= 1.0 + sdGrain * ' + f(S.grain) + ' * sdNear; sdRough *= 1.0 + sdGrain * ' + f(S.grain * 2.2) + ' * sdNear;',
+    'if (zNatK < 0.5) { float zFig = sdNoise((zp - sdCC) * 0.9 + sdH1 * 17.0) - 0.5; float zSk1 = 1.0 - smoothstep(0.25, 0.6, zFwm * 18.0)' + (HIGH ? ', zSk2 = 1.0 - smoothstep(0.25, 0.6, zFwm * 45.0)' : '') + ';',   /* each octave gone before it nears the pixel (no moire) */
+    'sdTone *= (1.0 + zFig * 0.14 * sdNear * (1.0 - zNatK)) * (1.0 + ((zNz(zp * 18.0) - 0.5) * 0.1 * zSk1' + (HIGH ? ' + (zNz(zp * 45.0 + 3.3) - 0.5) * 0.09 * zSk2' : '') + ')); }');   /* paving only (the soil has its own grain) */   /* the stone's figure; a fine aggregate that fades before it can shimmer */
   body.push('diffuseColor.rgb *= sdTone * mix(1.0, ' + f(S.seamDark) + ', sdSeam);');
+  var mapFrag = ['#ifdef USE_MAP', '  vec4 sdMapC = texture2D(map, vMapUv, 5.0); float sdMapL = dot(sdMapC.rgb, vec3(0.2126, 0.7152, 0.0722));', '  diffuseColor *= vec4(mix(vec3(sdMapL), sdMapC.rgb, 0.35), 1.0);', '#endif'];   /* M20: the canvas floor's broad value, not its thin decorative lines (value-led: 35 % of its tint) */
   var rough = ['#include <roughnessmap_fragment>', 'roughnessFactor = clamp(mix(roughnessFactor * sdRough, max(roughnessFactor, 0.86), sdSeam), 0.04, 1.0);'];
-  var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - 0.6 * sdSeam;' + (LOW ? '' : ' metalnessFactor = mix(metalnessFactor, 0.02, zNatK);')];
+  var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - 0.6 * sdSeam;' + (LOW ? '' : ' metalnessFactor = mix(metalnessFactor, 0.02, max(zNatK, zCourse * 0.7));')];
   var nrm = ['#include <normal_fragment_maps>'];
-  if (!LOW) nrm.push('if (zNatK > 0.01) normal = normalize(mix(normal, geoBump(-vViewPosition, normal, (zGH * 0.5 - zGap * 0.2) * sdNear), zNatK));',
-    '{ vec3 sdTl = vec3(sdH1 - 0.5, 0.0, sdH2 - 0.5) * 0.045 * sdNear * (1.0 - zNatK) * (1.0 - zBand) * (1.0 - 0.6 * zWear); normal = normalize(normal + (viewMatrix * vec4(sdTl, 0.0)).xyz); }');   /* M14: every slab laid a hair off true, as real stone is, so the sky breaks slab by slab in its reflection */
-  if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.06)) + ', sdD)) * sdNear * clamp(' + f(Math.max(S.seam * 2.5, 0.06)) + ' / sdAA, 0.0, 1.0) * (1.0 - zPatch) * (1.0 - 0.6 * zBand) * (1.0 - zNatK); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-m14-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : 'H'].join('_');
+  if (!LOW) nrm.push('normal = geoBump(-vViewPosition, normal, (zGH * 0.12 + zPeb * 0.025) * sdNear);',   /* zGH / zPeb are 0 off the soil: the bump stays in uniform control flow */
+    '{ float sdN2 = 1.0 - smoothstep(8.0, 30.0, sdDist); vec3 sdTl = vec3(sdH1 - 0.5, 0.0, sdH2 - 0.5) * 0.03 * sdN2 * (1.0 - zNatK) * (1.0 - zBand) * (1.0 - zCourse) * (1.0 - 0.6 * zWear); normal = normalize(normal + (viewMatrix * vec4(sdTl, 0.0)).xyz); }');   /* M14: every slab laid a hair off true, as real stone is, so the sky breaks slab by slab in its reflection (M20: near the eye only) */
+  if (HIGH) nrm.push('{ float zMb = 0.0; if (sdDist < 14.0 && zNatK < 0.5) zMb = zNz(zp * 9.0) * 0.0008 * (1.0 - smoothstep(6.0, 14.0, sdDist)); normal = geoBump(-vViewPosition, normal, zMb); }');   /* HIGH: a hair of honed relief — the night floor is a mirror, a stronger relief rippled it */   /* M20 honed micro relief near the eye */
+  if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.05)) + ', sdD)) * sdNear * clamp(' + f(Math.max(S.seam * 2.5, 0.05)) + ' / (zFp * 1.25), 0.0, 1.0) * (1.0 - zPatch) * (1.0 - 0.6 * zBand) * (1.0 - zNatK); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-m20-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : (HIGH ? 'H' : 'M')].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
     sh.uniforms.uZWear = Z.wearU; sh.uniforms.uZWearB = Z.wearB; sh.uniforms.uZR = { value: Z.rects }; sh.uniforms.uZRT = { value: Z.rtype }; sh.uniforms.uZRS = { value: Z.rsoft }; sh.uniforms.uZC = { value: Z.circles }; sh.uniforms.uZCS = { value: Z.csoft }; sh.uniforms.uZS = { value: Z.soft }; sh.uniforms.uZDefSoft = Z.defSoft;
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0); vec3 sdN0 = objectNormal;', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP; sdN0 = mat3(instanceMatrix) * sdN0;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; vSdN = normalize(mat3(modelMatrix) * sdN0); }'].join('\n'));
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS + '\n' + ZONED_FUNCS).replace('#include <color_fragment>', body.join('\n'))
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS + '\n' + ZONED_FUNCS).replace('#include <map_fragment>', mapFrag.join('\n')).replace('#include <color_fragment>', body.join('\n'))
       .replace('#include <roughnessmap_fragment>', rough.join('\n')).replace('#include <metalnessmap_fragment>', metal.join('\n')).replace('#include <normal_fragment_maps>', nrm.join('\n')); };
   mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
   mat.userData.surfaceDetail = { kind: 'ZONED', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
