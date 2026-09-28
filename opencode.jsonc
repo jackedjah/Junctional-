@@ -1,5 +1,6 @@
 // OpenCode project config for MAHWORLD (non-secret settings only).
 // Inventory, auth steps and caveats: docs/OPENCODE_MIGRATION.md. Secrets only as {env:NAME}; never commit values.
+// Validated 2026-09-28 against the live schema https://opencode.ai/config.json (0 errors). MCP entries are a FLAT map under "mcp" (no "servers" key).
 // Every MCP is DISABLED by default: enable one only after the manual auth step listed for it in docs/OPENCODE_MIGRATION.md §4.
 {
   "$schema": "https://opencode.ai/config.json",

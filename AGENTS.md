@@ -127,3 +127,10 @@ movement calibration) waits for explicit owner authorization.
 - Parallel work: use separate `git worktree`s with one owner per file set, an independent adversarial review, and merge (cherry-pick) only what
   passes; the rules handed to such agents are in `world_pivot/M20_AGENT_BRIEF.md`.
 - Session history beyond the ledger: `world_pivot/M20_SESSION_LOG.md`.
+
+## 12. Portability status (read before promising a fresh-machine setup)
+The repository is portable for the game client, host server, world renders and 37 of 71 test files. It is **BLOCKED** for the other 34 test
+files and the release build on ten small files from three sibling roots that exist only in the owner's local archive (never in Git).
+Exact list, dependents and the one-command recovery (`deploy/bridge/apply_minimal_bridge.mjs --from <archive> --push`): `docs/OPENCODE_MIGRATION.md` §9.
+Do not recreate or stub those files; do not ask the owner for them unless they say they are back at the PC.
+`opencode.jsonc` was validated against the live OpenCode schema (flat `mcp` map — there is no `mcp.servers`): `docs/OPENCODE_MIGRATION.md` §10.

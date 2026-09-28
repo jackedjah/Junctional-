@@ -116,3 +116,48 @@ Container-only variables of the Claude cloud session (`CLAUDE_CODE_*`, `CCR_*`, 
   `WP.time()` in the preview re-runs day/night handlers, so tune variants must be applied after it; a material's `userData.dayNight` handler can
   silently override build-time values (the HALO soffit case); `Material.clone()` JSON-copies `userData` (a `Color` becomes a number → NaN);
   measure a region's value when a change is not obvious at sheet scale; lowering the cloud field blur brings back checker stipple.
+
+## 9. Runtime portability status (2026-09-28): BLOCKED on ten owner-archive files
+Checked from the cloud session: the three sibling roots are **not** on this machine (filesystem search) and **not** in any of the repository's
+499 commits on any branch (no `CLAUDE_RUNTIME_FOUNDATION/`, `CLAUDE_DUAL_LOCOMOTION/`, `CLAUDE_GAMEPLAY_FOUNDATION/` path, no `jsonSource.js`).
+Nothing was fabricated.
+- **What is actually needed:** exactly ten small text files (4 JS modules + 6 JSON configs), listed in
+  `CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/bridge/apply_minimal_bridge.mjs` (`BRIDGE_FILES`) and
+  `CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/CONVERGENCE/world_pivot/RUNTIME_BRIDGE_MANIFEST.md`:
+  `CLAUDE_RUNTIME_FOUNDATION/10_RUNTIME_LOADER/{jsonSource,ClassIdentityConfig,characterRegistry}.js`,
+  `CLAUDE_RUNTIME_FOUNDATION/12_ANIMATION_RUNTIME/AnimationStateController.js`,
+  `CLAUDE_RUNTIME_FOUNDATION/{01_CHARACTER_MANIFEST/CHARACTER_MASTER_MANIFEST,02_MATERIAL_CONTRACT/material_zones,03_CHARACTER_CREATOR/CHARACTER_VARIANT_SCHEMA,05_ANIMATION_CONTRACT/animation_set}.json`,
+  `CLAUDE_DUAL_LOCOMOTION/15_RUNTIME_DESIGN/config/runtime_config.default.json`,
+  `CLAUDE_GAMEPLAY_FOUNDATION/02_MOVEMENT/PLAYER_MOVEMENT_DEFAULTS.json`.
+- **Where they last existed:** the owner's local archive folder (the `MAHWORLD_CHARACTERS` copy on the owner's PC). Possibly also inside the
+  static build output of the earlier protected Netlify preview drafts (the static build copies these host files), but those drafts are behind
+  the password gate and Netlify auth — not reachable from here, and not a clean source.
+- **What depends on them:** 32 test programs stop at `00_CORE/bootstrap.js → CLAUDE_RUNTIME_FOUNDATION/10_RUNTIME_LOADER/jsonSource.js`;
+  `gameplay_mahgic_tree` needs the static build; `gameplay_legs_faithful` additionally needs the Character-lane raw model
+  `RAW_10_MODELS/Mah_Athlete_M.glb` (intentionally not backed up — Character lane). The release build
+  (`node CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/build_static_demo.mjs`) stops with `Error: missing: …` (the same ten files), so the
+  package / extraction / smoke / release gate cannot run from the repository alone. The host server and the world preview / renders do NOT need them.
+- **Repository-only result now:** full suite 71 files, 655 checks passed, 34 files failing = exactly `known_bridge_blocked_failures.txt`.
+- **Smallest recovery path (owner, on the machine that has the archive):**
+  ```
+  git clone https://github.com/jackedjah/Junctional- && cd Junctional- && git checkout backup/mahworld-m6-20260924T190351Z
+  node CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/bridge/apply_minimal_bridge.mjs --from "<folder that contains CLAUDE_RUNTIME_FOUNDATION>" --dry-run
+  node CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/bridge/apply_minimal_bridge.mjs --from "<same folder>" --push
+  ```
+  The script copies only those ten files into the repository root at the same relative paths (so no import has to change), refuses anything
+  > 1 MB, binary, containing secret-looking values or private absolute paths, and verifies every relative import resolves. Then run
+  `node CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/run_all_tests.mjs` and `build_static_demo.mjs`: 33 of the 34 files should run; `gameplay_legs_faithful`
+  stays blocked on the Character-lane GLB unless the owner decides otherwise.
+
+## 10. `opencode.jsonc` validation (2026-09-28)
+Validated with a JSON-Schema 2020-12 validator against the live schema at `https://opencode.ai/config.json` (the only published schema; it already
+carries the `ConfigV2.*` definitions; `config.v2.json` and similar URLs return 404): **0 errors**.
+- MCP structure: current OpenCode uses a flat `"mcp": { "<name>": { "type": "local" | "remote", … } }` map. There is **no `mcp.servers` key** in
+  the schema — a `mcp.servers` block fails validation (it would be read as one server named "servers"). The flat form is kept.
+- Remote servers use `type` / `url` / `headers` / `enabled` (+ optional `oauth`, `timeout`); the local server uses `type` / `command` /
+  `environment` / `enabled`. Secrets only as `{env:GITHUB_PERSONAL_ACCESS_TOKEN}` and `{env:NETLIFY_AUTH_TOKEN}` (mapped to the variable
+  `@netlify/mcp` reads, `NETLIFY_PERSONAL_ACCESS_TOKEN`).
+- Permissions use the current `permission` object (`bash` rule map of pattern → `ask` / `allow` / `deny`, `edit` action); no deprecated `tools`
+  or `mode` fields are used.
+- All four MCPs remain `enabled: false`. Endpoint probes without credentials: GitHub, Scenario and Supabase MCP URLs answer 401 (exist, need
+  auth); `@netlify/mcp` exists on npm (1.16.0). Nothing was enabled or authenticated.
