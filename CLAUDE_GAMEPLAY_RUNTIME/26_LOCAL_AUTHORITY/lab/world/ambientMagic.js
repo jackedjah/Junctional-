@@ -28,7 +28,7 @@ import { ridgeStations } from './ridgeLayout.js'; import { regionColliders, terr
 export var AMBIENT_REACH_M = 304;   /* residents.REACH_MIN_M / ridgeSculpt REACH_FLOOR: the host never reaches past it */
 export var AMBIENT_CLEAR_M = 3.4;   /* owner host law: art the host can reach stays ≥ 3.4 m above the ground it hangs over */
 var FLOOR_MARGIN_M = 0.4;
-export var AMBIENT_KIND = { MOTE: 0, POLLEN: 1, MOTH: 2 };
+export var AMBIENT_KIND = { MOTE: 0, POLLEN: 1, MOTH: 2, FRAGMENT: 3 };
 /* the class light colours (display space): the crystal light end of each class, LEAN as the deep class crimson (the pale 0xff6f82 reads pink
    on the night floor — the aura.js review trap), and one equal-channel white for the neutral light */
 export var AMBIENT_TINT = { gold: 0xffd88a, blue: 0x8fb4ff, red: 0xd42c3a, purple: 0xb99cff, pink: 0xffa6d4, white: 0xf0f0f0 };
@@ -39,8 +39,8 @@ function rnd(seed) { var s = seed >>> 0; return function () { s = (s + 0x6D2B79F
    can go. wd = the wind's unit direction [x, z]. */
 /* M20 lead review: a moth's loop moves x and z with independent ±r amplitudes, so it reaches √2·r diagonally (the footprint said r); each bench
    / overlook hosts at most one moth (picked with replacement, four looped within 2.5 m of one bench — a swarm) */
-export function ambientFootprint(p, wd) { var k = p.k, r = p.r || 0, h = p.h || 0, w = wd || [0, 1], a = k === 0 ? -r : 0, b = k === 2 ? 0 : r;
-  return { ax: p.x + w[0] * a, az: p.z + w[1] * a, bx: p.x + w[0] * b, bz: p.z + w[1] * b, rad: (k === 0 ? 0.3 * r : k === 1 ? 0.35 : r * 1.415) + 0.05, down: k === 0 ? h * 0.625 : k === 1 ? h : h * 0.5 + 0.07 }; }
+export function ambientFootprint(p, wd) { var k = p.k, r = p.r || 0, h = p.h || 0, w = wd || [0, 1], m0 = k === 0 || k === 3, a = m0 ? -r : 0, b = k === 2 ? 0 : r;   /* a FRAGMENT drifts like a mote */
+  return { ax: p.x + w[0] * a, az: p.z + w[1] * a, bx: p.x + w[0] * b, bz: p.z + w[1] * b, rad: (m0 ? 0.3 * r : k === 1 ? 0.35 : r * 1.415) + 0.05, down: m0 ? h * 0.625 : k === 1 ? h : h * 0.5 + 0.07 }; }
 function capsuleSamples(F) { var out = []; for (var i = 0; i <= 8; i++) { var t = i / 8; out.push([F.ax + (F.bx - F.ax) * t, F.az + (F.bz - F.az) * t]); } return out; }
 function capsuleReach(F) { return Math.min(Math.max(Math.abs(F.ax), Math.abs(F.az)), Math.max(Math.abs(F.bx), Math.abs(F.bz))) - F.rad; }
 /* the highest ground under the capsule: the terrain sampled along and across it, every host shape it touches (BOX / RAMP tops, CYLINDER
@@ -90,6 +90,10 @@ export function ambientPlan(src, tier) {
   function moth(m, site, tl, gOverride) { if (!put(Object.assign(m, { trail: 0 }), site, gOverride)) return false; var M0 = pts[pts.length - 1]; for (var q = 1; q < tl; q++) pts.push(Object.assign({}, M0, { trail: q })); return true; }   /* the trail points replay the head's path a moment behind */
   var T = AMBIENT_TINT, ZF = (reg.tree_lock && reg.tree_lock.zone_family) || {}, TL = HI ? 4 : 2;
   function mote(x, y, z) { return { k: 0, x: x, y: y, z: z, r: 4 + r() * 3, h: 1.4 + r() * 1.4, cyc: 48 + r() * 36, size: 0.3 + r() * 0.12, tint: T.white }; }
+  function frag(x, y, z, tint, shape) { return { k: 3, x: x, y: y, z: z, r: 3 + r() * 3, h: 1.2 + r() * 1.2, cyc: 70 + r() * 50, size: 0.6 + r() * 0.45, tint: tint, trail: shape }; }   /* M20 AURA FRAGMENTS (owner: 'tiny crystalline motes … small rhombuses, cubes, circular / soft aura forms … not pickups'): shape 0 rhombus, 1 cube, 2 soft ring — aTr carries the shape */
+  function fcl(cx, cy, cz, tints, n, site, gOv) { var ph = r(), cyc = 70 + r() * 50, cr = 3 + r() * 3, ch = 1.2 + r() * 1.2, got = 0;   /* M20 lead review: one lone shape in the sky read as a pickup — fragments drift as a loose little constellation (one lead shape, smaller shards round it) sharing one slow path, each with its own meander and turn */
+    for (var q = 0; q < n; q++) { var a = r() * 6.2832, d = q ? 0.8 + r() * 1.8 : 0, p = frag(cx + Math.cos(a) * d, cy + (q ? (r() - 0.5) * 2.4 : 0), cz + Math.sin(a) * d, tints[q % tints.length], Math.floor(r() * 2.999));
+      p.size = q ? 0.3 + r() * 0.35 : 0.6 + r() * 0.3; p.ph = ph; p.cyc = cyc; p.r = cr; p.h = ch; if (put(p, site, gOv)) got++; } return got; }
   /* 1. THE CLASS GROVES (in the reach): motes in the open air of the grove — over the canopy against the sky, and in the gaps and clearings
      between the crowns (inside a crown they would only be hidden by its leaves) — pollen off a few crystal tips, moths round the outside of
      a few crowns at night */
@@ -110,7 +114,17 @@ export function ambientPlan(src, tier) {
     for (i = 0, tries = 0; i < nmo && tries < nmo * 4; tries++) { t = tree(); g = G(t.x, t.z); a = r() * 6.2832;
       var mr = 4.6 + r() * 1.6;   /* just outside the crown's rim */
       if (moth({ k: 2, x: t.x + Math.cos(a) * mr, y: g + th(t) * (0.45 + r() * 0.25), z: t.z + Math.sin(a) * mr, r: 1.4 + r() * 1.0, h: 1.0 + r() * 0.8, cyc: 0.8 + r() * 0.5, size: 1.0, tint: tint, ph: 0 }, Z.id, TL)) { i++; S.moths++; } }
+    var nf = Math.max(1, Math.round(Math.max(2, Math.min(4, area / 1000)) * (HI ? 1 : 0.5))), got; S.fragments = 0;
+    for (i = 0, tries = 0; i < nf && tries < nf * 4; tries++) { t = tree(); var fx = t.x + (r() - 0.5) * 12, fz = t.z + (r() - 0.5) * 12; g = G(fx, fz);
+      got = fcl(fx, g + th(t) + 3 + r() * 6, fz, [tint], 3, Z.id); if (got) { i++; S.fragments += got; } }   /* the grove's own class light, over its crowns */
     out.sites.push(S); });
+  /* 1b. THE SHARED CIVIC PLAZA (the Nexus, in the reach): a few pearl fragments with GOLD, CRIMSON, PINK and the odd BLUE among them high in
+     the plaza air (owner 2026-09-28: gold / crimson / pink memorable, blue not dominant; purple stays VISIONARY's — none here) */
+  var NX = ((reg.regions && reg.regions.list) || []).filter(function (R) { return R.id === 'NEXUS'; })[0], NS = NX && NX.shape && NX.shape.kind === 'CIRCLE' ? NX.shape : null;
+  if (NS) { var S3 = { site: 'NEXUS', family: 'shared', fragments: 0 }, pl = [[T.gold, T.gold, T.white], [T.pink, T.white, T.pink], [T.red, T.red, T.white], [T.gold, T.white], [T.pink, T.pink, T.white], [T.red, T.white], [T.blue, T.white]], nfp = HI ? 7 : 4, jj, tr2, gn;
+    for (jj = 0, tr2 = 0; jj < nfp && tr2 < nfp * 5; tr2++) { var fa = r() * 6.2832, fr = NS.r * (0.2 + 0.75 * Math.sqrt(r())), px = NS.x + Math.cos(fa) * fr, pz = NS.z + Math.sin(fa) * fr;
+      gn = fcl(px, G(px, pz) + 8 + r() * 10, pz, pl[jj % pl.length], HI ? 4 : 3, 'NEXUS'); if (gn) { jj++; S3.fragments += gn; } }
+    out.sites.push(S3); }
   /* 2. THE VEIL HIGHLAND (beyond the reach): motes over the lanes; moths in the gardens round the benches and over the lane beds at night —
      the five classes in turn (the highland is every class's) */
   var V = src.veil; if (V && V.paths && V.paths.length) { var S2 = { site: 'VEIL', family: 'five', motes: 0, moths: 0 }, lanes = [], j, L, u, lx, lz, ly, cls = [T.gold, T.blue, T.red, T.purple, T.pink], ci = 0;
@@ -121,6 +135,8 @@ export function ambientPlan(src, tier) {
     for (j = 0; j < nvo && lanes.length; j++) { L = lanes[Math.floor(r() * lanes.length)]; u = r(); var dx = L.p.x - L.q.x, dz = L.p.z - L.q.z, dl = Math.hypot(dx, dz) || 1, sd = r() < 0.5 ? -1 : 1, off = L.hw + 1.2 + r() * 1.2;
       lx = L.q.x + dx * u - dz / dl * off * sd; lz = L.q.z + dz * u + dx / dl * off * sd; ly = L.q.y + (L.p.y - L.q.y) * u;
       if (moth({ k: 2, x: lx, y: ly + 1.8 + r() * 1.2, z: lz, r: 1.2 + r() * 0.9, h: 0.7 + r() * 0.5, cyc: 0.8 + r() * 0.5, size: 0.9, tint: cls[ci % 5], ph: 0 }, 'VEIL', TL, ly)) { S2.moths++; ci++; } }
+    var vf2 = [T.gold, T.pink, T.red, T.white, T.blue]; S2.fragments = 0; for (j = 0; j < (HI ? 5 : 3) && lanes.length; j++) { L = lanes[Math.floor(r() * lanes.length)]; u = r(); lx = L.q.x + (L.p.x - L.q.x) * u; lz = L.q.z + (L.p.z - L.q.z) * u; ly = L.q.y + (L.p.y - L.q.y) * u;
+      S2.fragments += fcl(lx + (r() - 0.5) * 10, ly + 4 + r() * 6, lz + (r() - 0.5) * 10, [vf2[j % 5], vf2[j % 5], T.white], 3, 'VEIL', ly); }
     for (j = 0; j < nvb && benches.length; j++) { var B = benches.splice(Math.floor(r() * benches.length), 1)[0], ba = r() * 6.2832, bd = 2 + r() * 2.5;
       if (moth({ k: 2, x: B.x + Math.cos(ba) * bd, y: B.y + 1.8 + r() * 1.2, z: B.z + Math.sin(ba) * bd, r: 1.2 + r() * 1.0, h: 0.7 + r() * 0.5, cyc: 0.8 + r() * 0.5, size: 0.9, tint: cls[ci % 5], ph: 0 }, 'VEIL', TL, B.y)) { S2.moths++; ci++; } }
     out.sites.push(S2); }
@@ -134,33 +150,42 @@ export function ambientSafe(pts, wd, ground, shapes) { return pts.filter(functio
 var VERT = [
   'attribute vec4 aK; attribute vec4 aD; attribute vec4 aC; attribute float aTr;',   /* aK: kind, phase, seed a, seed b · aD: drift / orbit radius (m), vertical range (m), cycle (s) or moth pace, FLOOR (y) · aC: display tint + size (m) · aTr: moth trail index */
   'uniform float uTime; uniform float uNight; uniform float uVH; uniform vec2 uWind; uniform vec3 uKey; uniform vec3 uDayL; uniform vec3 uNightL;',
-  'varying vec3 vC; varying float vA; varying float vMoth; varying float vPs;',
+  'varying vec3 vC; varying float vA; varying float vMoth; varying float vPs; varying float vFrag; varying float vShape; varying float vRot; varying float vOp;',
   'void main() { float k = floor(aK.x + 0.5), ph = aK.y, sa = aK.z * 6.2832, sb = aK.w * 6.2832, t = uTime, env = 1.0, glint = 1.0, u;',
   '  vec3 p = position, wd = vec3(uWind.x, 0.0, uWind.y), sd = vec3(-uWind.y, 0.0, uWind.x);',
   '  if (k < 0.5) { u = fract(ph + t / aD.z); p += wd * ((u - 0.5) * 2.0 * aD.x) + sd * (sin(t * 0.11 + sa) * aD.x * 0.3); p.y += aD.y * (0.5 * sin(t * 0.083 + sb) + 0.125 * (2.0 * u - 1.0));',   /* MOTE: one slow pass down-wind, a lazy meander */
   '    env = smoothstep(0.0, 0.22, u) * (1.0 - smoothstep(0.78, 1.0, u)); }',
   '  else if (k < 1.5) { u = fract(ph + t / aD.z); p += wd * (u * aD.x) + sd * (sin(t * 0.37 + sa) * 0.35); p.y -= aD.y * u;',   /* POLLEN: shed at a crystal tip, sinking down-wind */
   '    env = smoothstep(0.0, 0.08, u) * (1.0 - smoothstep(0.55, 1.0, u)); glint = 0.55 + 0.45 * sin(t * 1.7 + sa * 7.0); }',   /* a grain turning in the light */
+  '  else if (k > 2.5) { u = fract(ph + t / aD.z); p += wd * ((u - 0.5) * 2.0 * aD.x) + sd * (sin(t * 0.07 + sa) * aD.x * 0.3); p.y += aD.y * 0.5 * sin(t * 0.061 + sb);',   /* FRAGMENT: a slower mote that turns */
+  '    env = smoothstep(0.0, 0.18, u) * (1.0 - smoothstep(0.82, 1.0, u)); glint = 0.85 + 0.15 * sin(t * 0.9 + sa * 5.0); }',
   '  else { float tt = (t - aTr * 0.2) * aD.z;',   /* MOTH: a slow looping wander round its plant; the trail points replay the path a moment behind */
   '    p += vec3(aD.x * (0.72 * sin(tt * 0.29 + sa) + 0.28 * sin(tt * 0.77 + sb)), aD.y * 0.5 * sin(tt * 0.21 + sb * 1.4) + 0.06 * sin(tt * 8.0 + sa * 3.0), aD.x * (0.72 * cos(tt * 0.25 + sb) + 0.28 * sin(tt * 0.69 + sa)));',
   '    env = pow(max(0.0, 1.0 - aTr * 0.26), 2.0); glint = 0.82 + 0.18 * sin(t * 1.3 + sa * 3.0); }',
   '  env *= smoothstep(aD.w, aD.w + 0.9, p.y); p.y = max(p.y, aD.w);',   /* HOST LAW: never below the floor — faded out before it, held at it */
-  '  vec4 mv = viewMatrix * vec4(p, 1.0); float d = length(mv.xyz), far = k > 1.5 ? 180.0 : 110.0;',
+  '  vec4 mv = viewMatrix * vec4(p, 1.0); float d = length(mv.xyz), far = k > 1.5 ? (k > 2.5 ? 140.0 : 180.0) : 110.0;',
   '  env *= smoothstep(1.5, 6.0, d) * (1.0 - smoothstep(far * 0.5, far, d));',   /* faint toward the camera (never in anyone\'s face), gone with distance */
   '  float sc = pow(max(dot((p - cameraPosition) / max(d, 1e-3), uKey), 0.0), 7.0);',   /* forward scattering: the air glints toward the key light */
-  '  vec3 lv3 = mix(uDayL, uNightL, uNight); float lv = k < 0.5 ? lv3.x : (k < 1.5 ? lv3.y : lv3.z);',
-  '  float lit = k > 1.5 ? 1.0 : mix(0.22, 0.55, uNight) + mix(2.8, 1.0, uNight) * sc;',   /* motes / pollen are lit by the key; a moth makes its own light */
-  '  float px = aC.a * projectionMatrix[1][1] * 0.5 * uVH / max(-mv.z, 0.1), ps = k > 1.5 ? clamp(px, 5.0, 28.0) : clamp(px, 1.6, 8.0);',
-  '  vA = env * glint * lv * lit * (k > 1.5 ? min(1.0, px / ps) : min(1.0, px * px / (ps * ps))); vC = aC.rgb; vMoth = k > 1.5 ? 1.0 : 0.0;',   /* dust held at its minimum size keeps its energy; a far moth stays a point of light */
+  '  vec3 lv3 = mix(uDayL, uNightL, uNight); float lv = k < 0.5 ? lv3.x : (k < 1.5 ? lv3.y : (k > 2.5 ? mix(0.95, 1.1, uNight) : lv3.z));',
+  '  float lit = k > 2.5 ? mix(1.15, 1.0, uNight) + mix(1.4, 0.5, uNight) * sc : (k > 1.5 ? 1.0 : mix(0.22, 0.55, uNight) + mix(2.8, 1.0, uNight) * sc);',   /* a fragment carries a little of its own aura light, so it reads faintly by day too */   /* motes / pollen are lit by the key; a moth makes its own light */
+  '  float px = aC.a * projectionMatrix[1][1] * 0.5 * uVH / max(-mv.z, 0.1), ps = k > 2.5 ? clamp(px, 5.0, 20.0) : (k > 1.5 ? clamp(px, 5.0, 28.0) : clamp(px, 1.6, 8.0));',
+  '  vA = env * glint * lv * lit * (k > 1.5 ? min(1.0, px / ps) : min(1.0, px * px / (ps * ps))); vC = aC.rgb; vMoth = (k > 1.5 && k < 2.5) ? 1.0 : 0.0; vFrag = k > 2.5 ? 1.0 : 0.0; vShape = aTr; vRot = t * (0.18 + 0.12 * aK.z) + sa; vOp = k > 2.5 ? env * min(1.0, px / ps) : 0.0;',   /* dust held at its minimum size keeps its energy; a far moth stays a point of light */
   '  if (vA < 0.004 || mv.z > -0.1) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); gl_PointSize = 0.0; return; }',
   '  vPs = ps; gl_PointSize = ps; gl_Position = projectionMatrix * mv; }'
 ].join('\n');
 var FRAG = [
-  'varying vec3 vC; varying float vA; varying float vMoth; varying float vPs;',
+  'uniform float uNight; varying vec3 vC; varying float vA; varying float vMoth; varying float vPs; varying float vFrag; varying float vShape; varying float vRot; varying float vOp;',
   'void main() { vec2 q = gl_PointCoord * 2.0 - 1.0; float r2 = dot(q, q); if (r2 > 1.0) discard;',
+  '  if (vFrag > 0.5) { float cs = cos(vRot), sn = sin(vRot); vec2 w = vec2(cs * q.x - sn * q.y, sn * q.x + cs * q.y); float m, f, e;',   /* an AURA FRAGMENT: a small crystalline shape of the aura language, turning slowly, softly edged — m its cover, f the facet light, e the lit edge */
+  '    if (vShape < 0.5) { float d = abs(w.x) * 1.55 + abs(w.y); m = 1.0 - smoothstep(0.74, 0.9, d); f = w.x + 0.35 * w.y < 0.0 ? 1.0 : 0.55; e = smoothstep(0.58, 0.8, d) * m; }',   /* rhombus: a lit and a shaded facet, a bright rim */
+  '    else if (vShape < 1.5) { float hx = max(abs(w.x) * 0.866 + abs(w.y) * 0.5, abs(w.y)); m = 1.0 - smoothstep(0.62, 0.74, hx); f = w.y > abs(w.x) * 0.577 ? 1.0 : (w.x < 0.0 ? 0.66 : 0.42); e = smoothstep(0.5, 0.66, hx) * m; }',   /* cube: a lit top face over two shaded sides */
+  '    else { float rr = length(w); m = exp(-pow((rr - 0.6) / 0.12, 2.0)); f = 1.0; e = m; m += 0.12 * exp(-rr * rr * 5.0); }',   /* soft ring */
+  '    float al = m * vOp * mix(0.62, 0.3, uNight);',   /* M20 (lead review 2026-09-28: pure light vanished against the bright storm-calm sky): the body covers a little of what lies behind it, so the class colour reads by day; by night the light edge carries it */
+  '    vec3 body = vC * f * mix(0.95, 0.3, uNight), glow = vC / max(max(vC.r, vC.g), max(vC.b, 1e-3)) * (e * mix(0.55, 0.95, uNight) + f * mix(0.12, 0.34, uNight)) * vA;',   /* by night a fragment glows softly from within — the class tint at full brightness, never eased toward white (crimson + white reads pink) */
+  '    gl_FragColor = vec4(body * al + glow, al); return; }',
   '  float core = exp(-r2 * mix(7.0, 18.0, smoothstep(6.0, 20.0, vPs))), a = mix(exp(-r2 * 5.0), core + 0.26 * exp(-r2 * 3.5), vMoth) * (1.0 - r2);',   /* a soft point of light; a moth: a bright core in a wide faint halo (a far moth's core fills more of its small sprite: a point of light, not a smudge) */
   '  vec3 c = mix(vC, mix(vec3(1.0), vC, 0.3), vMoth * core);',   /* the moth core burns near-white, its halo keeps the class colour */
-  '  gl_FragColor = vec4(c * a * vA, 1.0); }'
+  '  gl_FragColor = vec4(c * a * vA, 0.0); }'
 ].join('\n');
 
 /* The runtime: reads the other modules' published data (the forest placement, the Veil's anchors) and draws the plan. opts: ground (x, z) → y,
@@ -178,7 +203,7 @@ export function createAmbientMagic(ctx, opts) {
     var key = opts.key || function () { return [0.7, 0.5, 0.4]; };
     U = { uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uVH: { value: 720 }, uWind: { value: new THREE.Vector2(plan.wind[0], plan.wind[1]) }, uKey: { value: new THREE.Vector3().fromArray(key(night)).normalize() },
       uDayL: { value: new THREE.Vector3(0.25, 0.35, 0.0) }, uNightL: { value: new THREE.Vector3(1.35, 1.1, 1.0) } };   /* per kind (mote, pollen, moth): dimmer by day than by night; moths only at night */
-    mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: U, transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, toneMapped: false });
+    mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: U, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, toneMapped: false });   /* premultiplied: motes / pollen / moths write alpha 0 (pure added light, exactly the old additive draw); a fragment's body writes its cover */
     mesh = new THREE.Points(geo, mat); mesh.name = 'WORLD_AMBIENT_MAGIC'; mesh.frustumCulled = false; mesh.renderOrder = 12.5; mesh.userData.noMerge = true; mesh.userData.nonInteractable = true;
     var vs = new THREE.Vector2(); mesh.onBeforeRender = function (renderer) { renderer.getDrawingBufferSize(vs); U.uVH.value = vs.y; };   /* the point scale follows the real buffer (phones render at 1–2x DPR) */
     ctx.group.add(mesh); info.draws = 1;
@@ -186,7 +211,7 @@ export function createAmbientMagic(ctx, opts) {
   function tick(dt, t) { if (U) U.uTime.value = t || 0; }
   function setNight(n) { night = !!n; if (U) { U.uNight.value = night ? 1 : 0; if (opts.key) U.uKey.value.fromArray(opts.key(night)).normalize(); } }
   function dispose() { if (mesh && mesh.parent) mesh.parent.remove(mesh); if (geo) geo.dispose(); if (mat) mat.dispose(); mesh = geo = mat = U = null; pts = null; info.points = 0; info.draws = 0; }
-  function debug() { var by = [0, 0, 0], lo = Infinity; (pts || []).forEach(function (p) { by[p.k]++; }); ambientSafe(pts || [], plan && plan.wind).forEach(function (c) { lo = Math.min(lo, c.clear_m); });
-    return { tier: info.tier, draws: info.draws, points: info.points, motes: by[0], pollen: by[1], moth_points: by[2], sites: info.sites || [], min_clear_in_reach_m: isFinite(lo) ? lo : null }; }
+  function debug() { var by = [0, 0, 0, 0], lo = Infinity; (pts || []).forEach(function (p) { by[p.k]++; }); ambientSafe(pts || [], plan && plan.wind).forEach(function (c) { lo = Math.min(lo, c.clear_m); });
+    return { tier: info.tier, draws: info.draws, points: info.points, motes: by[0], pollen: by[1], moth_points: by[2], fragments: by[3], sites: info.sites || [], min_clear_in_reach_m: isFinite(lo) ? lo : null }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug, plan: function () { return plan; } };
 }

@@ -31,4 +31,17 @@ var want = { gold: 'GOLD', blue: 'BLUE', red: 'RED', purple: 'PURPLE', pink: 'PI
 Object.keys(M.AMBIENT_TINT).forEach(function (k) { var h = M.AMBIENT_TINT[k]; s4[k] = classify(h); });
 ok('4. every light tint is lawful: white neutral, each class tint in its own window or a neutral pastel (never a foreign hue) ' + JSON.stringify(s4), Object.keys(want).every(function (k) { var c = s4[k]; return k === 'white' ? c.verdict === 'NEUTRAL' : (c.verdict === 'NEUTRAL' || (c.verdict === 'LAW' && c.family === want[k])); }) && Object.keys(M.AMBIENT_TINT).every(function (k) { return k in want; }), s4);
 
+/* 5. AURA FRAGMENTS (owner item G: small rhombuses, cubes, soft rings — ambient, never pickups): HIGH has them, each grove's fragments carry
+   that grove's own class light, the shared plaza's are white / gold / crimson / pink / the odd blue and NEVER purple (VISIONARY's), shapes 0–2 */
+var T5 = M.AMBIENT_TINT, s5 = {};
+['HIGH', 'MED'].forEach(function (T) { var fr = plans[T].pts.filter(function (p) { return p.k === M.AMBIENT_KIND.FRAGMENT; }), fam = {};
+  plans[T].sites.forEach(function (S) { fam[S.site] = S.family; });
+  var nx = fr.filter(function (p) { return p.site === 'NEXUS'; }), gr = fr.filter(function (p) { return p.site !== 'NEXUS' && p.site !== 'VEIL'; });
+  s5[T] = { n: fr.length, nexus: nx.length, grove: gr.length, nexusPurple: nx.filter(function (p) { return p.tint === T5.purple; }).length,
+    nexusWarm: ['gold', 'red', 'pink'].filter(function (k) { return nx.some(function (p) { return p.tint === T5[k]; }); }).length,
+    groveForeign: gr.filter(function (p) { return p.tint !== (T5[fam[p.site]] || T5.white); }).length,
+    badShape: fr.filter(function (p) { return !(p.trail === 0 || p.trail === 1 || p.trail === 2); }).length }; });
+ok('5. aura fragments: grove fragments in their grove\'s class light, plaza fragments warm-led and never purple, lawful shapes ' + JSON.stringify(s5),
+  s5.HIGH.n > 0 && s5.HIGH.nexus > 0 && s5.HIGH.grove > 0 && s5.MED.n > 0 && s5.MED.n <= s5.HIGH.n && ['HIGH', 'MED'].every(function (T) { return s5[T].nexusPurple === 0 && s5[T].groveForeign === 0 && s5[T].badShape === 0 && s5[T].nexusWarm === 3; }), s5);
+
 console.log('RESULT world m20 ambient: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
