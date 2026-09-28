@@ -453,18 +453,25 @@ export function createVeilFalls(ctx) {
        middle a round civic pavilion under a broad canopy faces the lake and the lip — the calm focal point under the spire. Two
        crescent overlooks sit on the field-facing rim either side of the falls, their rails lit at night. Visual only, beyond the host's
        reach like the rest of the highland; everything joins the existing villa draws (the shrubs join the grove canopy instances). */
-    var bodyP = [], darkP = [], glassP = [], spireParts = [], shrubs = [], laneLamps = [], gardens = [], sidePaths = [], benchAt = [], face = RES.face;
+    var bodyP = [], darkP = [], soffitP = [], glassP = [], spireParts = [], shrubs = [], laneLamps = [], gardens = [], sidePaths = [], benchAt = [], face = RES.face;
     var VT = tier() === 'LOW' ? 'LOW' : 'MED'; function boxAt(list, w, h, d, x, y, z, yaw) { var bg = softBox(THREE, w, h, d, Math.min(0.6, Math.min(w, h, d) * 0.24), VT); bg.rotateY(yaw); bg.translate(x, y, z); list.push(bg); }   /* M14 (design DNA, seen from afar): every villa / belvedere volume is filleted — no raw box edge on the highland skyline */
     var SEGR = VT === 'LOW' ? 12 : 20, rv = rnd(0xA11A);
     function W3(lx, lz) { var p = L2W(lx, lz); p.y = TOP + roll(p.x, p.z); return p; }
     function pillAt(list, w, h, d, x, y, z, yaw) { var r = d / 2, core = Math.max(0.05, w - d), b = new THREE.BoxGeometry(core, h, d), e1 = new THREE.CylinderGeometry(r, r, h, SEGR), e2 = e1.clone(); e1.translate(core / 2, 0, 0); e2.translate(-core / 2, 0, 0); [b, e1, e2].forEach(function (g) { g.rotateY(yaw); g.translate(x, y, z); list.push(g); }); }   /* a stadium-plan volume: straight sides, round ends */
-    function lensAt(list, rx, rz, hT, hB, x, y, z, yaw) { var e = 0.4 / Math.min(rx, rz), t = 0.2, pts = [], i, u;   /* a lens canopy: a shallow dome over a shallower soffit, meeting in a soft rounded rim (~0.4 m) — never a knife edge */
-      for (i = 0; i <= 6; i++) { u = i / 6; pts.push(new THREE.Vector2(u * (1 - e), -t - (hB - t) * (1 - u * u))); }
-      for (i = 1; i < 8; i++) { var a = -Math.PI / 2 + i / 8 * Math.PI; pts.push(new THREE.Vector2(1 - e + e * Math.cos(a), t * Math.sin(a))); }
-      for (i = 6; i >= 0; i--) { u = i / 6; pts.push(new THREE.Vector2(u * (1 - e), t + (hT - t) * (1 - u * u))); }
-      var g = new THREE.LatheGeometry(pts, SEGR + 8); g.scale(rx, 1, rz); g.rotateY(yaw); g.translate(x, y, z); list.push(g); }
+    function lensAt(list, rx, rz, hT, hB, x, y, z, yaw, opt) { var e = 0.4 / Math.min(rx, rz), t = 0.2, lo = [], hi = [], i, u;   /* a lens canopy: a shallow dome over a shallower soffit, meeting in a soft rounded rim (~0.4 m) — never a knife edge */
+      for (i = 0; i <= 6; i++) { u = i / 6; lo.push(new THREE.Vector2(u * (1 - e), -t - (hB - t) * (1 - u * u))); }
+      var rim = []; for (i = 1; i < 8; i++) { var a = -Math.PI / 2 + i / 8 * Math.PI, q = new THREE.Vector2(1 - e + e * Math.cos(a), t * Math.sin(a)); if (i <= 2) lo.push(q); if (i >= 2 && i <= 6) rim.push(q); if (i >= 6) hi.push(q); }
+      for (i = 6; i >= 0; i--) { u = i / 6; hi.push(new THREE.Vector2(u * (1 - e), t + (hT - t) * (1 - u * u))); }
+      function lathe(pts, L) { var g = new THREE.LatheGeometry(pts, SEGR + 8); g.scale(rx, 1, rz); g.rotateY(yaw); g.translate(x, y, z); L.push(g); }
+      if (opt && opt.soffit) { lathe(lo, opt.soffit); lathe(rim, opt.rim || list); lathe(hi, list); } else lathe(lo.concat(rim.slice(1), hi.slice(1)), list);
+      if (opt && opt.lantern) { var lr = 0.3, ly = y + t + (hT - t) * (1 - lr * lr) - 0.08;   /* a clerestory drum: white body, a glazed band round its side, a white cap (from above a raised drum, never a dark hole) */
+        [[lr, lr, 0.72, 0.36, list], [lr * 1.012, lr * 1.012, 0.3, 0.42, opt.lantern], [lr * 1.05, lr * 1.05, 0.08, 0.76, list]].forEach(function (d) { var g = new THREE.CylinderGeometry(d[0], d[1], d[2], SEGR + 8); g.scale(rx, 1, rz); g.rotateY(yaw); g.translate(x, ly + d[3], z); d[4].push(g); }); } }
+    /* M20 (lead self-review: the villas and the pavilion read as white SAUCERS — a white lens on sticks against a white sky): the lens keeps its
+       form but is BUILT — a mid-grey metal soffit (weight under the white top without a black lid), a graphite fascia band round the rim (the
+       roof edge reads from the lanes and from the air), a clerestory drum in each home's crown (white, glazed round its side: a roof, not a disc,
+       from above; lit at night), columns with more body. One new draw (VEIL_VILLA_SOFFITS); beyond the host's reach. */
     function arcAt(list, R, tube, A, x, y, z, yaw) { var g = new THREE.TorusGeometry(R, tube, 5, Math.max(8, Math.round(A * 9)), A); g.rotateX(-Math.PI / 2); g.rotateY(-Math.PI / 2 - A / 2 + yaw); g.translate(x, y, z); list.push(g); }   /* a flat arc centred on the yaw's forward (sin yaw, cos yaw) */
-    function colAt(list, h, x, y, z) { var g = new THREE.CylinderGeometry(0.16, 0.24, h, 8); g.translate(x, y + h / 2, z); list.push(g); }
+    function colAt(list, h, x, y, z) { var g = new THREE.CylinderGeometry(0.22, 0.3, h, 12); g.translate(x, y + h / 2, z); list.push(g); }
     function strip(list, a, b, w, lift) { var n = Math.max(2, Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 2.5)), dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz) || 1, px = -dz / l * w / 2, pz = dx / l * w / 2, P = [], I = [];
       for (var i = 0; i <= n; i++) { var f = i / n, x = a.x + dx * f, z = a.z + dz * f; P.push(x - px, gY(x - px, z - pz) + lift, z - pz, x + px, gY(x + px, z + pz) + lift, z + pz); if (i) { var k = i * 2 - 2; I.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } }
       var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); if (g.attributes.normal.getY(0) < 0) { I.reverse(); g.setIndex(I); g.computeVertexNormals(); } list.push(g); }   /* a flush ribbon that follows the meadow */
@@ -479,7 +486,7 @@ export function createVeilFalls(ctx) {
       var hall = new THREE.CylinderGeometry(7, 7, 4.4, SEGR * 2, 1, true); hall.translate(civ.x, civ.y + 0.25 + 2.2, civ.z); glassP.push(hall);
       var ring = new THREE.TorusGeometry(7.1, 0.28, 6, SEGR * 2); ring.rotateX(Math.PI / 2); ring.translate(civ.x, civ.y + 4.75, civ.z); bodyP.push(ring);
       for (var cI = 0; cI < 8; cI++) { var a = cI / 8 * Math.PI * 2 + 0.2; colAt(bodyP, 6.3, civ.x + Math.cos(a) * 10.5, civ.y + 0.25, civ.z + Math.sin(a) * 10.5); }
-      lensAt(bodyP, 13, 13, 1.6, 0.55, civ.x, civ.y + 6.8, civ.z, face);
+      lensAt(bodyP, 13, 13, 1.6, 0.55, civ.x, civ.y + 6.8, civ.z, face, { soffit: soffitP, rim: darkP });   /* the crown crystal stands where a lantern would: no lantern here */
       var fin = gemG(); fin.scale(2.25, 5.2, 2.25); fin.translate(civ.x, civ.y + 6.8 + 1.6 + 2.2, civ.z); spireParts.push(fin);   /* a small VISIONARY crystal crowns it (the spire's draw) */
       [-1, 1].forEach(function (sd) { var s2 = side(face, 16.5 * sd); shrubs.push({ x: civ.x + s2[0], y: civ.y + 1.0, z: civ.z + s2[1], s: 0.95, yaw: sd, c: sd < 0 ? CRYSTAL_TINT.gold : CRYSTAL_TINT.blue }); }); })();   /* M16: the civic pavilion is shared — gold and blue either side, its crown crystal keeps the district's VISIONARY violet */
     /* the homes */
@@ -488,7 +495,7 @@ export function createVeilFalls(ctx) {
       pillAt(glassP, W0 - 1.5, 3.3, D0 - 1.0, H.x, y0 + 0.65 + 1.65, H.z, yaw);                                           /* the glass ground floor */
       pillAt(bodyP, W0, 3.0, D0, H.x + f1[0] * cant, y0 + 0.65 + 3.3 + 1.5, H.z + f1[1] * cant, yaw);                     /* the white upper volume, cantilevered toward the view */
       pillAt(glassP, W0 + 0.12, 0.95, D0 + 0.12, H.x + f1[0] * cant, y0 + 0.65 + 3.3 + 1.7, H.z + f1[1] * cant, yaw);     /* its lit ribbon window */
-      var cy = y0 + 0.65 + 6.3 + 0.9; lensAt(bodyP, (W0 + 5) / 2, (D0 + 5) / 2, 0.95, 0.32, H.x + f1[0] * cant, cy, H.z + f1[1] * cant, yaw);   /* the lens canopy roof */
+      var cy = y0 + 0.65 + 6.3 + 0.9; lensAt(bodyP, (W0 + 5) / 2, (D0 + 5) / 2, 0.95, 0.32, H.x + f1[0] * cant, cy, H.z + f1[1] * cant, yaw, { soffit: soffitP, rim: darkP, lantern: glassP });   /* the lens canopy roof */
       [[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(function (q) { var s1 = side(yaw, q[0] * (W0 / 2 + 1.3)), f2 = fwd(yaw, cant + q[1] * (D0 / 2 + 1.3)); colAt(bodyP, cy - y0 - 0.3, H.x + s1[0] + f2[0], y0 + 0.3, H.z + s1[1] + f2[1]); });
       var g0 = fwd(yaw, 7.8); gardens.push({ x: H.x + g0[0], z: H.z + g0[1], y: y0, yaw: yaw, H: H });                   /* the curved garden wall (M19: built in stone below, as the terrace's retaining edge) */
       for (var sI = 0; sI < 6; sI++) { var a = (rv() - 0.5) * 2.0, rr = 1.2 + rv() * 3.6, gx = H.x + g0[0] + Math.sin(yaw + a) * rr, gz = H.z + g0[1] + Math.cos(yaw + a) * rr, s = 0.42 + rv() * 0.4;
@@ -830,6 +837,7 @@ export function createVeilFalls(ctx) {
 
     merged(bodyP, keep(new THREE.MeshStandardMaterial({ color: 0xd9dde4, roughness: 0.38, metalness: 0.35, envMapIntensity: 0.6 })), 'VEIL_VILLAS');
     merged(darkP, keep(new THREE.MeshStandardMaterial({ color: 0x2e333d, roughness: 0.55, metalness: 0.4 })), 'VEIL_VILLA_ROOFS');
+    merged(soffitP, keep(new THREE.MeshStandardMaterial({ color: 0xb4b8bf, roughness: 0.62, metalness: 0.25, side: THREE.DoubleSide })), 'VEIL_VILLA_SOFFITS');   /* M20: the canopies' mid-grey metal soffits */
     glassMat = keep(new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.08, metalness: 0.7, emissive: 0xfff1dc, emissiveIntensity: night ? 0.9 : 0.06, envMapIntensity: 1.0, side: THREE.DoubleSide }));
     /* M20 ROOMS BEHIND THE GLASS (review: at night every villa, the civic hall and the doors glowed as one flat cream sheet — a blank screen).
        The vertical glass now reads as glazing onto rooms: a mullion / transom grid in world space (1.7 m bays, 2.9 m storeys) that frames it by
