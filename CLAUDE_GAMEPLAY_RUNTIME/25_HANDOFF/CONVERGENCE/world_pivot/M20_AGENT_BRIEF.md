@@ -94,6 +94,80 @@ set of files, works in its OWN git worktree, commits there (never pushes), and h
   / white rim at a surface that faces up mirrors the bright sky as a white cap; "near-invisible at mid-range" is not a win — check every
   camera the brief names, zoomed; host-safety regressions are always blocking; keep CRLF lines CRLF (read / write files as raw bytes).
 
+## OWNER ENHANCEMENT DIRECTIVE (2026-09-28 — the lens for wave 6; verbatim essentials)
+"HARD ENHANCEMENT MODE. NO WIDER MAP. NO 'just add more random stuff.' FIRST make what already exists look significantly better and more
+intentional." The world should feel like "a magical crystalline civilization infused with combat energy and training culture — premium,
+calm, elegant, slightly surreal, physically believable enough to feel modern, visually unique enough to feel like our own IP, readable for
+gameplay". Too many things still read as "choppy, retro, too sharp / too faceted, not materially resolved, not distinct enough from nearby
+elements, not elegant enough". Rules: no map expansion (small elements only if they support polish / identity); do not wipe out progress;
+DISTINCTIVENESS OVER BLENDING (every major element reads as what it is — architecture, path, cliff, water, crystal plant, aura object,
+light, gameplay space — each family with its own material, lighting and shape language); ELEGANCE OVER NOISE (anything that reads as an
+artifact gets fixed or removed); UNIQUENESS OVER GENERIC FANTASY; no character insertion yet. Priorities: 1 clarity / elegance / realism,
+2 waterfall + rock + water contact, 3 sky / moon / atmosphere ("day should NOT become plain white or plain blue … calm before the storm,
+violet-gray, elegant atmospheric tension"; the moon whole and intentional), 4 buildings / entrances / dome ("cleaner entrances, clearer
+material hierarchy, more intentional facade language … buildings do not blur into floors, sky or neighbours"; the dome interior "cleaner
+lighting, cleaner surfaces, cleaner purpose"), 5 vegetation / crystal flora smoothing ("GLB trees smoother and more premium … crystal bushes
+/ grasses elegant, not noisy or crude … transitions where flora meets ground"), 6 class-colour distribution (red, gold, blue, purple, pink
+across the world "tasteful, distributed, premium … no sloppy blending"), 7 subtle floating magical micro-elements ("tiny crystalline motes …
+small rhombuses, cubes, circular / soft aura forms … fainter near the ground or near players … not pickups"), 8 fitness / combat identity
+cues ("this civilization values movement, power, refinement, readiness, and mastery" — environmental motifs, branded spatial language,
+structures implying training / performance; NOT cheesy gym-equipment spam, NOT clutter). Sharpness list: cliff / mountain edges, waterfall
+rock edges, building transitions, vegetation silhouettes, crystal grasses / bushes / GLB tree integration, dome / interior surfaces,
+road / floor transitions — "round off or soften harsh edge reads … sculpted and premium, not jagged and retro".
+
+## OWNER CLARIFICATION FOR THE IDENTITY / CLASS-COLOUR PASS (2026-09-28, verbatim essentials — binding)
+"DO NOT optimize toward equal pixel percentages. 95% neutral world material is not inherently a defect. The objective is BALANCED VISUAL
+IMPORTANCE, not 20/20/20/20/20 screen coverage. Keep platinum, graphite, stone, glass, water and other neutral materials as the visual
+foundation. Correct the current BLUE dominance and make GOLD / CRIMSON / PINK sufficiently present and memorable through intentional
+landmarks, architecture, crystal ecology, lighting, hardscape and environmental identity. PURPLE remains VISIONARY — not generic magic.
+A player should be able to encounter and remember all five class identities without the world becoming rainbow-saturated."
+Priorities, in order: 1 recognizable class identity, 2 tasteful distribution, 3 environmental hierarchy, 4 gameplay readability, 5 restraint.
+Lead audit data (five_colour_audit.py on the self-review frames, c25fb59 — a diagnostic, NOT a target): DAY accent map GOLD 0.09 BLUE 0.55
+RED 0.11 PURPLE 0.17 PINK 0.06; shared civic spaces GOLD 0.01 PINK 0.00 PURPLE 0.36 (F2 purple-led); mean neutral 0.95. NIGHT map
+GOLD 0.04 BLUE 0.43 RED 0.37 PURPLE 0.08 PINK 0.06; shared spaces BLUE 0.93. Reading: blue dominates, gold and pink are nearly absent from
+the shared world by day, gold vanishes at night — fix by IMPORTANCE (a memorable gold / crimson / pink moment in each class's own places and
+at shared thresholds), never by coverage.
+
+## STATE AFTER WAVE 6 (merged at 02f3cc2; surfaces at 72d1626 — your wave-7 worktree base is one of these)
+- Sky (92c4e17): a code-set storm-calm day grade (violet-grey near-neutral), a contained Sun, cloud masses with weight. SKY ROUND 2 is STILL
+  RUNNING (cloudBodies.js, the Sun / sky files): do NOT edit sky.js, atmosphere.js, cloudBodies.js, celestial.js, nor the light-rig colours in
+  lab/fieldScene.js.
+- Mountains (3f3becf): per-pixel rounded folds on the in-reach collision faces, rounded fin noses beyond reach, far massifs capped.
+- Buildings (3857cdb): plaza masts are modern halo luminaires with night pools that read; stone base storeys on the Training Hall and the
+  MAHGIC Exchange; the HALO serve court (reticle targets, ATHLETE-gold bullseye) and a graphite return portal; bench bases; honed dais.
+- Lead (02f3cc2): AURA FRAGMENTS in ambientMagic.js (small rhombus / cube / soft-ring shapes drifting in loose clusters over the groves, the
+  NEXUS plaza — gold / crimson / pink-led, never purple — and the Veil lanes; premultiplied blend). ambientMagic.js is the lead's: do not edit.
+- SURFACES merged at 72d1626 (0057fd7 + 72d1626): road stone laid in road space (bends fanned, kerbs, grates; LOW straight courses at the
+  old cost, R8 wear), humanized plaza paving with a sett band, grove planted beds (soil / gravel margin, calm at night). The wave-7 FLORA
+  agent (base 72d1626) may touch meadow.js and the grove-bed / tree-pit shading only; nobody else edits terrain.js, surfaceDetail.js,
+  roadNetwork.js or hardscapeInlays.js in wave 7. (The wave-7 IDENTITY agent is based on 02f3cc2, before this merge.) MAH MATCH's blue / purple nightlife light was the owner's own M14-2 request: do not recolour matchHall.js.
+- Identity research (read it): world_pivot/M20_IDENTITY_MAP.md (in the repo) — where each class colour shows today, the generic cool (blue) defaults in
+  shared spaces, purple outside VISIONARY, the hooks, and the training / combat culture already present. Line numbers are at 3857cdb.
+
+## STATE AFTER WAVE 5a (merged at c08c25b — your wave-6 worktree base)
+- Lead: the Moon is whole (a same-material core closes the torn traced L0 shell, its own map sampled triplanar — celestial.js moon code is
+  FROZEN); the Veil falls base (flow-mapped plunge foam instead of concentric rings, edge-on / near-eye fade of the curtain, softer spray);
+  Veil villas' lens canopies built (soffit, fascia, clerestory drum); the flume blow-out fixed; HALO dome / deck / interiors merged (wave 4).
+- Wave 5 plaza furniture merged: the white faceted plaza pylons are slim light masts (cityScene buildLightMasts + contactAO decals). Open:
+  the lantern heads read CLASSIC / near-black (retro — the owner's complaint); the r 0.6 m collider vs the slim mast; night pools invisible.
+- Wave 5 SURFACES (terrain.js, surfaceDetail.js ground families, meadow.js, roadNetwork.js, hardscapeInlays.js) is STILL IN REVIEW —
+  do NOT edit those files (applyGeology in surfaceDetail.js is the exception for the mountains area; touch nothing else in that file).
+- Tried and rejected by the lead: rock crease normals 68° → 95° (no visible change: the knife reads are silhouettes / geometry, not shading).
+
+## STATE AFTER WAVE 4 (merged at a330208 — your wave-5 worktree base)
+- MOUNTAINS round 2 merged (crest caps / ledges / nose ribs, close-range rock detail, island relief; lead: crags clear the FIELD flight
+  ceiling — the FIELD room flies to 100 m, so solid art in the reach square must clear 105.6 m; m19 check 15 reads dev_tuning).
+- SMALL FALLS (lead): the TITAN fall pours off its ledge deck lip into the lake's open water (flush deck feed, plunge foam); the NORTH
+  sheet is retired (m20_water check 10). MAGIC ECOLOGY merged (ambientMagic.js motes / pollen / night moths, 1 draw; aura.js: the dotted
+  rings round crown gems removed; test gameplay_world_m20_ambient).
+- HALO DOME / DECK / INTERIORS is STILL UNDER REVIEW (not merged): do NOT edit the HALO realm code in lab/cityScene.js (deck, dome /
+  shell, lattice, rim, promenade, gardens, sky-walk, soffit) or lab/interiorScene.js.
+- Full suite: the same 34 bridge-blocked files fail (fail_w2.txt); gameplay_world_m20_ambient and m20_water (10) are new / grown.
+- Lead self-review of the whole world at c25fb59 (frames …/m20/rev1/, sheets …/m20/rev1_p2..p6.jpg vs c51ac67): clear gains in sky /
+  sun, water, falls, mountains, crystals, MAH MATCH, the Veil; STILL WEAK: the plaza's big white faceted light pylons (V13 foreground,
+  V21, V32, F3 — primitive plastic shells), vast featureless plaza / road floors (V25, TS1, V03, V13), the flat in-reach ridge faces
+  (V05, V16 — shading only, the face is the collision plane), the Veil villas' thin saucer roofs (lead), a grey-flat sky overall.
+
 ## Where things are (paths relative to your worktree root; the repo root contains CLAUDE_GAMEPLAY_RUNTIME/)
 - World modules: `CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/world/*.js` (worldB.js builds them in order); civic plaza / buildings
   `lab/cityScene.js`; renderer + tone mapping `lab/play.js` (line ~61) and the evidence harness `deploy/world_preview/world_preview.js`
