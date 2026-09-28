@@ -204,7 +204,7 @@ var FRAG = [
   '      if (d > 0.002) {',
   '        float dk = max(th - p.y, 0.0), sun = exp(-min(dk / kY, max(0.0, 0.8 - dot(e, kx)) * (hx + hz) * 0.5 / kH) * (CLOUD_TAPS == 0 ? uSig * 0.55 : uSigL)), amb = 0.45 + 0.55 * clamp((p.y - b) / max(th - b, 1.0), 0.0, 1.0);',   /* the key through the shorter of two paths — down from the local top, or in from the sun-facing flank (a tall mass is lit on its sunward side, not only on its crown) · sky ambient rising with height */
   '        float lr = clamp(sun * (0.72 - 0.3 * uShadowK) + amb * uAmb + uAmb * 0.33, 0.0, 1.0), ai = 1.0 - exp(-d * uSig * ds);',
-  '        C += T * ai * mix(uShade, uTop, lr) * (1.0 - uBaseDark * (1.0 - smoothstep(0.0, 0.55, p.y / H)) * mix(smoothstep(0.08, 0.55, dk / H), 1.0, uBelly));',   /* a deeper but SOFT underside: only under thick cells, fading up through the lower body */
+  '        C += T * ai * mix(uShade, uTop, lr) * (1.0 - uBaseDark * (1.0 - smoothstep(0.0, 0.55, p.y / H)) * mix(smoothstep(0.08, 0.55, dk / H), 1.0, uBelly) * (1.0 - 0.85 * sun));',   /* a deeper but SOFT underside: only under thick cells, fading up through the lower body — M20 lead review of sky round 2: and only where the key does not reach (a sunlit flank low on a body stays lit: front-lit bodies had gone dull grey, level with the sky) */
   '        tAcc += T * ai * t; lAcc += T * ai * lr; if (T > 0.55 && T * (1.0 - ai) <= 0.55) { ps = p; tS = th; } T *= 1.0 - ai; if (T < 0.02) break; }',
   '    }',
   '    a = 1.0 - T; if (a < 0.004) discard; col = C / a; dist = tAcc / a; lit = lAcc / a;',
