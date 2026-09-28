@@ -112,3 +112,18 @@ movement calibration) waits for explicit owner authorization.
 5. Check line endings (`git diff --stat` == `--ignore-cr-at-eol --stat`).
 6. Commit with a message that states what changed, the evidence and the tests; push with `git push -u origin backup/mahworld-m6-20260924T190351Z`.
 7. Report honestly: what improved, what did not, what still needs the owner. Never mark anything owner-approved.
+
+## 11. OpenCode operating notes (environment and tooling)
+- Environment / tooling inventory, env-var NAMES, MCP translation and manual auth steps: `docs/OPENCODE_MIGRATION.md`. Project config:
+  `opencode.jsonc` (every MCP disabled until the owner authenticates it; secrets only as `{env:NAME}`).
+- Needed locally: Node 22, git, Python 3 + Pillow, **global** Playwright 1.56.1 + its Chromium (`npm i -g playwright@1.56.1 && npx playwright install chromium`;
+  if Chromium is not at `/opt/pw-browsers/chromium`, set `PLAYWRIGHT_CHROMIUM` for `capture.mjs` and `MAHWORLD_CHROME` / `CHROME` for probes).
+- Commit and push before ending any unit of work (the Claude session enforced this with a stop hook; OpenCode has none configured).
+  Never leave verified work only in a working tree; never commit unverified visual changes — park them as a patch with a status note.
+- Render budget: software-GL frames take 30–90 s; run at most ~3 render processes on a 4-CPU machine; use 1–3 cameras per fix and one
+  broad set per milestone (`CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/final_render.sh`, cameras in `tools/cams.sh`).
+- Tuning without code edits: `tools/tune_variants.mjs` evaluates JS against `window.WP` after `WP.time(tod)` (day / night handlers such as a
+  material's `userData.dayNight` re-apply on the time switch — apply variants after it, and check that code changes survive it).
+- Parallel work: use separate `git worktree`s with one owner per file set, an independent adversarial review, and merge (cherry-pick) only what
+  passes; the rules handed to such agents are in `world_pivot/M20_AGENT_BRIEF.md`.
+- Session history beyond the ledger: `world_pivot/M20_SESSION_LOG.md`.

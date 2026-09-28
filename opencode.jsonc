@@ -1,0 +1,59 @@
+// OpenCode project config for MAHWORLD (non-secret settings only).
+// Inventory, auth steps and caveats: docs/OPENCODE_MIGRATION.md. Secrets only as {env:NAME}; never commit values.
+// Every MCP is DISABLED by default: enable one only after the manual auth step listed for it in docs/OPENCODE_MIGRATION.md §4.
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // AGENTS.md (repo root) is read automatically; these add the owner law and the live handoff pointer.
+  "instructions": [
+    "CLAUDE.md",
+    "CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/CONVERGENCE/world_pivot/M20_WORKING_NOTES.md",
+    "CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/CONVERGENCE/world_pivot/m21_wip/M21_STATUS.md"
+  ],
+
+  // Conservative: pushes, force pushes and destructive commands need confirmation (owner law: no production deploy, never rewrite history).
+  "permission": {
+    "bash": {
+      "git push --force*": "deny",
+      "git push -f*": "deny",
+      "git reset --hard*": "ask",
+      "git push*": "ask",
+      "rm -rf*": "ask",
+      "npx netlify*": "ask",
+      "netlify *": "ask",
+      "*": "allow"
+    },
+    "edit": "allow"
+  },
+
+  "mcp": {
+    // GitHub (issues / PRs / CI on jackedjah/Junctional-). Plain git works without it.
+    // Manual: export GITHUB_PERSONAL_ACCESS_TOKEN, then set enabled: true.
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}" },
+      "enabled": false
+    },
+    // Scenario (PAID AI generation). Owner approval required before ANY generation.
+    // Manual: set enabled: true, then `opencode mcp auth scenario` (browser OAuth).
+    "scenario": {
+      "type": "remote",
+      "url": "https://mcp.scenario.com/mcp",
+      "enabled": false
+    },
+    // Supabase: serves the separate MAHFITT / FOB site at the repo root only (do not touch MAHFITT). Manual: enable, then `opencode mcp auth supabase`.
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp",
+      "enabled": false
+    },
+    // Netlify (deploys; owner-gated, never production). Manual: export NETLIFY_AUTH_TOKEN, then set enabled: true.
+    "netlify": {
+      "type": "local",
+      "command": ["npx", "-y", "@netlify/mcp"],
+      "environment": { "NETLIFY_PERSONAL_ACCESS_TOKEN": "{env:NETLIFY_AUTH_TOKEN}" },
+      "enabled": false
+    }
+  }
+}
