@@ -90,7 +90,7 @@ Container-only variables of the Claude cloud session (`CLAUDE_CODE_*`, `CCR_*`, 
 - Model-specific session settings (effort level, auto-compaction) have no project meaning.
 
 ## 6. Configuration outside the repo that another agent needs (now reproduced in the repo)
-- Full-suite runner + the 34 bridge-blocked test files: `CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/run_all_tests.mjs`,
+- Full-suite runner + the known-failing test files (34 before the 2026-09-28 bridge recovery, 33 after): `CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/run_all_tests.mjs`,
   `known_bridge_blocked_failures.txt` (were only in session scratch).
 - Evidence cameras + whole-world render script: `25_HANDOFF/tools/cams.sh`, `final_render.sh` (were scratch).
 - In-page tuning harness + contact sheets: `25_HANDOFF/tools/tune_variants.mjs`, `sheet2.py`.
@@ -117,7 +117,7 @@ Container-only variables of the Claude cloud session (`CLAUDE_CODE_*`, `CCR_*`, 
   silently override build-time values (the HALO soffit case); `Material.clone()` JSON-copies `userData` (a `Color` becomes a number → NaN);
   measure a region's value when a change is not obvious at sheet scale; lowering the cloud field blur brings back checker stipple.
 
-## 9. Runtime portability status (2026-09-28): BLOCKED on ten owner-archive files
+## 9. Runtime portability status (2026-09-28): ten owner-archive files RESTORED (see the update at the end of this section)
 Checked from the cloud session: the three sibling roots are **not** on this machine (filesystem search) and **not** in any of the repository's
 499 commits on any branch (no `CLAUDE_RUNTIME_FOUNDATION/`, `CLAUDE_DUAL_LOCOMOTION/`, `CLAUDE_GAMEPLAY_FOUNDATION/` path, no `jsonSource.js`).
 Nothing was fabricated.
@@ -148,6 +148,11 @@ Nothing was fabricated.
   > 1 MB, binary, containing secret-looking values or private absolute paths, and verifies every relative import resolves. Then run
   `node CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/run_all_tests.mjs` and `build_static_demo.mjs`: 33 of the 34 files should run; `gameplay_legs_faithful`
   stays blocked on the Character-lane GLB unless the owner decides otherwise.
+- **Update (same day), RESTORED:** the owner supplied `MAHWORLD_RUNTIME_RECOVERY.zip`, recovered from the M7 Netlify preview deploy. All ten
+  files matched their manifest hashes and were imported with the importer above (first `--dry-run`, then without `--push`). They were committed
+  byte-exact. The release build now passes. The full suite now gives 71 files, 38 ok, 656 checks passed, 33 failing, with no new failures.
+  The guess above that "33 of the 34 should run" did not hold: 31 files stop at the ESM / root-`package.json` module-type issue. Provenance,
+  per-file causes, the VISIONARY GREEN trace and the corrections waiting on the owner are in `docs/RUNTIME_RECOVERY_PROVENANCE.md`.
 
 ## 10. `opencode.jsonc` validation (2026-09-28)
 Validated with a JSON-Schema 2020-12 validator against the live schema at `https://opencode.ai/config.json` (the only published schema; it already

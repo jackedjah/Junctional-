@@ -1,0 +1,56 @@
+{
+ "_doc": "THE single canonical gameplay tunables source (MAHWORLD_GAMEPLAY_CANON.md section 11). Every value here is CANON_TUNABLE: the design is established, the number is configurable. Values come from the human-directed gameplay notes 2026-09-13; nothing is invented. Do not restate these numbers in code or in other documents - reference the key.",
+ "config_version": "0.1.0",
+ "source": "human-directed gameplay notes 2026-09-13",
+ "classification": "CANON_TUNABLE",
+ "units": {"speed": "mph", "altitude": "m", "combat_height": "ft", "time": "s"},
+ "fused": {
+  "forward_speed_mph": {"min": 20, "max": 40},
+  "propulsion": "CENTRAL_LOWER_TIP",
+  "propulsion_relative_power": 1.0,
+  "fingertip_stabilization_relative_power": {"value": null, "rule": "clearly weaker than the central lower propulsion; exact fraction OPEN_DECISION (OD-16)"},
+  "posture_forward": ["body slightly hinged forward", "legs fully fused / straight", "hips visibly flexed into forward travel posture", "arms slightly extended behind the body", "fingers relatively straight", "central lower taper produces propulsion (not a foot)"],
+  "posture_backward": ["slight backward hinge / lean, as if falling backward but catching the motion", "primary lower-tip propulsion shifts the character backward", "subtle fingertip MAHGIC stabilization"]
+ },
+ "split": {
+  "forward_speed_mph": {"min": 8, "max": 15},
+  "propulsion": "PER_TIP_PULSE",
+  "propulsion_relative_power_per_tip": 0.7,
+  "gait": "human-readable leg gait; tips never make heel/toe ground contact; each tip fires a small MAHGIC propulsion pulse in the gait cycle",
+  "gait_notifies": ["FIELD_ACQUIRE", "FIELD_STABLE", "PUSH_OFF", "SWING"],
+  "forbidden_notifies": ["HEEL_STRIKE", "FOOT_FLAT", "TOE_OFF", "FOOTSTEP"],
+  "feel": ["relaxed", "cool", "confident", "controlled"]
+ },
+ "backward_speed_multiplier": 0.5,
+ "flight": {
+  "fused_travel_max_altitude_m": 50,
+  "split_travel_max_altitude_m": {"min": 8, "max": 12},
+  "combat_max_height_ft": 8,
+  "combat_override_rule": "during any combat engagement, regardless of form, flight is capped at combat_max_height_ft above the combat surface; travel ceilings never apply inside combat",
+  "consumes_resource": "FLIGHT_ENERGY (abstract resource, see 12_SCHEMAS/resource.schema.json)",
+  "propulsion_visibly_harder": true,
+  "duration_and_recharge": {"value": null, "rule": "OPEN_DECISION (OD-14)"}
+ },
+ "idle": {
+  "flourish_interval_seconds": 30,
+  "hover": true,
+  "aura": "tiny subtle MAHGIC aura near fingertips / fingernails",
+  "flourish_max_duration_seconds": {"value": null, "rule": "brief; exact cap OPEN_DECISION (OD-17)"}
+ },
+ "eccentric": {
+  "default_duration_seconds": {"min": 2, "max": 3},
+  "tick_damage_relative_to_main": {"value": null, "rule": "eccentric tail deals LESS than the main concentric damage; exact ratio OPEN_DECISION (OD-18)"},
+  "applies_to": "LONG_RANGE_MANIFESTATION_ATTACKS_ONLY",
+  "direction_visual": "reversed (downward for an upward concentric)",
+  "color_shift": "slightly darker"
+ },
+ "combat": {
+  "movement_pattern_slots": {"min": 8, "max": 12},
+  "attack_families": ["BASIC", "SKILL", "SPECIAL", "BUFF_UTILITY"],
+  "slot_counts_per_family": {"value": null, "rule": "OPEN_DECISION (OD-05)"}
+ },
+ "duel": {"spectator_default_max": 20, "call_next_policy": "FIRST_COME_FIRST_SERVED", "after_decline": {"value": null, "rule": "OPEN_DECISION (OD-02)"}},
+ "raid": {"party_default_max": 4, "party_min": 1, "scaling_formula": {"value": null, "rule": "OPEN_DECISION (OD-08)"}},
+ "mentors": {"default_count": {"min": 8, "max": 12}},
+ "_derived_note": "mph -> engine units for mahloco (runtime_config.default.json speed_* placeholders) is a mapping step owned by a later phase; mahloco is not modified by the gameplay foundation."
+}

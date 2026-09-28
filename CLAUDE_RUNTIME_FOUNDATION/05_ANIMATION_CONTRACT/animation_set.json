@@ -1,0 +1,152 @@
+{
+ "_doc": "INITIAL_ANIMATION_ANCHOR_CONTRACT.md - minimum clip set (29 clips); types: loop | oneshot | scrub",
+ "required_clips": {
+  "FUSED_IDLE": "loop",
+  "FUSED_HOVER": "loop",
+  "FUSED_GLIDE": "loop",
+  "FUSED_FORWARD": "loop",
+  "FUSED_BACKWARD": "loop",
+  "FUSED_STRAFE_LEFT": "loop",
+  "FUSED_STRAFE_RIGHT": "loop",
+  "FUSED_ASCEND": "loop",
+  "FUSED_DESCEND": "loop",
+  "FUSED_DASH": "oneshot",
+  "FUSED_FLIGHT_IDLE": "loop",
+  "FUSED_FLIGHT_FORWARD": "loop",
+  "UNFUSE_CURL": "scrub",
+  "UNFUSE_CHARGE": "scrub",
+  "UNFUSE_BURST_STAR": "scrub",
+  "UNFUSE_RECOVER": "scrub",
+  "SPLIT_IDLE": "loop",
+  "SPLIT_FORWARD": "loop",
+  "SPLIT_RUN": "loop",
+  "SPLIT_STRAFE_LEFT": "loop",
+  "SPLIT_STRAFE_RIGHT": "loop",
+  "SPLIT_CROUCH": "loop",
+  "SPLIT_LUNGE": "oneshot",
+  "SPLIT_KICK": "oneshot",
+  "SPLIT_CLIMB": "loop",
+  "REFUSE_KNEES_UP": "scrub",
+  "REFUSE_ALIGN": "scrub",
+  "REFUSE_SNAP": "scrub",
+  "REFUSE_RECOVER": "scrub"
+ },
+ "optional_clips": {
+  "UNFUSE_ABORT": "oneshot",
+  "REFUSE_ABORT": "oneshot",
+  "SPLIT_COMBAT": "loop"
+ },
+ "required_notifies": {
+  "SPLIT_FORWARD": [
+   "FIELD_ACQUIRE",
+   "FIELD_STABLE",
+   "PUSH_OFF",
+   "SWING"
+  ],
+  "SPLIT_RUN": [
+   "FIELD_ACQUIRE",
+   "FIELD_STABLE",
+   "PUSH_OFF",
+   "SWING"
+  ],
+  "SPLIT_CLIMB": [
+   "CLIMB_REACH_L",
+   "CLIMB_REACH_R",
+   "CLIMB_PULL"
+  ],
+  "UNFUSE_BURST_STAR": [
+   "BURST_FRAME",
+   "STAR_APEX"
+  ],
+  "REFUSE_SNAP": [
+   "SNAP_FRAME"
+  ],
+  "FUSED_DASH": [
+   "DASH_BURST",
+   "DASH_RECOVER"
+  ],
+  "SPLIT_LUNGE": [
+   "LUNGE_PLANT",
+   "LUNGE_RELEASE"
+  ],
+  "SPLIT_KICK": [
+   "KICK_CONTACT_WINDOW_OPEN",
+   "KICK_CONTACT_WINDOW_CLOSE"
+  ],
+  "SPLIT_STRAFE_LEFT": [
+   "FIELD_ACQUIRE",
+   "FIELD_STABLE",
+   "PUSH_OFF",
+   "SWING"
+  ],
+  "SPLIT_STRAFE_RIGHT": [
+   "FIELD_ACQUIRE",
+   "FIELD_STABLE",
+   "PUSH_OFF",
+   "SWING"
+  ]
+ },
+ "forbidden_notifies": [
+  "HEEL_STRIKE",
+  "FOOT_FLAT",
+  "TOE_OFF",
+  "FOOTSTEP"
+ ],
+ "runtime_state_to_clip": {
+  "UNFUSE_ENTER": "UNFUSE_CURL",
+  "UNFUSE_CURL": "UNFUSE_CURL",
+  "UNFUSE_CHARGE": "UNFUSE_CHARGE",
+  "UNFUSE_BURST": "UNFUSE_BURST_STAR",
+  "UNFUSE_STAR": "UNFUSE_BURST_STAR",
+  "UNFUSE_RECOVER": "UNFUSE_RECOVER",
+  "REFUSE_ENTER": "REFUSE_KNEES_UP",
+  "REFUSE_KNEES_UP": "REFUSE_KNEES_UP",
+  "REFUSE_ALIGN": "REFUSE_ALIGN",
+  "REFUSE_SNAP": "REFUSE_SNAP",
+  "REFUSE_RECOVER": "REFUSE_RECOVER",
+  "SPLIT_WALK_OR_GROUNDED_MOVE": "SPLIT_FORWARD",
+  "SPLIT_STRAFE_LEFT": "SPLIT_STRAFE_LEFT",
+  "SPLIT_STRAFE_RIGHT": "SPLIT_STRAFE_RIGHT"
+ },
+ "bones_required": [
+  "ROOT",
+  "PELVIS",
+  "SPINE_01",
+  "SPINE_02",
+  "SPINE_03",
+  "CHEST",
+  "NECK",
+  "HEAD",
+  "CLAV_L",
+  "CLAV_R",
+  "UPPERARM_L",
+  "UPPERARM_R",
+  "FOREARM_L",
+  "FOREARM_R",
+  "HAND_L",
+  "HAND_R",
+  "THIGH_L",
+  "THIGH_R",
+  "SHIN_L",
+  "SHIN_R",
+  "TIP_L",
+  "TIP_R",
+  "FUSED_HIP",
+  "FUSED_BASE",
+  "FUSED_TIP"
+ ],
+ "bones_optional": [
+  "HAIR_ROOT",
+  "EYE_L",
+  "EYE_R"
+ ],
+ "sockets_required": [
+  "SOCKET_HAIR",
+  "SOCKET_FOREHEAD_DIAMOND",
+  "PROPULSION_CENTRAL",
+  "PROPULSION_TIP_L",
+  "PROPULSION_TIP_R",
+  "TIP_L_CONTACT",
+  "TIP_R_CONTACT"
+ ]
+}

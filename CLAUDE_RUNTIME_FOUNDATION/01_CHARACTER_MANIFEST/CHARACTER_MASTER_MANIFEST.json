@@ -1,0 +1,660 @@
+{
+ "manifest_version": "0.2.0",
+ "generated": "2026-09-13",
+ "_rules": "Values come only from recorded evidence (RAW hashes, Phase 1A audit, Astra handoffs, Claude engineering runs). UNKNOWN/null means not established - never guessed. Phase 4.5: eyes are human-like (iris = class colour, no emission); the Phase 1B/Palette B glowing eyes are LEGACY_GLOW and need visual migration.",
+ "models": [
+  {
+   "id": "MAH_ATHLETE_F",
+   "class": "ATHLETE",
+   "sex": "F",
+   "visual_source": {
+    "path": "ASTRA_VISUAL_CLEANUP\\14_HANDOFF_EXPORTS\\Athlete_F\\ATHLETE_F_FINAL_APPROVED_PALETTE_B.blend",
+    "sha256": "4024290092cb9dc5429c50a96bcc06c7e6989f0f201ffa0f8224bfd2a977c818",
+    "status": "FROZEN",
+    "note": "human_approved Palette B 2026-09-13; crystallization gate reopened by canon"
+   },
+   "runtime_source": {
+    "path": "CLAUDE_DUAL_LOCOMOTION\\15_ASTRA_VISUAL_HANDOFF\\Athlete_F\\ATHLETE_F_DUAL_LOCOMOTION_ENGINEERING.blend",
+    "sha256": "b4c031cda0abedb136c5989c9e81bba67679294b9ef6799e855bc8997e9a8070",
+    "status": "PREPARED",
+    "note": "engineering file (split modules, rig, emitters); split surfaces await Astra bake; sha256 from ENGINEERING_MANIFEST.json"
+   },
+   "retopo_status": "RUNTIME_READY",
+   "rig_status": "PREPARED",
+   "material_zones": {
+    "CLASS_COLOR": "PRESENT",
+    "SILVER_METAL": "PRESENT",
+    "GRAPHITE": "PRESENT",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "LEGACY",
+    "EYE_IRIS": "LEGACY",
+    "EYE_PUPIL": "LEGACY",
+    "EYE_CORNEA": "LEGACY",
+    "FOREHEAD_DIAMOND": "PRESENT",
+    "CORE_DIAMONDS": "PRESENT",
+    "HAIR": "MISSING",
+    "OPTIONAL_FACE_FEATURES": "UNKNOWN"
+   },
+   "iris_color": "GOLD",
+   "eye_system": "LEGACY_GLOW",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "PRESENT",
+    "socket": "SOCKET_FOREHEAD_DIAMOND",
+    "material": "CLASS_COLOR",
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "VISUAL_FINISH_PENDING",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "5796eced2f4c41d59df62330b0616582387d11e70bb4c72414b22aeab983790f",
+   "version": "RAW-2026-09 / VISUAL PaletteB / RUNTIME eng-R09",
+   "geometry": {
+    "tris": 18387,
+    "density_class": "RETOPO",
+    "head_yaw_deg": 2,
+    "symmetry_mm": 0.06,
+    "class_hue_deg": 36,
+    "hue_on_canon": false
+   },
+   "silver_exceptions": [],
+   "notes": "material zones as separate slots are NOT yet split in the approved file (one material ASTRA_P01_PALETTE_B); PRESENT here means the zone exists in the texture, runtime zone carrier still to be produced | Phase 4.5: eyes in the approved Palette B file are the Phase 1B glowing projection (LEGACY_GLOW) - human-like sclera/iris/pupil/cornea eyes are required before READY (or an explicit eye_legacy_waiver)."
+  },
+  {
+   "id": "MAH_ATHLETE_M",
+   "class": "ATHLETE",
+   "sex": "M",
+   "visual_source": {
+    "path": "ASTRA_VISUAL_CLEANUP\\ATHLETE_M (in progress)",
+    "sha256": null,
+    "status": "IN_PROGRESS"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RUNTIME_READY",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "UNKNOWN",
+    "EYE_IRIS": "UNKNOWN",
+    "EYE_PUPIL": "UNKNOWN",
+    "EYE_CORNEA": "UNKNOWN",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "GOLD",
+   "eye_system": "UNKNOWN",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "PLANNED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "7b023694ea924b86128ff2e1ae3b64157491c1d5b11805b9d4d2b68131592b63",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 12900,
+    "density_class": "RETOPO",
+    "head_yaw_deg": 10,
+    "symmetry_mm": 0.09,
+    "class_hue_deg": 33,
+    "hue_on_canon": false
+   },
+   "silver_exceptions": []
+  },
+  {
+   "id": "MAH_TITAN_F",
+   "class": "TITAN",
+   "sex": "F",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "IN_PROGRESS"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RETOPO_REQUIRED",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "UNKNOWN",
+    "EYE_IRIS": "UNKNOWN",
+    "EYE_PUPIL": "UNKNOWN",
+    "EYE_CORNEA": "UNKNOWN",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "BLUE",
+   "eye_system": "UNKNOWN",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "BLOCKED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "ffe6fca85a1a53f60dcf3c436a9c932354c26670e95bbe729ab16ea113bb2410",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 1960000,
+    "density_class": "DENSE",
+    "head_yaw_deg": 22,
+    "symmetry_mm": 13.6,
+    "class_hue_deg": 212.5,
+    "hue_on_canon": true
+   },
+   "silver_exceptions": [],
+   "notes": "dense; head yaw 22 deg; retopo after visual lock"
+  },
+  {
+   "id": "MAH_TITAN_M",
+   "class": "TITAN",
+   "sex": "M",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RUNTIME_READY",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "MISSING",
+    "EYE_IRIS": "MISSING",
+    "EYE_PUPIL": "MISSING",
+    "EYE_CORNEA": "MISSING",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "BLUE",
+   "eye_system": "UNMAPPED",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "PLANNED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "1e0bd2c07329427ea240703971523bd85246c3fec54bd2a0b0a97c0664f33499",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 12400,
+    "density_class": "RETOPO",
+    "head_yaw_deg": 1,
+    "symmetry_mm": 0.06,
+    "class_hue_deg": 212,
+    "hue_on_canon": true
+   },
+   "silver_exceptions": [],
+   "notes": "recommended second dual-locomotion model (retopo, mirrored, heaviest legs)"
+  },
+  {
+   "id": "MAH_LEAN_F",
+   "class": "LEAN",
+   "sex": "F",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "IN_PROGRESS"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RUNTIME_READY",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "UNKNOWN",
+    "EYE_IRIS": "UNKNOWN",
+    "EYE_PUPIL": "UNKNOWN",
+    "EYE_CORNEA": "UNKNOWN",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "RED",
+   "eye_system": "UNKNOWN",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "PLANNED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "a03e0142c8a7491355b27b3413a6a9b62f69bbc7a514041e49e17639c42e1469",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 14200,
+    "density_class": "RETOPO",
+    "head_yaw_deg": 1,
+    "symmetry_mm": 0.07,
+    "class_hue_deg": 352.5,
+    "hue_on_canon": true
+   },
+   "silver_exceptions": [],
+   "notes": "red flame streaks on the taper (Phase 1A E2) - zone boundary cleanup by Astra"
+  },
+  {
+   "id": "MAH_LEAN_M",
+   "class": "LEAN",
+   "sex": "M",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RETOPO_REQUIRED",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "MISSING",
+    "EYE_IRIS": "MISSING",
+    "EYE_PUPIL": "MISSING",
+    "EYE_CORNEA": "MISSING",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "RED",
+   "eye_system": "UNMAPPED",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "BLOCKED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "ee0e4373a173072589d02a139f3c038633cf9e9535fde87a59b2a521e4379beb",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 1930000,
+    "density_class": "DENSE",
+    "head_yaw_deg": 21,
+    "symmetry_mm": 11,
+    "class_hue_deg": 3,
+    "hue_on_canon": true
+   },
+   "silver_exceptions": [],
+   "notes": "top-heavy (upper/lower bulk 3.67); torn taper texture seam; retopo after visual lock"
+  },
+  {
+   "id": "MAH_BAGE_F",
+   "class": "BAGE",
+   "sex": "F",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RUNTIME_READY",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "MISSING",
+    "EYE_IRIS": "MISSING",
+    "EYE_PUPIL": "MISSING",
+    "EYE_CORNEA": "MISSING",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "PINK",
+   "eye_system": "UNMAPPED",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "PLANNED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "77d80e343b46987c23db47f80e8dfdc07e916cfe90a648881f380bb5990b145c",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 11600,
+    "density_class": "RETOPO",
+    "head_yaw_deg": 15,
+    "symmetry_mm": 0.13,
+    "class_hue_deg": 332,
+    "hue_on_canon": false
+   },
+   "silver_exceptions": [],
+   "notes": "lightest mesh; narrowest female hips (393 mm) - lower-body width decision pending"
+  },
+  {
+   "id": "MAH_BAGE_M",
+   "class": "BAGE",
+   "sex": "M",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RETOPO_REQUIRED",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "MISSING",
+    "EYE_IRIS": "MISSING",
+    "EYE_PUPIL": "MISSING",
+    "EYE_CORNEA": "MISSING",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "PINK",
+   "eye_system": "UNMAPPED",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "BLOCKED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "0416c1f456b7c3b0961d27f1bacd89033639f18e2de79d07ede6044c06bc3aaa",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 2000000,
+    "density_class": "DENSE",
+    "head_yaw_deg": 28,
+    "symmetry_mm": 15.8,
+    "class_hue_deg": 323.5,
+    "hue_on_canon": false
+   },
+   "silver_exceptions": [],
+   "notes": "largest head yaw (28 deg); lattice + pink streaks on the taper"
+  },
+  {
+   "id": "MAH_VISIONARY_F",
+   "class": "VISIONARY",
+   "sex": "F",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RETOPO_REQUIRED",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "MISSING",
+    "EYE_IRIS": "MISSING",
+    "EYE_PUPIL": "MISSING",
+    "EYE_CORNEA": "MISSING",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "GREEN",
+   "eye_system": "UNMAPPED",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "BLOCKED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "48c8427efa316d61043bc092b26ae7ce3f824a1e3235f49ca66ba4543d520bf4",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 615000,
+    "density_class": "INTERMEDIATE",
+    "head_yaw_deg": 24,
+    "symmetry_mm": 15,
+    "class_hue_deg": 264,
+    "hue_on_canon": false
+   },
+   "silver_exceptions": [],
+   "notes": "intermediate density (615 k); violet - canon GREEN; retopo or heavy optimisation after visual lock"
+  },
+  {
+   "id": "MAH_VISIONARY_M",
+   "class": "VISIONARY",
+   "sex": "M",
+   "visual_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "runtime_source": {
+    "path": null,
+    "sha256": null,
+    "status": "NOT_STARTED"
+   },
+   "retopo_status": "RETOPO_REQUIRED",
+   "rig_status": "NOT_STARTED",
+   "material_zones": {
+    "CLASS_COLOR": "UNKNOWN",
+    "SILVER_METAL": "UNKNOWN",
+    "GRAPHITE": "UNKNOWN",
+    "FACE_SKIN": "UNKNOWN",
+    "EYE_SCLERA": "MISSING",
+    "EYE_IRIS": "MISSING",
+    "EYE_PUPIL": "MISSING",
+    "EYE_CORNEA": "MISSING",
+    "FOREHEAD_DIAMOND": "UNKNOWN",
+    "CORE_DIAMONDS": "UNKNOWN"
+   },
+   "iris_color": "GREEN",
+   "eye_system": "UNMAPPED",
+   "eye_legacy_waiver": null,
+   "head_surface": {
+    "standard": "PREMIUM_SMOOTH",
+    "certified": null,
+    "certified_by": null,
+    "date": null,
+    "note": "Astra must certify visual passage; runtime records only"
+   },
+   "forehead_diamond": {
+    "present": "UNKNOWN",
+    "socket": null,
+    "material": null,
+    "three_d": null,
+    "vertical_certified": null,
+    "central_certified": null,
+    "certified_by": null,
+    "date": null
+   },
+   "facet_status": "NOT_STARTED",
+   "fused_split_readiness": "BLOCKED",
+   "animation_readiness": "NOT_STARTED",
+   "character_creator_readiness": "NOT_STARTED",
+   "hash": "13631faba2a3cbd4fa63fe77a8d660c171addc5be2cc615922cdcf9ce010eb06",
+   "version": "RAW-2026-09",
+   "geometry": {
+    "tris": 1930000,
+    "density_class": "DENSE",
+    "head_yaw_deg": 0,
+    "symmetry_mm": 0.35,
+    "class_hue_deg": 276.5,
+    "hue_on_canon": false
+   },
+   "silver_exceptions": [],
+   "notes": "best dense model (near-mirrored, straight head); purple - canon GREEN"
+  }
+ ]
+}

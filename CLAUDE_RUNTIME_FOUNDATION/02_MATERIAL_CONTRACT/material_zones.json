@@ -1,0 +1,372 @@
+{
+ "_doc": "MATERIAL_ZONE_CONTRACT.md; Phase 4.5 (2026-09-13) universal MAHBeing HEAD / EYE canon: human-like eyes (sclera / iris / pupil / cornea), NO standard eye emission; thresholds are placeholders pending human approval",
+ "contract_version": "0.2.0",
+ "eye_canon": "HUMAN_STANDARD",
+ "zones": {
+  "CLASS_COLOR": {
+   "id": 1,
+   "required": true,
+   "option_scope": "none"
+  },
+  "SILVER_METAL": {
+   "id": 2,
+   "required": true,
+   "option_scope": "none",
+   "preserved_regions": [
+    "HEAD",
+    "FOREARM_L_BELOW_ELBOW",
+    "FOREARM_R_BELOW_ELBOW",
+    "LOWER_SHIN_FUSED_REGION"
+   ]
+  },
+  "GRAPHITE": {
+   "id": 3,
+   "required": true,
+   "option_scope": "none",
+   "note": "intentional only; graphite inside CLASS_COLOR = black gap"
+  },
+  "FACE_SKIN": {
+   "id": 4,
+   "required": true,
+   "option_scope": "skin_color",
+   "alias": "HEAD_SURFACE",
+   "surface_standard": "PREMIUM_SMOOTH",
+   "note": "base heads are silver/platinum; future skin variants recolour this zone only and must keep the same smoothness standard"
+  },
+  "FOREHEAD_DIAMOND": {
+   "id": 6,
+   "required": true,
+   "option_scope": "none",
+   "approved_asset": true,
+   "socket": "SOCKET_FOREHEAD_DIAMOND",
+   "material": "CLASS_COLOR",
+   "placement": "CENTRAL",
+   "orientation": "VERTICAL",
+   "geometry": "3D"
+  },
+  "CORE_DIAMONDS": {
+   "id": 7,
+   "required": true,
+   "option_scope": "none",
+   "approved_asset": true
+  },
+  "HAIR": {
+   "id": 8,
+   "required": false,
+   "option_scope": "hair_style,hair_color",
+   "attachment": true
+  },
+  "OPTIONAL_FACE_FEATURES": {
+   "id": 9,
+   "required": false,
+   "option_scope": "face_type"
+  },
+  "SPLIT_INNER_SURFACE": {
+   "id": 10,
+   "required": false,
+   "runtime_only": true
+  },
+  "SEAM_FX": {
+   "id": 11,
+   "required": false,
+   "runtime_only": true
+  },
+  "PROPULSION_FX": {
+   "id": 12,
+   "required": false,
+   "runtime_only": true
+  },
+  "EYE_SCLERA": {
+   "id": 13,
+   "required": true,
+   "option_scope": "none",
+   "eye": true,
+   "material_family": [
+    "SILVER",
+    "PLATINUM"
+   ],
+   "emission": false,
+   "note": "no glow; still distinguishable from the head; slightly softer / wet response allowed; governed by MAHBeing eye canon"
+  },
+  "EYE_IRIS": {
+   "id": 14,
+   "required": true,
+   "option_scope": "eye_style",
+   "eye": true,
+   "color_locked_to_class": true,
+   "emission": false,
+   "note": "CLASS EYE COLOUR = IRIS COLOUR; eye styles may change pattern / intensity of detail, never the colour"
+  },
+  "EYE_PUPIL": {
+   "id": 15,
+   "required": true,
+   "option_scope": "none",
+   "eye": true,
+   "material_family": [
+    "DARK_GRAPHITE",
+    "CHARCOAL"
+   ],
+   "shape": "CIRCULAR",
+   "emission": false
+  },
+  "EYE_CORNEA": {
+   "id": 16,
+   "required": true,
+   "option_scope": "none",
+   "eye": true,
+   "role": "TRANSPARENT_REFLECTIVE",
+   "approved_representations": [
+    "GEOMETRY",
+    "SHADER"
+   ],
+   "emission": false,
+   "note": "catchlight / wet-eye depth; no class-colour emission"
+  },
+  "EYE_LID_UPPER": {
+   "id": 17,
+   "required": false,
+   "option_scope": "none",
+   "eye": true,
+   "metadata_only": true
+  },
+  "EYE_LID_LOWER": {
+   "id": 18,
+   "required": false,
+   "option_scope": "none",
+   "eye": true,
+   "metadata_only": true
+  }
+ },
+ "legacy_zones": {
+  "EYE_EMISSION": {
+   "id": 5,
+   "status": "SUPERSEDED",
+   "superseded_on": "2026-09-13",
+   "superseded_by": [
+    "EYE_SCLERA",
+    "EYE_IRIS",
+    "EYE_PUPIL",
+    "EYE_CORNEA"
+   ],
+   "detect_as": "LEGACY_EYE_SYSTEM",
+   "note": "glowing class-colour eyes (Phase 1B projected emission mask). An asset carrying this zone / an eye emission mask needs visual migration; it may not be promoted to READY without an explicit eye_legacy_waiver."
+  }
+ },
+ "rules": {
+  "R1_class_color_coverage": {
+   "metric": "class_color_uncovered_frac",
+   "op": "<=",
+   "threshold": 0.001,
+   "black_gap_faces": 0
+  },
+  "R2_silver_preservation": {
+   "metric": "silver_region_violations",
+   "op": "==",
+   "threshold": 0,
+   "exception_key": "silver_exceptions"
+  },
+  "R3_eye_structure": {
+   "required_regions": [
+    "EYE_SCLERA",
+    "EYE_IRIS",
+    "EYE_PUPIL",
+    "EYE_CORNEA"
+   ],
+   "sclera_material_family": [
+    "SILVER",
+    "PLATINUM"
+   ],
+   "iris_hue_bands_deg": {
+    "TITAN": [
+     205,
+     220
+    ],
+    "ATHLETE": [
+     38,
+     52
+    ],
+    "LEAN": [
+     350,
+     10
+    ],
+    "BAGE": [
+     320,
+     345
+    ],
+    "VISIONARY": [
+     110,
+     140
+    ]
+   },
+   "pupil_max_value": 0.12,
+   "pupil_shape": "CIRCULAR",
+   "cornea_representations": [
+    "GEOMETRY",
+    "SHADER"
+   ],
+   "emission_max_intensity": 0.01,
+   "pairing": [
+    "L",
+    "R"
+   ],
+   "overlap_faces": 0,
+   "legacy_detect": "EYE_EMISSION zone or eye emission mask present -> LEGACY_EYE_SYSTEM"
+  },
+  "R4_no_zone_overlap": {
+   "metric": "zone_overlap_faces",
+   "op": "==",
+   "threshold": 0
+  },
+  "R5_no_unassigned": {
+   "metric": "unassigned_faces",
+   "op": "==",
+   "threshold": 0
+  },
+  "R6_diamonds_approved": {
+   "metric": "diamond_hash_match",
+   "op": "==",
+   "threshold": true
+  },
+  "R7_skin_isolation": {
+   "metric": "skin_recolor_leak_faces",
+   "op": "==",
+   "threshold": 0
+  },
+  "R8_hair_isolation": {
+   "metric": "hair_is_attachment",
+   "op": "==",
+   "threshold": true
+  },
+  "R9_head_surface": {
+   "standard": "PREMIUM_SMOOTH",
+   "certified_by": "ASTRA_HUMAN",
+   "metric": "head_surface_certified",
+   "op": "==",
+   "threshold": true,
+   "forbidden_on_head": [
+    "COARSE_FACETING",
+    "CLASS_COLOR_CRYSTAL",
+    "WARM_CONTAMINATION",
+    "MOTTLED_RESIDUE"
+   ],
+   "note": "surface / material / normal quality standard, not permission to blur geometry; eyelids, cheekbones, nose, lips, jaw and sex-specific structure are retained"
+  },
+  "R10_forehead_diamond": {
+   "metric": "forehead_diamond_metadata",
+   "required": [
+    "present",
+    "socket",
+    "material_class_color",
+    "three_d",
+    "vertical",
+    "central"
+   ],
+   "socket": "SOCKET_FOREHEAD_DIAMOND",
+   "note": "runtime validates presence + metadata; straightness / centring / facet quality / shape are Astra-human review"
+  }
+ },
+ "iris_color_by_class": {
+  "TITAN": "BLUE",
+  "ATHLETE": "GOLD",
+  "LEAN": "RED",
+  "BAGE": "PINK",
+  "VISIONARY": "GREEN"
+ },
+ "class_palette": {
+  "TITAN": null,
+  "ATHLETE": {
+   "source": "ASTRA Palette B (Athlete_F approved 2026-09-13)",
+   "values": null
+  },
+  "LEAN": null,
+  "BAGE": null,
+  "VISIONARY": null
+ },
+ "head_surface": {
+  "standard": "PREMIUM_SMOOTH",
+  "applies_to": [
+   "HEAD",
+   "FACE_SKIN",
+   "EYE_SCLERA",
+   "EYE_IRIS",
+   "EYE_PUPIL",
+   "EYE_CORNEA"
+  ],
+  "reads_as": [
+   "ultra-smooth",
+   "clean",
+   "continuous",
+   "premium silver / platinum",
+   "controlled highlights",
+   "no random warm contamination",
+   "no noisy faceting",
+   "no mottled residue"
+  ],
+  "retains": [
+   "eyelids",
+   "cheekbones",
+   "nose",
+   "lips",
+   "jaw",
+   "facial anatomy",
+   "sex-specific facial structure"
+  ],
+  "certification": "ASTRA_HUMAN",
+  "future_variants": "skin-colour / face-type variants keep the same smoothness even when the face material is no longer metallic"
+ },
+ "facet_scope": {
+  "applies_to": [
+   "CLASS_COLOR"
+  ],
+  "excluded": [
+   "EYE_SCLERA",
+   "EYE_IRIS",
+   "EYE_PUPIL",
+   "EYE_CORNEA",
+   "FACE_SKIN",
+   "SILVER_METAL:HEAD",
+   "FOREHEAD_DIAMOND",
+   "CORE_DIAMONDS"
+  ],
+  "class_color_facet_status_values": [
+   "APPROVED",
+   "PENDING",
+   "NONE"
+  ],
+  "note": "HEAD_SURFACE_STANDARD = PREMIUM_SMOOTH coexists with CLASS_COLOR_FACET_STATUS"
+ },
+ "forehead_diamond": {
+  "socket": "SOCKET_FOREHEAD_DIAMOND",
+  "placement": "CENTRAL",
+  "orientation": "VERTICAL",
+  "geometry": "3D",
+  "material": "CLASS_COLOR",
+  "variant_compatibility": [
+   "face_type",
+   "hair_style"
+  ],
+  "runtime_owns": [
+   "presence",
+   "socket reference",
+   "metadata"
+  ],
+  "astra_owns": [
+   "visual straightness",
+   "actual centring",
+   "facet quality",
+   "aesthetic shape"
+  ]
+ },
+ "required_textures": [
+  "BASECOLOR",
+  "NORMAL",
+  "ORM_OR_SEPARATE"
+ ],
+ "optional_textures": [
+  "ZONE_ID",
+  "FACET_NORMAL",
+  "SPLIT_BAKE",
+  "EMISSION_MASK"
+ ],
+ "_emission_mask_note": "EMISSION_MASK is no longer required: standard MAHBeing eyes have no emission. If present it must not drive the eyes (FX only) or the asset is LEGACY_EYE_SYSTEM."
+}

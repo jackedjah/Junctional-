@@ -1,0 +1,403 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "MAHWORLD Character Variant Definitions (per base master)",
+ "description": "Cosmetic variants are DATA that plug into a base master. No variant may write a locked zone, add/remove bones, or change body proportions. Catalogues are empty except the mandatory defaults until cosmetic work is approved. Face types must preserve rig compatibility, left/right eye socket placement, iris/pupil/cornea compatibility, class identity and the forehead-diamond attachment (Phase 4.5 human-like eye canon).",
+ "type": "object",
+ "required": [
+  "schema_version",
+  "base_model",
+  "rig_signature",
+  "variants"
+ ],
+ "properties": {
+  "schema_version": {
+   "type": "string"
+  },
+  "base_model": {
+   "type": "string",
+   "pattern": "^MAH_(TITAN|ATHLETE|LEAN|BAGE|VISIONARY)_(F|M)$"
+  },
+  "rig_signature": {
+   "type": "string",
+   "description": "sha256 of the sorted bone-name list + bone lengths of the base rig; every variant must declare the same signature"
+  },
+  "variants": {
+   "type": "object",
+   "required": [
+    "skin_colors",
+    "face_types",
+    "hair_styles",
+    "hair_colors",
+    "eye_styles"
+   ],
+   "properties": {
+    "skin_colors": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "$ref": "#/$defs/skin_color"
+     }
+    },
+    "face_types": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "$ref": "#/$defs/face_type"
+     }
+    },
+    "hair_styles": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "$ref": "#/$defs/hair_style"
+     }
+    },
+    "hair_colors": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/hair_color"
+     }
+    },
+    "eye_styles": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/eye_style"
+     }
+    }
+   }
+  }
+ },
+ "$defs": {
+  "approval": {
+   "type": "object",
+   "required": [
+    "approved_by",
+    "date",
+    "status"
+   ],
+   "properties": {
+    "approved_by": {
+     "type": "string"
+    },
+    "date": {
+     "type": "string"
+    },
+    "status": {
+     "type": "string",
+     "enum": [
+      "DEFAULT",
+      "CANDIDATE",
+      "APPROVED",
+      "REJECTED"
+     ]
+    }
+   }
+  },
+  "skin_color": {
+   "type": "object",
+   "required": [
+    "id",
+    "display_name",
+    "kind",
+    "zone_writes",
+    "parameters",
+    "approval"
+   ],
+   "properties": {
+    "id": {
+     "type": "string",
+     "pattern": "^SKIN_[A-Z0-9_]+$"
+    },
+    "display_name": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string",
+     "enum": [
+      "MATERIAL_PARAMETERS"
+     ]
+    },
+    "zone_writes": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "enum": [
+       "FACE_SKIN"
+      ]
+     },
+     "description": "FACE_SKIN only: never CLASS_COLOR / SILVER_METAL body regions, GRAPHITE, iris, pupil or diamonds"
+    },
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "base_tint": {
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "roughness_offset": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "subsurface": {
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     }
+    },
+    "approval": {
+     "$ref": "#/$defs/approval"
+    }
+   }
+  },
+  "face_type": {
+   "type": "object",
+   "required": [
+    "id",
+    "display_name",
+    "kind",
+    "morph_targets",
+    "vertex_whitelist",
+    "feature_overlay",
+    "rig_signature",
+    "approval",
+    "eye_socket_tolerance_mm",
+    "forehead_diamond_socket_preserved",
+    "class_identity_preserved",
+    "eye_socket_pairing_preserved",
+    "eye_structure_compatible"
+   ],
+   "properties": {
+    "id": {
+     "type": "string",
+     "pattern": "^FACE_[A-Z0-9_]+$"
+    },
+    "display_name": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string",
+     "enum": [
+      "MORPH_SET"
+     ]
+    },
+    "morph_targets": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "name",
+       "weight"
+      ],
+      "properties": {
+       "name": {
+        "type": "string"
+       },
+       "weight": {
+        "type": "number"
+       }
+      }
+     }
+    },
+    "vertex_whitelist": {
+     "type": "string",
+     "enum": [
+      "HEAD_FACE_REGION"
+     ]
+    },
+    "feature_overlay": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "description": "OPTIONAL_FACE_FEATURES asset ref or null"
+    },
+    "eye_socket_tolerance_mm": {
+     "type": "number"
+    },
+    "rig_signature": {
+     "type": "string"
+    },
+    "approval": {
+     "$ref": "#/$defs/approval"
+    },
+    "forehead_diamond_socket_preserved": {
+     "type": "boolean",
+     "enum": [
+      true
+     ],
+     "description": "SOCKET_FOREHEAD_DIAMOND transform unchanged by the morph set (diamond attachment logic intact)"
+    },
+    "diamond_socket_tolerance_mm": {
+     "type": "number"
+    },
+    "class_identity_preserved": {
+     "type": "boolean",
+     "enum": [
+      true
+     ],
+     "description": "no zone writes outside OPTIONAL_FACE_FEATURES; class colour / iris colour untouched"
+    },
+    "eye_socket_pairing_preserved": {
+     "type": "boolean",
+     "enum": [
+      true
+     ],
+     "description": "left and right eye sockets keep their placement (each <= eye_socket_tolerance_mm) and pairing"
+    },
+    "eye_structure_compatible": {
+     "type": "boolean",
+     "enum": [
+      true
+     ],
+     "description": "sclera / iris / pupil / cornea regions and the corneal surface remain valid under the morph set"
+    }
+   }
+  },
+  "hair_style": {
+   "type": "object",
+   "required": [
+    "id",
+    "display_name",
+    "kind",
+    "attachment_socket",
+    "mesh_ref",
+    "material_zone",
+    "extra_bones_parent",
+    "approval"
+   ],
+   "properties": {
+    "id": {
+     "type": "string",
+     "pattern": "^HAIR_[A-Z0-9_]+$"
+    },
+    "display_name": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string",
+     "enum": [
+      "ATTACHMENT"
+     ]
+    },
+    "attachment_socket": {
+     "type": "string",
+     "enum": [
+      "SOCKET_HAIR"
+     ]
+    },
+    "mesh_ref": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "material_zone": {
+     "type": "string",
+     "enum": [
+      "HAIR"
+     ]
+    },
+    "extra_bones_parent": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "enum": [
+      "HAIR_ROOT",
+      null
+     ]
+    },
+    "approval": {
+     "$ref": "#/$defs/approval"
+    },
+    "forehead_diamond_clearance": {
+     "type": "boolean",
+     "description": "hair mesh must not occlude / intersect the forehead diamond"
+    }
+   }
+  },
+  "hair_color": {
+   "type": "object",
+   "required": [
+    "id",
+    "display_name",
+    "zone_writes",
+    "approval"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "display_name": {
+     "type": "string"
+    },
+    "zone_writes": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "enum": [
+       "HAIR"
+      ]
+     }
+    },
+    "approval": {
+     "$ref": "#/$defs/approval"
+    }
+   }
+  },
+  "eye_style": {
+   "type": "object",
+   "required": [
+    "id",
+    "display_name",
+    "zone_writes",
+    "color_locked_to_class",
+    "approval"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "display_name": {
+     "type": "string"
+    },
+    "zone_writes": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "enum": [
+       "EYE_IRIS"
+      ]
+     }
+    },
+    "color_locked_to_class": {
+     "type": "boolean",
+     "enum": [
+      true
+     ],
+     "description": "iris colour is the class colour; eye styles change iris pattern / detail intensity only; never emission"
+    },
+    "approval": {
+     "$ref": "#/$defs/approval"
+    }
+   }
+  }
+ },
+ "locked_zones": [
+  "CLASS_COLOR",
+  "SILVER_METAL",
+  "GRAPHITE",
+  "FOREHEAD_DIAMOND",
+  "CORE_DIAMONDS",
+  "EYE_SCLERA",
+  "EYE_PUPIL",
+  "EYE_CORNEA"
+ ],
+ "eye_color_lock": "EYE_IRIS colour is the class colour (iris_color_by_class); eye styles change pattern / detail only; sclera stays silver/platinum per the MAHBeing eye canon unless an explicitly approved future species variant changes it; no eye emission"
+}

@@ -51,9 +51,11 @@ Read this file, then `CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/CONVERGENCE/CONTINUE_HE
   `deploy/world_preview/world_preview.js` must mirror any renderer change made in `lab/play.js` (e.g. tone-mapping exposure, now 1.28).
 - Tools preserved in `CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/`: `run_all_tests.mjs` (full suite), `known_bridge_blocked_failures.txt`,
   `tune_variants.mjs` (in-page variant tuning, one page load), `sheet2.py` (before/after contact sheets, needs Pillow).
-- Full suite: `node CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/run_all_tests.mjs`. Current baseline: **71 files, 655 checks passed, 34 files failing** —
-  the 34 are exactly `known_bridge_blocked_failures.txt` (they import sibling roots that are not in this repo until the deferred runtime bridge
-  lands). A change must not add a failure. Core-only quick test: `cd CLAUDE_GAMEPLAY_RUNTIME && npm test`.
+- Full suite: `node CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/tools/run_all_tests.mjs`. Current baseline (after the 2026-09-28 bridge recovery):
+  **71 files, 38 ok, 656 checks passed, 33 files failing**. The 33 are exactly `known_bridge_blocked_failures.txt`, and each one's cause is in
+  `docs/RUNTIME_RECOVERY_PROVENANCE.md`. A change must not add a failure. Release build:
+  `node CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/build_static_demo.mjs` now passes. Its output, `deploy/static_dist/`, is not committed.
+  Core-only quick test: `cd CLAUDE_GAMEPLAY_RUNTIME && npm test`.
 - Tests that must stay green for any world change: gameplay_world_colour_law, gameplay_world_pivot_host_safety, gameplay_world_combat_zones,
   gameplay_world_duel_roster, gameplay_world_hardscape_inlays, gameplay_world_material_realism, gameplay_world_veil_district,
   gameplay_world_warm_class_light, gameplay_world_m19_mountains, gameplay_world_m20_water, gameplay_world_m20_ambient, gameplay_m5_moon_cloud,
@@ -86,7 +88,8 @@ colour-law tests.
 - Current open list: `world_pivot/M20_WORKING_NOTES.md` (Veil fall banding at close range, Veil fins 109 / 111, crown silhouettes locked to the GLB,
   terrace trees on bare slab, small clouds as smooth capsules, faint ambient life, MED plaza-floor shader +33 % static ALU, LEAN spire house buried
   in the ridge — owner decision).
-- 34 test files cannot run until the runtime bridge lands (deferred by the owner; do not poll).
+- 33 test files still fail after the bridge recovery. 31 need a one-line ESM marker, one needs a missing canon document, one needs a raw
+  Character GLB, and one has a false-positive word match. Each is waiting on an owner decision: `docs/RUNTIME_RECOVERY_PROVENANCE.md`.
 
 ## 8. Current active task
 **M21 — final high-ROI polish / consolidation** (owner brief: one lead, targeted fixes, 1–3 cameras per fix, then one broad evidence set, then the
@@ -129,8 +132,10 @@ movement calibration) waits for explicit owner authorization.
 - Session history beyond the ledger: `world_pivot/M20_SESSION_LOG.md`.
 
 ## 12. Portability status (read before promising a fresh-machine setup)
-The repository is portable for the game client, host server, world renders and 37 of 71 test files. It is **BLOCKED** for the other 34 test
-files and the release build on ten small files from three sibling roots that exist only in the owner's local archive (never in Git).
-Exact list, dependents and the one-command recovery (`deploy/bridge/apply_minimal_bridge.mjs --from <archive> --push`): `docs/OPENCODE_MIGRATION.md` §9.
-Do not recreate or stub those files; do not ask the owner for them unless they say they are back at the PC.
+The ten runtime bridge files were **RESTORED** on 2026-09-28 from the owner's recovery package: hash-verified and imported with the
+existing `deploy/bridge/apply_minimal_bridge.mjs`. Provenance and results are in `docs/RUNTIME_RECOVERY_PROVENANCE.md`.
+The release build now passes, and 38 of 71 test files pass. The other 33 fail for the reasons listed there (mainly the root
+`package.json` is `"type": "commonjs"` and belongs to MAHFITT, so do not touch it). Do not stub files, weaken tests or substitute models to
+turn them green. The corrections in that file need the owner's decision.
+Historical VISIONARY iris "GREEN" in the recovered `material_zones.json` is evidence, not canon: VISIONARY stays PURPLE.
 `opencode.jsonc` was validated against the live OpenCode schema (flat `mcp` map — there is no `mcp.servers`): `docs/OPENCODE_MIGRATION.md` §10.

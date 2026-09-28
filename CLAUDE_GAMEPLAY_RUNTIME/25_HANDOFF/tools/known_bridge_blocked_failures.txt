@@ -20,7 +20,6 @@ gameplay_m5_owner_buildings.test.mjs
 gameplay_m5_owner_corrections.test.mjs
 gameplay_m7_halo_scale.test.mjs
 gameplay_mahgic_anywhere.test.mjs
-gameplay_mahgic_tree.test.mjs
 gameplay_navigation.test.mjs
 gameplay_od29_disconnect.test.mjs
 gameplay_phase4.test.mjs
