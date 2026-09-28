@@ -29,3 +29,22 @@ in the runtime: the tree at the migration commit is clean.
    gold from the M20 identity pass) — check at eye level whether it reads garish.
 Then the owner's final exit test (major defects? another large pass justified? ready for the first character calibration pass?) and, if yes,
 a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit owner authorization.
+
+## Reference add-on 01 — GUIDE PILLARS (done, OpenCode lead 2026-09-28)
+- **Site:** NEXUS south perimeter (0,-70) yaw 0 — open sand, zero colliders r12, lamp 10 m N, doors/courts/routes 20 m+.
+  B (training forecourt) rejected: gym-lane + door queue + inlay overlap. C (FOREST_W clearing) rejected: the clearing IS the pond.
+- **Build:** `lab/world/ledArtifacts.js` (new) + worldB registration; two 5.2 m platinum drums (dark graphite-platinum body),
+  graphite collars, chrome dome caps, gold finials, stone plinths, contact decals; 14 draws all tiers (LOW: plain, SEG 10).
+  Registry via one guarded builder line (+73 JSON lines); CYLINDER colliders r0.75/h5.2 via a 1-line authority branch
+  (9457 → 9459 shapes, `--check` IN SYNC, dev.json +22 hand-minimal); `guide_meet` encounter reservation DISABLED.
+- **LED:** 2 feathered travelling bands + slow 16 s pearl-bridged 5-class cycle in GLSL only (emissive cap 0.62, hue survives
+  ACES); day gain 0.55 / night 1.0; shared wall-clock; no strobe. All 11 hex literals in-law (colour law 4/0).
+- **Corrections:** v1 clipped white (flood) → dark body + cap; v2 still flooded (weak modulation) → deep band floor; a syntax
+  slip broke two renders, caught by `--check` discipline (now run after every edit). Mast-ring reuse tried, subliminal by
+  design, REVERTED (cityScene zero diff) — reuse gate UNMET by decision, not by oversight.
+- **Evidence:** `evidence/m21_guide_pillars.jpg` (R1A/R1B day/night); 8-phase night loop GIF + MED 393x852 frames (local refpack
+  dir); probes: module builds on MED, 3 HEAP bodies total in sky (visible capsules likely STREET/SHEET — do NOT retry the
+  parked HEAP patch; verify form first). Tests: colour_law 4/0, host_safety 21/0, combat_zones 8/0, duel_roster 12/0,
+  warm_class_light 7/0, material_realism 10/0; build_static_demo 200 files clean. Independent review: KEEP (4/5 gates).
+- **Follow-up (queued, not started):** fascia-line travelling band in own-class colour (hook: architecture.js pushColored +
+  ARCH_SEAMS uT; evidence: 1 house closeup clip) to close the existing-accent reuse gate. Then terrace grounding (M21 #3).

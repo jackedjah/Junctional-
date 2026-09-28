@@ -1992,6 +1992,68 @@
     "visible": false
    },
    "state": "PLACED"
+  },
+  {
+   "id": "GUIDE_PILLAR_W",
+   "role": "guidance encounter pillar (west)",
+   "family": "platinum",
+   "district": "nexus",
+   "position": [
+    -1.75,
+    0,
+    -70
+   ],
+   "yaw_deg": 0,
+   "target_height_m": 5.2,
+   "collision": {
+    "policy": "CYLINDER",
+    "r_m": 0.75,
+    "h_m": 5.2
+   },
+   "map": {
+    "visible": true,
+    "label": "GUIDE PILLARS",
+    "marker": "guide"
+   },
+   "interaction": {
+    "kind": "ENCOUNTER",
+    "state": "RESERVED",
+    "hook": "future guidance-NPC meet point; gameplay stays disabled until the owner authorizes it"
+   },
+   "material_family": "platinum",
+   "state": "PLACED",
+   "note": "M21 reference add-on 01: NEXUS south perimeter bed (0,-70) — open sand, no collider / route / door / court / lamp inside 10 m; pair axis E-W so the north approach faces both drums"
+  },
+  {
+   "id": "GUIDE_PILLAR_E",
+   "role": "guidance encounter pillar (east)",
+   "family": "platinum",
+   "district": "nexus",
+   "position": [
+    1.75,
+    0,
+    -70
+   ],
+   "yaw_deg": 0,
+   "target_height_m": 5.2,
+   "collision": {
+    "policy": "CYLINDER",
+    "r_m": 0.75,
+    "h_m": 5.2
+   },
+   "map": {
+    "visible": true,
+    "label": "GUIDE PILLARS",
+    "marker": "guide"
+   },
+   "interaction": {
+    "kind": "ENCOUNTER",
+    "state": "RESERVED",
+    "hook": "future guidance-NPC meet point; gameplay stays disabled until the owner authorizes it"
+   },
+   "material_family": "platinum",
+   "state": "PLACED",
+   "note": "M21 reference add-on 01: NEXUS south perimeter bed (0,-70) — open sand, no collider / route / door / court / lamp inside 10 m; pair axis E-W so the north approach faces both drums"
   }
  ],
  "creatures": {
@@ -8440,6 +8502,17 @@
    ],
    "min_player_distance_m": 6,
    "note": "occasional NPC-vs-NPC spars at eligible practice spots through the existing rules field; harmless FREE context; far spars run at reduced presentation"
+  },
+  "guide_meet": {
+   "enabled": false,
+   "locations": [
+    {
+     "x": 0,
+     "z": -70
+    }
+   ],
+   "min_player_distance_m": 2.5,
+   "note": "M21 reference add-on 01 reservation: the future guidance-NPC meet point between the pillars. Disabled until the NPC design is authorized; no framework, powers, quests or economy."
   }
  },
  "resource_patches": {

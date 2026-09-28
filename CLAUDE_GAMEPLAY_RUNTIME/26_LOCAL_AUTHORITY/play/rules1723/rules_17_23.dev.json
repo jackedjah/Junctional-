@@ -14369,6 +14369,28 @@
      "pylon": true
     },
     {
+     "id": "GUIDE_PILLAR_W_SOLID",
+     "type": "CYLINDER",
+     "x": -1.75,
+     "z": -70,
+     "r": 0.75,
+     "h": 5.2,
+     "world": "JOBB",
+     "zone": "GUIDE_PILLAR_W",
+     "prop": true
+    },
+    {
+     "id": "GUIDE_PILLAR_E_SOLID",
+     "type": "CYLINDER",
+     "x": 1.75,
+     "z": -70,
+     "r": 0.75,
+     "h": 5.2,
+     "world": "JOBB",
+     "zone": "GUIDE_PILLAR_E",
+     "prop": true
+    },
+    {
      "id": "RIVER_N_SHORE_S",
      "type": "RAMP",
      "x1": -175,
