@@ -25,13 +25,29 @@
      · ZENITH CAST: the fixed cool cast is scaled per time of day (cast_k), so a grey-violet day zenith does not saturate toward violet;
      · FOG FOLLOWS THE SKY: worldB hands this module the field GROUP as ctx.scene, so the fog / background writes never reached the real
        scene (the effective day fog stayed fieldScene's sky-blue #b9cddd). They now go to the root scene on build AND on every time switch
-       (fog colour and near, consistent), so the distance falloff takes the dome's own haze tone: one truth for sky and aerial perspective. */
+       (fog colour and near, consistent), so the distance falloff takes the dome's own haze tone: one truth for sky and aerial perspective.
+   M20 WAVE 6 STORM-CALM GRADE (owner 2026-09-28: "The daytime should NOT become plain white or plain blue. It should lean toward: calm
+   before the storm, violet-gray, elegant atmospheric tension, soft but intentional color, premium sky treatment"; the lead's audit: the
+   horizon band goes white-grey, overhead reads a little flat, the Sun's glow whites out a large part of the frame):
+     · GRADE (below) is the day palette authored here — it takes precedence over the wave-2 registry day block (kept as the reference;
+       the lead may fold GRADE into the registry through the builder). Every stop stays a NEAR-NEUTRAL violet-grey (HSL saturation 0.15–0.22,
+       under the colour law's 0.28 — a violet-grey, never a purple sky: purple is VISIONARY's): a deeper violet-grey zenith, a pearl-violet
+       horizon and haze a step below white, so the frame is GRADED — deep overhead, luminous at the horizon line — instead of flat lavender;
+     · the wide haze SKIRT is narrower (skirt) and warms less toward the Sun (sun_haze): the luminous band hugs the horizon, the sky above
+       it keeps its depth; the dome's Sun glow is lower (mie) — the Sun's own halo (celestial.js) is contained in the same pass;
+     · the ALTOSTRATUS VEIL turns relative (veil_rel): its thick streaks are a shade DARKER than the sky they cross (veil_d, a storm deck
+       with weight) and silvered only toward the Sun, instead of a fixed mid-tone that lightened the zenith and flattened the gradient; it
+       fades less toward the zenith (veil_top), so overhead has structure;
+     · NIGHT is unchanged: its keys fall back to the registry / NIGHT values, and the new shader terms reduce exactly to the old ones there
+       (skirt 0.38, sun_haze 0.55, veil_rel 0, veil_top 0.55). No texture, draw call or tier path added. */
 export function createAtmosphere(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var scene = ctx.scene; var reg = ctx.registry || {}; var A = (reg.sky && reg.sky.atmosphere) || {};
   var night = !!ctx.night, mat = null, prev = null, dome = null, clock = 0, own = [];
   var DAY = { zenith: '#63678b', horizon: '#c8c6d8', haze: '#e0dfe9', sunTint: '#f0ede8', ground: '#4d4e5a', mie: 0.85, fog: '#bdbccd', fog_near_m: 75, lavender: '#bab2cc', lavender_k: 0.35, haze_k: 0.8, veil_k: 0.55, veil_scale: 1, cast_k: 0.3 };
   var NIGHT = { zenith: '#04070f', horizon: '#15213a', haze: '#1d2a45', sunTint: '#aab8d2', ground: '#090c14', mie: 0.55, fog: '#0d1522', fog_near_m: 80, lavender: '#2f3a58', lavender_k: 0.2, haze_k: 0.6, veil_k: 0.25, veil_scale: 1, cast_k: 0.6 };
-  function P(k) { var src = night ? (A.night || {}) : (A.day || {}); var base = night ? NIGHT : DAY; return src[k] !== undefined ? src[k] : base[k]; }
+  var SHAPE = { skirt: 0.38, sun_haze: 0.55, veil_rel: 0, veil_d: 0, veil_top: 0.55 };   /* M20 wave 6: the new shader terms at their old values (night, and any key the grade leaves out) */
+  var GRADE = { day: { zenith: '#5a5680', horizon: '#aaa5c0', haze: '#d4cfe0', lavender: '#aca5c2', fog: '#b1adc3', mie: 0.6, haze_k: 0.78, veil_k: 0.75, cast_k: 0.15, skirt: 0.24, sun_haze: 0.3, veil_rel: 1, veil_d: 0.22, veil_top: 0.3 }, night: {} };   /* M20 wave 6 storm-calm grade: zenith 246° s .20 · horizon 251° s .18 · haze 257° s .21 · lavender 254° s .19 · fog 251° s .16 — all near-neutral violet-greys */
+  function P(k) { var g = night ? GRADE.night : GRADE.day; if (g[k] !== undefined) return g[k]; var src = night ? (A.night || {}) : (A.day || {}); var base = night ? NIGHT : DAY; return src[k] !== undefined ? src[k] : (base[k] !== undefined ? base[k] : SHAPE[k]); }
   function col(hex) { return new THREE.Color(hex); }
   function tier() { var t = null; try { t = ctx.quality && ctx.quality.tier ? ctx.quality.tier() : null; } catch (e) { t = null; } return t ? String(t).toUpperCase() : 'HIGH'; }
   function sunDir() { var v = new THREE.Vector3(26, 34, 14); var cel = reg.celestial && reg.celestial.sun && (reg.celestial.sun.direction || reg.celestial.sun.dir); if (cel && cel.length === 3) v.set(cel[0], cel[1], cel[2]); if (night) { var m = reg.celestial && reg.celestial.moon && reg.celestial.moon.dir; if (m && m.length === 3) v.set(m[0], m[1], m[2]); else v.set(-Math.sin(0.35), 0.085, -Math.cos(0.35)); } return v.normalize(); }
@@ -53,10 +69,12 @@ export function createAtmosphere(ctx) {
     var low = tier() === 'LOW';
     mat = new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, depthTest: true, fog: false, toneMapped: false, transparent: false, defines: { VEIL: low ? 0 : 1 },
       uniforms: { uSun: { value: sunDir() }, uZenith: { value: col(P('zenith')) }, uHorizon: { value: col(P('horizon')) }, uHaze: { value: col(P('haze')) }, uSunTint: { value: col(P('sunTint')) }, uGround: { value: col(P('ground')) }, uMie: { value: low ? 0 : P('mie') }, uT: { value: 0 }, uWind: { value: 0 }, uLav: { value: col(P('lavender')) }, uLavK: { value: P('lavender_k') }, uHazeK: { value: P('haze_k') },
-        uVeilK: { value: low ? 0 : P('veil_k') }, uVeilS: { value: P('veil_scale') }, uVeilW: { value: windDir() }, uVeilO: { value: new THREE.Vector2() }, uVeilTex: { value: low ? null : veilTexture() }, uCastK: { value: P('cast_k') } },   /* M20 */
+        uVeilK: { value: low ? 0 : P('veil_k') }, uVeilS: { value: P('veil_scale') }, uVeilW: { value: windDir() }, uVeilO: { value: new THREE.Vector2() }, uVeilTex: { value: low ? null : veilTexture() }, uCastK: { value: P('cast_k') },   /* M20 */
+        uSkirt: { value: P('skirt') }, uSunHaze: { value: P('sun_haze') }, uVeilRel: { value: P('veil_rel') }, uVeilD: { value: P('veil_d') }, uVeilTop: { value: P('veil_top') } },   /* M20 wave 6 */
       vertexShader: 'varying vec3 vDir; void main() { vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: [
         'precision mediump float; varying vec3 vDir; uniform vec3 uSun, uZenith, uHorizon, uHaze, uSunTint, uGround, uLav; uniform float uMie, uT, uWind, uLavK, uHazeK, uVeilK, uVeilS, uCastK; uniform vec2 uVeilW, uVeilO;',
+        'uniform float uSkirt, uSunHaze, uVeilRel, uVeilD, uVeilTop;',   /* M20 wave 6: haze skirt width · haze warming toward the Sun · relative veil (0 = the wave-2 fixed tone) · its darkening · its zenith fade */
         '#if VEIL',
         'uniform sampler2D uVeilTex;',
         '#endif',
@@ -68,8 +86,8 @@ export function createAtmosphere(ctx) {
         '  vec3 sky = mix(uZenith, uHorizon, t);',
         '  sky *= mix(0.9, 1.1, (0.5 + 0.5 * mu) * (0.35 + 0.65 * t));',                        /* multiple scattering: brighter and paler on the Sun side, deeper blue opposite */
         '  float breathe = 1.0 + 0.04 * sin(uT * 0.05 + uWind);',
-        '  float hazeK = (exp(-hp * 16.0) + 0.38 * exp(-hp * 3.6)) * breathe;',                 /* a tight bright horizon line + a wide soft haze skirt */
-        '  vec3 haze = mix(uHaze, uSunTint, 0.55 * pow(max(mu, 0.0), 4.0));',                   /* warmer toward the sun */
+        '  float hazeK = (exp(-hp * 16.0) + uSkirt * exp(-hp * 3.6)) * breathe;',                 /* a tight bright horizon line + a wide soft haze skirt (M20 wave 6: uSkirt, 0.38 before) */
+        '  vec3 haze = mix(uHaze, uSunTint, uSunHaze * pow(max(mu, 0.0), 4.0));',                   /* warmer toward the sun (M20 wave 6: uSunHaze, 0.55 before) */
         '  vec3 c = mix(sky, haze, clamp(hazeK * uHazeK, 0.0, 1.0));',
         '  float anti = pow(max(-mu, 0.0), 1.4) * exp(-hp * 7.0);',                              /* lavender band on the anti-solar horizon (ties the sky to the Moon) */
         '  c = mix(c, uLav, clamp(anti * uLavK, 0.0, 1.0));',
@@ -83,8 +101,9 @@ export function createAtmosphere(ctx) {
            where thick (the storm-light layering), silvered on the key's side */
         '  { vec2 q = d.xz / (hp + 0.16); q = vec2(dot(q, uVeilW), dot(q, vec2(-uVeilW.y, uVeilW.x))) * vec2(0.11, 0.2) * uVeilS + uVeilO;',   /* uVeilO: the drift, wrapped on the CPU (a mediump clock would quantise it after an hour) */
         '    float n = texture2D(uVeilTex, q).r * 0.66 + texture2D(uVeilTex, q * vec2(2.0, 3.0) + vec2(0.37, 0.61)).g * 0.34;',   /* M20 review: integer octave scales, so the CPU-wrapped drift never jumps the fine octave (it popped every ~42 min); the streaks are less anisotropic and thin toward the zenith (they converged into vertical bands overhead) */
-        '    float hz = smoothstep(0.03, 0.18, hp), cov = smoothstep(0.36, 0.74, n) * hz * (1.0 - 0.55 * smoothstep(0.45, 0.95, hp)), gap = (1.0 - smoothstep(0.16, 0.4, n)) * hz, sunK = pow(max(mu, 0.0), 3.0);',
+        '    float hz = smoothstep(0.03, 0.18, hp), cov = smoothstep(0.36, 0.74, n) * hz * (1.0 - uVeilTop * smoothstep(0.45, 0.95, hp)), gap = (1.0 - smoothstep(0.16, 0.4, n)) * hz, sunK = pow(max(mu, 0.0), 3.0);',
         '    vec3 vc = mix(uHorizon, uZenith, 0.38 + 0.3 * smoothstep(0.55, 0.9, n)) * (0.9 + 0.26 * sunK) + uSunTint * sunK * 0.12;',
+        '    vc = mix(vc, c * (1.0 - uVeilD * (0.55 + 0.45 * smoothstep(0.5, 0.9, n))) * (0.92 + 0.2 * sunK) + uSunTint * sunK * 0.08, uVeilRel);',   /* M20 wave 6: the storm deck a shade darker than the sky it crosses, silvered only toward the key (0 = the wave-2 fixed mid-tone) */
         '    c = mix(c, vc, cov * uVeilK); c = mix(c, uHaze, gap * uVeilK * 0.24); }',   /* thick streaks a shade darker, the thin breaks a shade silverier: light moving through the layer */
         '#endif',
         '  c = mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, h) * uCastK);',     /* MAHWORLD: a cool cast at the zenith, never a photoreal Earth sky (M20: scaled per time of day) */
@@ -99,7 +118,7 @@ export function createAtmosphere(ctx) {
     log('atmosphere: scattering dome on (' + tier() + (low ? ', Mie + veil off' : '') + '), fog → ' + P('fog') + ', sun ' + sunDir().toArray().map(function (v) { return v.toFixed(2); }).join(','));
   }
   function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (!mat) return; mat.uniforms.uT.value = clock; var w = ctx.wind; mat.uniforms.uWind.value = w && typeof w.t === 'number' ? w.t * 0.1 : 0; var vo = clock * 0.0004; mat.uniforms.uVeilO.value.set(vo - Math.floor(vo), 0); }   /* M20: the veil drifts downwind, a few tenths of a degree a second overhead */
-  function setNight(n) { night = !!n; if (!mat) return; mat.uniforms.uZenith.value.set(P('zenith')); mat.uniforms.uHorizon.value.set(P('horizon')); mat.uniforms.uHaze.value.set(P('haze')); mat.uniforms.uSunTint.value.set(P('sunTint')); mat.uniforms.uGround.value.set(P('ground')); mat.uniforms.uMie.value = tier() === 'LOW' ? 0 : P('mie'); mat.uniforms.uSun.value.copy(sunDir()); mat.uniforms.uLav.value.set(P('lavender')); mat.uniforms.uLavK.value = P('lavender_k'); mat.uniforms.uHazeK.value = P('haze_k'); mat.uniforms.uVeilK.value = tier() === 'LOW' ? 0 : P('veil_k'); mat.uniforms.uVeilS.value = P('veil_scale'); mat.uniforms.uCastK.value = P('cast_k'); applyFog(); }   /* M20: fog colour + near follow the time of day on the real scene (fieldScene rebuilds its Fog on every switch; this runs after it) */
+  function setNight(n) { night = !!n; if (!mat) return; mat.uniforms.uZenith.value.set(P('zenith')); mat.uniforms.uHorizon.value.set(P('horizon')); mat.uniforms.uHaze.value.set(P('haze')); mat.uniforms.uSunTint.value.set(P('sunTint')); mat.uniforms.uGround.value.set(P('ground')); mat.uniforms.uMie.value = tier() === 'LOW' ? 0 : P('mie'); mat.uniforms.uSun.value.copy(sunDir()); mat.uniforms.uLav.value.set(P('lavender')); mat.uniforms.uLavK.value = P('lavender_k'); mat.uniforms.uHazeK.value = P('haze_k'); mat.uniforms.uVeilK.value = tier() === 'LOW' ? 0 : P('veil_k'); mat.uniforms.uVeilS.value = P('veil_scale'); mat.uniforms.uCastK.value = P('cast_k'); mat.uniforms.uSkirt.value = P('skirt'); mat.uniforms.uSunHaze.value = P('sun_haze'); mat.uniforms.uVeilRel.value = P('veil_rel'); mat.uniforms.uVeilD.value = P('veil_d'); mat.uniforms.uVeilTop.value = P('veil_top'); applyFog(); }   /* M20: fog colour + near follow the time of day on the real scene (fieldScene rebuilds its Fog on every switch; this runs after it) */
   function dispose() { var sk = ctx.mods && ctx.mods.sky; if (mat && sk && sk.shareSky) sk.shareSky(null); if (dome && prev) { dome.material = prev; } own.forEach(function (m) { m.dispose(); }); own = []; mat = null; }
   function debug() { var rs = rootScene(); return { on: !!mat, tier: tier(), night: night, fog: rs && rs.fog ? '#' + rs.fog.color.getHexString() : null, fog_near_m: rs && rs.fog ? rs.fog.near : null, mie: mat ? mat.uniforms.uMie.value : null, veil: mat ? +mat.uniforms.uVeilK.value.toFixed(2) : null, sun: sunDir().toArray().map(function (v) { return +v.toFixed(3); }) }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug, uniforms: function () { return mat ? mat.uniforms : null; } };   /* M20: the water reflects THIS dome (water.js skyWater) — shared by reference, so day / night follow */

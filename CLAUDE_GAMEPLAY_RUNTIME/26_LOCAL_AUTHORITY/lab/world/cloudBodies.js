@@ -68,11 +68,11 @@
    a darker sky). Below the horizon the airlight is the horizon haze (what the scene fog paints over the terrain), not the dome's graphite
    ground colour, which is never seen. Per fragment on HIGH / MED, per vertex on LOW. */
 var SKY_FN = [
-  'uniform vec3 uSkyZ, uSkyH, uSkyHz, uSkyT, uSkyL, uSkyS; uniform float uSkyMie, uSkyLavK, uSkyHazeK, uSkyOn, uSkyCast;',
+  'uniform vec3 uSkyZ, uSkyH, uSkyHz, uSkyT, uSkyL, uSkyS; uniform float uSkyMie, uSkyLavK, uSkyHazeK, uSkyOn, uSkyCast, uSkySkirt, uSkySunHaze;',
   'vec3 skyAt(vec3 d) {',
   '  float hp = max(d.y, 0.0), mu = dot(d, normalize(uSkyS)), mp = max(mu, 0.0), od = 1.0 / (hp * 4.0 + 0.22);',
   '  float t = clamp(0.62 * pow(1.0 - hp, 2.2) + 0.38 * (1.0 - exp(-od * 0.55)), 0.0, 1.0); vec3 c = mix(uSkyZ, uSkyH, t) * mix(0.9, 1.1, (0.5 + 0.5 * mu) * (0.35 + 0.65 * t));',
-  '  c = mix(c, mix(uSkyHz, uSkyT, 0.55 * pow(mp, 4.0)), clamp((exp(-hp * 16.0) + 0.38 * exp(-hp * 3.6)) * uSkyHazeK, 0.0, 1.0));',
+  '  c = mix(c, mix(uSkyHz, uSkyT, uSkySunHaze * pow(mp, 4.0)), clamp((exp(-hp * 16.0) + uSkySkirt * exp(-hp * 3.6)) * uSkyHazeK, 0.0, 1.0));',   /* M20 wave 6: the dome's haze skirt width and Sun warming (shared uniforms) */
   '  c = mix(c, uSkyL, clamp(pow(max(-mu, 0.0), 1.4) * exp(-hp * 7.0) * uSkyLavK, 0.0, 1.0)) + uSkyT * pow(mp, 3.0) * exp(-hp * 3.0) * 0.16 * uSkyMie;',
   '  c += uSkyT * (0.0039312 / pow(1.6724 - 1.64 * mu, 1.5) * uSkyMie + pow(mp, 10.0) * 0.1 * max(uSkyMie, 0.25) + pow(mp, 56.0) * 0.28 * uSkyMie);',   /* the dome's HG glare (g 0.82) + soft halo + tight aureole */
   '  return mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, d.y) * uSkyCast); }'].join('\n');   /* M20: the dome's zenith cast, scaled per time of day (atmosphere cast_k) */
@@ -138,6 +138,7 @@ var FRAG = [
   'uniform sampler2D uMap, uField; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor; uniform float uDiffuse, uAuraK; uniform vec3 uAuraA, uAuraB, uAuraC;',
   'uniform vec2 uAerial; uniform float uErode, uSig, uFieldN, uAmb; uniform mat4 projectionMatrix;',   /* M19: aerial extinction (start m, e-folding m) · field erosion · extinction per metre · field texture size · the camera projection (for the fragment's own depth) */
   'uniform float uBreak, uVeilDown;',   /* M20: the break-up from above · the residual thinning from above */
+  'uniform float uRimP, uRimF;',   /* M20 wave 6: the silver lining's forward lobe (exponent · gain) */
   SKY_FN,
   'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vFade;',
   'varying vec3 vView; varying vec3 vCtr; varying vec4 vBodyK; varying vec4 vSlab; varying float vKind;',
@@ -217,7 +218,7 @@ var FRAG = [
   '    col = mix(uShade, uTop, lit) * (1.0 - uBaseDark * baseK * (1.0 - 0.4 * sunK)); bodyCol = mix(uShade, uTop, clamp(0.4 + 0.32 * sunK + 0.18 * h, 0.0, 1.0));',
   '    col = mix(col, bodyCol, 0.4 * uDiffuse); thin = 1.0 - smoothstep(0.08, 0.62, dens); dist = vDist; hN = vH; fw = vFwd; an = cN(vUv * 2.3 + vPuff.y * 9.0);',
   '  }',
-  '  col += uRim * uRimK * thin * (0.08 + 1.5 * pow(fw, 5.0)) * (0.35 + 0.65 * sunK);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light */
+  '  col += uRim * uRimK * thin * (0.08 + uRimF * pow(fw, uRimP)) * (0.35 + 0.65 * sunK);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light (M20 wave 6: its lobe per look — by day a tight bright rim near the Sun instead of a white wash over every body within ~35° of it) */
   /* M19 AERIAL PERSPECTIVE: contrast falls away first (toward the body tone), then the body takes the sky's own colour along the view ray
      (Beer-Lambert extinction by the distance where the body actually is, plus the long horizon path) — far decks become brighter sky */
   '  float fogK = smoothstep(uHazeNear, uHazeFar, dist) * uHazeMax, ext = max(fogK, 1.0 - exp(-max(dist - uAerial.x, 0.0) / max(uAerial.y, 1.0)));',
@@ -403,8 +404,8 @@ export function createCloudBodies(ctx, L, opts) {
       uHazeNear: { value: 260 }, uHazeFar: { value: 1250 }, uHazeMax: { value: 0.7 }, uHor: { value: new THREE.Vector2(0.0, 0.16) }, uBaseDark: { value: 0.18 }, uShadowK: { value: 0.55 }, uTime: { value: 0 },
       uOblong: { value: 1 }, uDiffuse: { value: 1 }, uAuraK: { value: 0.2 }, uAuraA: { value: new THREE.Color(0xffe9b3) }, uAuraB: { value: new THREE.Color(0xb4c4ee) }, uAuraC: { value: new THREE.Color(0xf2b3dc) },
       uAerial: { value: new THREE.Vector2(160, 1100) }, uErode: { value: 0.9 }, uField: { value: field }, uFieldN: { value: fieldN }, uSig: { value: 0.06 }, uAmb: { value: 0.3 },   /* M19 */
-      uSkyZ: { value: new THREE.Color() }, uSkyH: { value: new THREE.Color() }, uSkyHz: { value: new THREE.Color() }, uSkyT: { value: new THREE.Color() }, uSkyL: { value: new THREE.Color() }, uSkyS: { value: new THREE.Vector3(0, 1, 0) }, uSkyMie: { value: 0 }, uSkyLavK: { value: 0 }, uSkyHazeK: { value: 0 }, uSkyOn: { value: 0 }, uSkyCast: { value: 1 },   /* M19: replaced by the dome's own uniform objects (shareSky) */
-      uBreak: { value: 0.75 }, uVeilDown: { value: 0.55 } } });   /* M20 */
+      uSkyZ: { value: new THREE.Color() }, uSkyH: { value: new THREE.Color() }, uSkyHz: { value: new THREE.Color() }, uSkyT: { value: new THREE.Color() }, uSkyL: { value: new THREE.Color() }, uSkyS: { value: new THREE.Vector3(0, 1, 0) }, uSkyMie: { value: 0 }, uSkyLavK: { value: 0 }, uSkyHazeK: { value: 0 }, uSkyOn: { value: 0 }, uSkyCast: { value: 1 }, uSkySkirt: { value: 0.38 }, uSkySunHaze: { value: 0.55 },   /* M19: replaced by the dome's own uniform objects (shareSky) */
+      uBreak: { value: 0.75 }, uVeilDown: { value: 0.55 }, uRimP: { value: 5 }, uRimF: { value: 1.5 } } });   /* M20 · M20 wave 6: uRimP / uRimF */
   own.push(mat);
   var mesh = new THREE.InstancedMesh(geo, mat, puffs.length); mesh.name = 'SKY_' + L.id; mesh.frustumCulled = false; mesh.userData.noMerge = true; mesh.renderOrder = opts.renderOrder || 4; mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.userData.cloudSilhouette = { kind: tower ? 'LIT_TOWER_CLUSTER' : 'LIT_PUFF_CLUSTER', rectangular: false, feathered: true, clouds: clouds.length, puffs: puffs.length, tier_scale: tierScale, shapes: 'ATLAS_4_NOISE_ERODED', self_shadow_taps: taps, style: style, body: 'HEIGHTFIELD_VOLUME', card: 'BOX_PROXY + STREAK_CARDS', forms: clouds.map(function (c) { return c.form || 'TOWER'; }).join(',') };
@@ -421,13 +422,13 @@ export function createCloudBodies(ctx, L, opts) {
     U.uOblong.value = look.oblong !== undefined ? look.oblong : 1; U.uDiffuse.value = look.diffuse !== undefined ? look.diffuse : 1; U.uAuraK.value = look.auraK !== undefined ? look.auraK : 0.2;   /* M14 */
     if (look.auraA) U.uAuraA.value.set(look.auraA); if (look.auraB) U.uAuraB.value.set(look.auraB); if (look.auraC) U.uAuraC.value.set(look.auraC);
     if (look.aerial) U.uAerial.value.set(look.aerial[0], look.aerial[1]); U.uErode.value = look.erode !== undefined ? look.erode : 0.9; U.uSig.value = look.sig !== undefined ? look.sig : 0.06; U.uAmb.value = look.amb !== undefined ? look.amb : 0.3;   /* M19 */
-    U.uBreak.value = look.brk !== undefined ? look.brk : 0.75; U.uVeilDown.value = look.veilDown !== undefined ? look.veilDown : 0.55; }   /* M20 */
+    U.uBreak.value = look.brk !== undefined ? look.brk : 0.75; U.uVeilDown.value = look.veilDown !== undefined ? look.veilDown : 0.55; U.uRimP.value = look.rimPow !== undefined ? look.rimPow : 5; U.uRimF.value = look.rimFwd !== undefined ? look.rimFwd : 1.5; }   /* M20 · M20 wave 6: the rim lobe */
   /* M19: share the sky dome's scattering uniforms BY REFERENCE (atmosphere.js calls sky.shareSky once its shader exists), so day / night
      switches and the LOW tier's Mie-off reach the clouds' aerial perspective with no copy; null falls back to the flat haze colour.
      This swaps uniform OBJECTS inside mat.uniforms after the program may have compiled: it works because three.js resolves each uniform
      by name in material.uniforms on every upload (no cached reference to the old object). It relies on the build order sky → atmosphere
      (worldB.js); a module built later that calls shareSky again simply re-points the same entries. */
-  function shareSky(D) { var U = mat.uniforms; if (!D) { U.uSkyOn = { value: 0 }; return; } U.uSkyZ = D.uZenith; U.uSkyH = D.uHorizon; U.uSkyHz = D.uHaze; U.uSkyT = D.uSunTint; U.uSkyL = D.uLav; U.uSkyS = D.uSun; U.uSkyMie = D.uMie; U.uSkyLavK = D.uLavK; U.uSkyHazeK = D.uHazeK; if (D.uCastK) U.uSkyCast = D.uCastK; U.uSkyOn = { value: 1 }; }
+  function shareSky(D) { var U = mat.uniforms; if (!D) { U.uSkyOn = { value: 0 }; return; } U.uSkyZ = D.uZenith; U.uSkyH = D.uHorizon; U.uSkyHz = D.uHaze; U.uSkyT = D.uSunTint; U.uSkyL = D.uLav; U.uSkyS = D.uSun; U.uSkyMie = D.uMie; U.uSkyLavK = D.uLavK; U.uSkyHazeK = D.uHazeK; if (D.uCastK) U.uSkyCast = D.uCastK; if (D.uSkirt) U.uSkySkirt = D.uSkirt; if (D.uSunHaze) U.uSkySunHaze = D.uSunHaze; U.uSkyOn = { value: 1 }; }
   /* camPos: {x,y,z} (ctx.cameraPos()) for the back-to-front sort · lightDir: the world direction of the active key (Sun by day, Moon by night) */
   function tick(dt, t, camPos, lightDir) { mat.uniforms.uTime.value = t || 0; if (lightDir) mat.uniforms.uLightWorld.value.set(lightDir[0], lightDir[1], lightDir[2]).normalize();
     sortClock += dt || 0; var sortNow = sortClock > 0.25 && camPos; write(sortNow ? camPos : null); if (sortNow) sortClock = 0; }
