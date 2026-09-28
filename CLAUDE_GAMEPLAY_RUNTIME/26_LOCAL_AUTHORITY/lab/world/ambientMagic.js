@@ -35,10 +35,12 @@ export var AMBIENT_TINT = { gold: 0xffd88a, blue: 0x8fb4ff, red: 0xd42c3a, purpl
 
 function rnd(seed) { var s = seed >>> 0; return function () { s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 /* THE FOOTPRINT: the ground a point's motion sweeps, as a capsule (the same amplitudes as the vertex shader): a mote travels ±r down-wind
-   with a ±0.3 r meander, pollen 0…r down-wind (±0.35 m sway), a moth loops within r of its anchor. `down` is how far below its anchor it
+   with a ±0.3 r meander, pollen 0…r down-wind (±0.35 m sway), a moth loops within √2·r of its anchor (independent ±r in x and z). `down` is how far below its anchor it
    can go. wd = the wind's unit direction [x, z]. */
+/* M20 lead review: a moth's loop moves x and z with independent ±r amplitudes, so it reaches √2·r diagonally (the footprint said r); each bench
+   / overlook hosts at most one moth (picked with replacement, four looped within 2.5 m of one bench — a swarm) */
 export function ambientFootprint(p, wd) { var k = p.k, r = p.r || 0, h = p.h || 0, w = wd || [0, 1], a = k === 0 ? -r : 0, b = k === 2 ? 0 : r;
-  return { ax: p.x + w[0] * a, az: p.z + w[1] * a, bx: p.x + w[0] * b, bz: p.z + w[1] * b, rad: (k === 0 ? 0.3 * r : k === 1 ? 0.35 : r) + 0.05, down: k === 0 ? h * 0.625 : k === 1 ? h : h * 0.5 + 0.07 }; }
+  return { ax: p.x + w[0] * a, az: p.z + w[1] * a, bx: p.x + w[0] * b, bz: p.z + w[1] * b, rad: (k === 0 ? 0.3 * r : k === 1 ? 0.35 : r * 1.415) + 0.05, down: k === 0 ? h * 0.625 : k === 1 ? h : h * 0.5 + 0.07 }; }
 function capsuleSamples(F) { var out = []; for (var i = 0; i <= 8; i++) { var t = i / 8; out.push([F.ax + (F.bx - F.ax) * t, F.az + (F.bz - F.az) * t]); } return out; }
 function capsuleReach(F) { return Math.min(Math.max(Math.abs(F.ax), Math.abs(F.az)), Math.max(Math.abs(F.bx), Math.abs(F.bz))) - F.rad; }
 /* the highest ground under the capsule: the terrain sampled along and across it, every host shape it touches (BOX / RAMP tops, CYLINDER
@@ -119,7 +121,7 @@ export function ambientPlan(src, tier) {
     for (j = 0; j < nvo && lanes.length; j++) { L = lanes[Math.floor(r() * lanes.length)]; u = r(); var dx = L.p.x - L.q.x, dz = L.p.z - L.q.z, dl = Math.hypot(dx, dz) || 1, sd = r() < 0.5 ? -1 : 1, off = L.hw + 1.2 + r() * 1.2;
       lx = L.q.x + dx * u - dz / dl * off * sd; lz = L.q.z + dz * u + dx / dl * off * sd; ly = L.q.y + (L.p.y - L.q.y) * u;
       if (moth({ k: 2, x: lx, y: ly + 1.8 + r() * 1.2, z: lz, r: 1.2 + r() * 0.9, h: 0.7 + r() * 0.5, cyc: 0.8 + r() * 0.5, size: 0.9, tint: cls[ci % 5], ph: 0 }, 'VEIL', TL, ly)) { S2.moths++; ci++; } }
-    for (j = 0; j < nvb && benches.length; j++) { var B = benches[Math.floor(r() * benches.length)], ba = r() * 6.2832, bd = 2 + r() * 2.5;
+    for (j = 0; j < nvb && benches.length; j++) { var B = benches.splice(Math.floor(r() * benches.length), 1)[0], ba = r() * 6.2832, bd = 2 + r() * 2.5;
       if (moth({ k: 2, x: B.x + Math.cos(ba) * bd, y: B.y + 1.8 + r() * 1.2, z: B.z + Math.sin(ba) * bd, r: 1.2 + r() * 1.0, h: 0.7 + r() * 0.5, cyc: 0.8 + r() * 0.5, size: 0.9, tint: cls[ci % 5], ph: 0 }, 'VEIL', TL, B.y)) { S2.moths++; ci++; } }
     out.sites.push(S2); }
   return out;
