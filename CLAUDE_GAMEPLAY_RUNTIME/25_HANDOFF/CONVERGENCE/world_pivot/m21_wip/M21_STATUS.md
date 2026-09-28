@@ -16,6 +16,9 @@ in the runtime: the tree at the migration commit is clean.
   It was rendered once (V09 / MX / V21) but the render was never reviewed, so it is unverified. Apply with `git apply`, render V09 / MX / V21 day
   with `deploy/world_preview/capture.mjs`, compare against the current frames, keep only if the small clusters clearly read less like capsules
   without stipple. Rejected on the way: lowering the field blur (`lodB` ×0.4) brings back checker stipple inside clouds.
+- **Verdict 2026-09-28 (OpenCode lead, rendered V09 / MX / V21 day before + after, 2x zoom crops): no visible change —**
+  the heap clusters read as smooth capsules in both sets, full-frame and zoomed. Patch REVERTED, tree clean; the file above
+  stays parked. Do not re-try this exact variant; any new attempt must first confirm the visible capsules are the HEAP form.
 
 ## Not started (owner's M21 list, in order)
 3. Terrace-tree grounding: small per-tree planted pits on the north terraces (NOT the rejected full soil overlay — see ledger M20 "removed").
