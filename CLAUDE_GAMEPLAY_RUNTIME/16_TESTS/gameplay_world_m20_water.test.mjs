@@ -101,4 +101,24 @@ ok('9. the fall pours from ' + ST9.length + ' notches (' + ST9.map(function (S) 
   ST9.length >= 2 && ST9.some(function (S) { return S.station === REGW.macro.waterfalls.filter(function (w) { return w.style === 'VEIL'; })[0].station; }) && lipOk && worstTurn < 90 && pl9 && plY[0] >= SEA9 && plY[1] - SEA9 <= 0.05 && /vfStrand/.test(VF), { ST9: ST9, worstTurn: worstTurn, plY: plY });
 vf9.dispose();
 
+/* 10. THE SMALL FALLS (M20): the TITAN fall hung in the air 3.4 m in front of its ledge, half past the deck corner, a flat plane landing on the
+   dry shore strip; the NORTH sheet stood in the open floor of the north pass (46 m of water under no rock). Now the TITAN fall leaves the
+   ledge deck's own south lip level, on the free-fall parabola, into the lake's OPEN water, fed by a flush flume on the deck (2 cm, inside the
+   walkable footprint) from the monolith inlay, with churned foam on the water (≤ 5 cm); the NORTH sheet is retired (registry entry kept for
+   the ridge keep circle; its spring pool stays). */
+var REG10 = JSON.parse(src('lab/assets/world/world_registry_v1.json')), TF10 = REG10.macro.waterfalls.filter(function (w) { return w.id === 'TITAN_FALL'; })[0], NF10 = REG10.macro.waterfalls.filter(function (w) { return w.id === 'NORTH_FALL'; })[0];
+var LG10 = REG10.architecture.class_houses.filter(function (h) { return h.id === 'TITAN_LEDGE'; })[0].platform, LK10 = REG10.water.rivers.concat(REG10.water.ponds || []).filter(function (w) { return w.id === 'TITAN_LAKE'; })[0] || (REG10.water.lakes || []).filter(function (w) { return w.id === 'TITAN_LAKE'; })[0];
+var { createMacro: cM10 } = await import('../26_LOCAL_AUTHORITY/lab/world/macro.js'), g10 = new THREE.Group(), M10 = cM10({ THREE: THREE, group: g10, registry: REG10, quality: { tier: function () { return 'HIGH'; } }, log: function () { } }); M10.build();
+var sh10 = g10.getObjectByName('MACRO_FALL_TITAN_FALL'), fd10 = g10.getObjectByName('MACRO_FALL_FEED_TITAN_FALL'), P10 = sh10 && sh10.geometry.attributes.position, s10 = {};
+if (P10) { var n10 = P10.count, top10 = [], bot10 = []; for (var i10 = 0; i10 < 7; i10++) { top10.push([P10.getX(i10), P10.getY(i10), P10.getZ(i10)]); bot10.push([P10.getX(n10 - 7 + i10), P10.getY(n10 - 7 + i10), P10.getZ(n10 - 7 + i10)]); }
+  s10.lipOnDeck = top10.every(function (q) { return Math.abs(q[1] - LG10.h) < 1e-6 && Math.abs(q[2] - LG10.z1) < 1e-6 && q[0] > LG10.x1 && q[0] < LG10.x2; });
+  s10.landsInOpenWater = bot10.every(function (q) { return Math.abs(q[1] - TF10.receiver.y) < 1e-6 && q[0] > LK10.x1 + 0.5 && q[0] < LK10.x2 && q[2] < LK10.z2 - (LK10.shore_w || 0) + 2.5 && q[2] > LK10.z1; });
+  var mono = true, prevY = Infinity; for (var r10 = 0; r10 * 7 < n10; r10++) { var y10 = P10.getY(r10 * 7); if (y10 > prevY + 1e-9) mono = false; prevY = y10; } s10.fallsMonotone = mono; }
+var FP10 = fd10 && fd10.geometry.attributes.position; if (FP10) { var inFoot = true, flush = true; for (var j10 = 0; j10 < FP10.count; j10++) { var x = FP10.getX(j10), y = FP10.getY(j10), z = FP10.getZ(j10); if (!(x >= LG10.x1 && x <= LG10.x2 && z >= LG10.z1 - 1e-6 && z <= LG10.z2)) inFoot = false; if (!(y - LG10.h >= 0 && y - LG10.h <= 0.05)) flush = false; } s10.feedInFootprint = inFoot; s10.feedFlush = flush; }
+var foam10 = null; g10.traverse(function (o) { if (o.isMesh && o.material && o.material.uniforms && o.material.uniforms.uR && Math.abs(o.position.x - TF10.receiver.x) < 1e-6) foam10 = o; });
+s10.foamOnWater = !!foam10 && foam10.position.y - TF10.receiver.y > 0 && foam10.position.y - TF10.receiver.y <= 0.05;
+s10.northRetired = !!NF10 && !!NF10.retired && !g10.getObjectByName('MACRO_FALL_NORTH_FALL') && NF10.scenic_only === true && M10.debug().waterfalls.every(function (w) { return w.id !== 'NORTH_FALL'; });
+ok('10. the small falls: TITAN leaves the ledge deck lip level (y ' + LG10.h + ', z ' + LG10.z1 + ') on a falling arc into the lake\'s open water, fed by a flush flume inside the deck footprint, foam ≤ 5 cm on the water; the NORTH sheet retired', s10.lipOnDeck && s10.landsInOpenWater && s10.fallsMonotone && s10.feedInFootprint && s10.feedFlush && s10.foamOnWater && s10.northRetired, s10);
+M10.dispose();
+
 console.log('RESULT world m20 water: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

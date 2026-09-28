@@ -43,10 +43,21 @@ var STRAND = ['uniform vec4 uStr[4]; uniform float uStrBase; varying float vWy;'
    PlaneGeometry (1 at the top); sx scales the across-sheet frequencies to the sheet's width (1 = the 24–58 m Veil ribbon). ribs: the
    geometry carries aRib (0..1, a buttress nose under the water): there, and in broad noise bands, the curtain thins to strands so the
    dark wet rock shows between them, as in the owner's reference; the lower third merges into one white wall of spray. */
+/* M20 THE PLUNGE of the small falls: churned white water where the sheet enters the pool — soft foam cells churning at the entry, an elliptic
+   patch along the lip (normal blending: it reads on bright day water, where the old additive disc vanished). Local xz in metres (aP). */
+export function plungeFoamMaterial(THREE, opts) { opts = opts || {};
+  return new THREE.ShaderMaterial({ uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uR: { value: new THREE.Vector2(opts.rx || 2, opts.rz || 1.4) } }]), transparent: true, depthWrite: false, fog: true,
+    vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vP;\nvoid main() { vP = position.xy; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
+    fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform vec2 uR; varying vec2 vP;', NOISE,
+      'void main() { vec2 q = vP / uR; float r = length(q), t = uTime;',
+      '  float n = vfN(vP * 1.5 + vec2(t * 0.45, -t * 0.3)) * 0.5 + vfN(vP * 3.6 + vec2(-t * 0.6, t * 0.5) + 7.0) * 0.32 + vfN(vP * 8.0 + vec2(t * 0.9, t * 0.7) + 3.0) * 0.18;',
+      '  float churn = 1.0 - smoothstep(0.0, 0.55, r), foam = smoothstep(0.42, 0.7, n + 0.5 * churn - 0.25 * r) * (1.0 - smoothstep(0.7, 1.0, r));',
+      '  vec3 col = mix(vec3(0.78, 0.82, 0.88), vec3(0.98, 0.985, 1.0), foam) * mix(1.0, 0.42, uNight);',
+      '  gl_FragColor = vec4(col, clamp(foam * 0.9 + churn * 0.25, 0.0, 0.92));', '#include <fog_fragment>', '}'].join('\n') }); }
 export function veilWaterMaterial(THREE, opts) { opts = opts || {};
   var U = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uSX: { value: opts.sx || 1 }, uFlip: { value: opts.flipV ? 1 : 0 }, uSeed: { value: opts.seed || 0 }, uFilm: { value: 0 } }]);
   if (opts.strands) { U.uStr = { value: opts.strands }; U.uStrBase = { value: opts.strandBase || 0 }; }   /* uFilm: the curtain continues as a flush film down the rock to the sea (M20) */
-  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true, defines: Object.assign({}, opts.ribs ? { VEIL_RIBS: 1 } : {}, opts.front ? { VEIL_FRONT: 1 } : {}, opts.strands ? { VEIL_STRANDS: 1 } : {}),
+  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true, defines: Object.assign({}, opts.ribs ? { VEIL_RIBS: 1 } : {}, opts.front ? { VEIL_FRONT: 1 } : {}, opts.strands ? { VEIL_STRANDS: 1 } : {}, opts.spill ? { VEIL_SPILL: 1 } : {}),
     vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\n#ifdef VEIL_RIBS\nattribute float aRib; varying float vRib;\n#endif\n#ifdef VEIL_STRANDS\nvarying float vWy;\n#endif\nvoid main() { vUv = uv;\n#ifdef VEIL_RIBS\n vRib = aRib;\n#endif\n#ifdef VEIL_STRANDS\n vWy = (modelMatrix * vec4(position, 1.0)).y;\n#endif\n vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
     fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; uniform float uSeed; uniform float uFilm; varying vec2 vUv;', '#ifdef VEIL_RIBS', 'varying float vRib;', '#endif', NOISE, '#ifdef VEIL_STRANDS', STRAND, '#endif',
         'void main() { float x = vUv.x, y = mix(vUv.y, 1.0 - vUv.y, uFlip), t = uTime, xs = x * uSX + uSeed;',
@@ -56,6 +67,7 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
         '  float rag = vfN(vec2(xs * 9.0, ya * 9.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
         '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) * smoothstep(-0.02, -0.001, y) + smoothstep(0.72, 1.0, y) * 0.9;',   /* M19: up the flume (y < 0; 0.1 ≈ 20 m) the water runs clear and streaked, whitening only in the last ~4 m before the brink */
         '#ifdef VEIL_RIBS', '  aer += vRib * 0.35 * smoothstep(0.04, 0.3, y);', '#endif',
+        '#ifdef VEIL_SPILL', '  aer = smoothstep(0.08, 0.4, y) * 0.55 + smoothstep(0.72, 1.0, y) * 0.9; float yq = max(y, 0.0); edge = smoothstep(0.0, 0.03 + 0.2 * yq + 0.12 * rag * yq, side);', '#endif',   /* M20 THE SMALL FALLS: water leaving a lip is a smooth glassy tongue with crisp edges, breaking up and whitening only as it falls */
         '#ifdef VEIL_STRANDS', '  float stL, stM = vfStrand(x, vWy, t, 1.0, 0.0, stL); if (y < 0.0) stM = 1.0; aer = max(aer, stL * 0.85);', '#endif',   /* each strand whitens where it tips over its own lip */   /* M19: white water where the fall breaks over a rock rib */
         '  float strand = smoothstep(0.22, 0.72, vfN(vec2(xs * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(xs * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
         '  vec3 body = mix(vec3(0.72, 0.77, 0.85), vec3(0.985, 0.99, 1.0), clamp(streak * 0.95 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',   /* M19: thin water shows the dark rock through it — more contrast between sheet and streak (M20: a paler body, less blue glass) */
@@ -78,6 +90,7 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
         '  if (y > 1.0) { float yf2 = clamp((y - 1.0) / 0.08, 0.0, 1.0), f1 = vfN(vec2(xs * 34.0, yf2 * 1.4 - t * 2.2)) * 0.6 + vfN(vec2(xs * 90.0 + 5.0, yf2 * 3.0 - t * 3.6)) * 0.4, wh = smoothstep(0.32, 0.78, f1);',   /* M20 THE FILM: white water cascading down the last metres of rock into the sea — flush on the rock (host-safe) */
         '    body = mix(vec3(0.76, 0.8, 0.86), vec3(0.97, 0.98, 1.0), clamp(0.6 + 0.3 * wh + 0.3 * smoothstep(0.55, 1.0, yf2), 0.0, 1.0)) * mix(1.0, 0.42, uNight); a = edge * (0.58 + 0.26 * wh) * (1.0 + 0.1 * smoothstep(0.6, 1.0, yf2)) * smoothstep(0.0, 0.3 + 0.2 * f1, yf2); }   /* long vertical runs (not foil blotches), whitening into foam where it meets the sea */',
         '#ifdef VEIL_STRANDS', '  a = max(a, ck * 0.9 * edge * step(0.0, y)); a *= stM;', '#endif',
+        '#ifdef VEIL_SPILL', '  if (y < 0.0) { body = mix(vec3(0.66, 0.72, 0.8), vec3(0.97, 0.98, 1.0), streak * 0.8) * mix(1.0, 0.42, uNight) + sp * 0.05; a = edge * (0.3 + 0.42 * streak); }', '  a *= mix(0.72, 1.0, smoothstep(0.02, 0.2, y)); a *= 1.0 - 0.94 * smoothstep(0.82, 1.0, y) * (0.6 + 0.4 * rag);', '#endif',   /* a thinner clear tongue at the lip; the hem dissolves raggedly into the splash (no hard bottom edge on the water) */
         '  gl_FragColor = vec4(body, clamp(a, 0.0, 0.96));', '#include <fog_fragment>', '}'].join('\n') }); }
 
 /* THE CURTAIN (owner reference pass): the station lines (inner foot → crest) the curtain pours over, and the keep circles that hold the ridge

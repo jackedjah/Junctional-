@@ -8890,25 +8890,47 @@
     "source_id": "TITAN_LEDGE",
     "receiver_id": "TITAN_LAKE",
     "source": {
-     "x": 158,
-     "y": 11.6,
-     "z": 118.6
+     "x": 159.6,
+     "y": 12,
+     "z": 122
     },
     "receiver": {
-     "x": 158,
+     "x": 159.3,
      "y": -0.16,
-     "z": 118.2
+     "z": 115.2
     },
-    "width_m": 4.2,
+    "width_m": 2.4,
     "yaw_rad": 0,
     "speed": 1.15,
     "ripple": true,
-    "note": "off the mountain ledge platform (12 m) straight into the Titan lake below it; contact ripples through water.js"
+    "feed": {
+     "y": 12.02,
+     "path": [
+      [
+       162.3,
+       127.3
+      ],
+      [
+       160.9,
+       125.2
+      ],
+      [
+       159.6,
+       123.4
+      ],
+      [
+       159.6,
+       122
+      ]
+     ]
+    },
+    "note": "off the south lip of the mountain ledge platform (deck 12 m, x 158–172, z 122–138) in a free-fall arc into the open water of the Titan lake (x 137–161, z 90–118; its shore strip runs to z 116, the open water from z 115) 6.8 m out; contact ripples through water.js. M20: it hung in the air 3.4 m in front of the ledge, half of it past the deck corner, falling from nothing. feed: the flush flume (2 cm on the walkable deck, inside the platform) from the monolith inlay to the lip — the water has a source"
    },
    {
     "id": "NORTH_FALL",
     "source_id": "RIDGE_NEAR",
     "receiver_id": "RIVER_N",
+    "retired": "M20 (owner quality pivot: reduce what cannot be made right): the 46 m sheet stood in the open floor of the north pass (rock under it 0–1 m, the pass floor 0–10 m for 60 m north, walls 60–130 m either side) — water falling from the sky with a square top. No rock exists at the lip height and a dam / tarn would be new landform (no map expansion), so the sheet, plunge, mist and aura are gone; the spring pool and its stream to the canal stay. Entry kept: RIDGE_NEAR keeps its keep circle (ridge and colliders unchanged)",
     "source": {
      "x": 0,
      "y": 46,
