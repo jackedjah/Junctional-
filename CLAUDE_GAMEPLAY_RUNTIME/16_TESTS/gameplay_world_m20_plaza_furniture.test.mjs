@@ -2,12 +2,13 @@
    white faceted light pylons (host colliders PILLAR_NW / NE / SW / SE) are re-dressed by lab/cityScene.js as civic light masts. The renders
    show the look; this test holds what they cannot: the adoption still recognises exactly the columns the field builder draws (and nothing
    else), the host law for every vertex of every tier (below 3.4 m within the collider radius + 5 cm), the phone budget (LOW never heavier
-   than the columns it replaces) and the colour law of the lit element.  node 16_TESTS/gameplay_world_m20_plaza_furniture.test.mjs */
+   than the columns it replaces), the colour law of the lit element and a contact shadow that follows the mast, not the old column.  node 16_TESTS/gameplay_world_m20_plaza_furniture.test.mjs */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { classify } from '../26_LOCAL_AUTHORITY/deploy/world_preview/colour_law_audit.mjs';
 import { adoptLightColumns, lightMastParts, LIGHT_MAST, adoptRampEdges, rampNosings } from '../26_LOCAL_AUTHORITY/lab/cityScene.js';
 import { taperShaft, orb, energyTip } from '../26_LOCAL_AUTHORITY/lab/world/formKit.js';
+import { createContactAO } from '../26_LOCAL_AUTHORITY/lab/world/contactAO.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)), LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -78,5 +79,19 @@ R6.forEach(function (R, k) { var s = RAMPS[k], hAt = function (x, z) { return s.
     for (var i = 0; i < p.count; i++) { var x = p.getX(i), z = p.getZ(i), dy = p.getY(i) - hAt(Math.min(s.x2, Math.max(s.x1, x)), Math.min(s.z2, Math.max(s.z1, z))); s6.out = Math.max(s6.out, s.x1 - x, x - s.x2, s.z1 - z, z - s.z2); s6.above = Math.max(s6.above, dy); s6.below = Math.min(s6.below, dy); }
     for (var t = 0; t < ix.length; t += 3) { var A = new THREE.Vector3().fromBufferAttribute(p, ix[t]), B = new THREE.Vector3().fromBufferAttribute(p, ix[t + 1]), Cc = new THREE.Vector3().fromBufferAttribute(p, ix[t + 2]); s6.tris++; if (new THREE.Vector3().crossVectors(B.sub(A), Cc.sub(A)).normalize().dot(new THREE.Vector3().fromBufferAttribute(nr, ix[t])) > 0.5) s6.winding++; } }); });
 ok('6. each plaza ramp loses its floating bar and gets nosings on the walking surface ' + JSON.stringify(s6), barSig && RAMPS.length === 2 && R6.length === 2 && s6.bars === 2 && s6.strips === 6 && s6.out <= 1e-6 && s6.above <= 0.05 && s6.below >= -1e-4 && s6.winding === s6.tris && /ramps = adoptRampEdges\(group\)/.test(CITY), s6);
+
+/* 7. the contact decal follows the mast (review of 883984f: contactAO still grounded each PILLAR as the old r 0.6 m x 5 m column, a cast
+      about 1.2 m wide trailing 4-5 m from a 0.24 m mast, the shadow of an invisible column). contactAO, replayed on the real registry and
+      layout: each column gets a plinth band on its footprint (r + plinth_out) that casts from plinth_h only and, on MED / HIGH, one slim
+      mast cast (half-width <= 0.15 m) from the column's full height; nothing at a column is wider than the mast and casts from above the
+      plinth; LOW (no casts) keeps one decal per column (never heavier) */
+var REG = JSON.parse(src('lab/assets/world/world_registry_v1.json')), s7 = {};
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var grp = new THREE.Group(), cao = createContactAO({ THREE: THREE, group: grp, registry: REG, layout: { shapes: LAYOUT.filter(function (s) { return !s.world; }) }, quality: { tier: function () { return T; } } }), mesh = null; cao.build(); grp.traverse(function (o) { if (o.isInstancedMesh) mesh = o; });
+  var A = mesh && mesh.geometry.attributes, m4 = new THREE.Matrix4(), v = new THREE.Vector3(), r = { masts: cao.debug().masts, cols: COLS.map(function () { return []; }) };
+  if (mesh) for (var i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, m4); v.setFromMatrixPosition(m4); COLS.forEach(function (s, k) { if (Math.abs(v.x - s.x) < 1e-6 && Math.abs(v.z - s.z) < 1e-6) r.cols[k].push({ half: +A.aBox.getX(i).toFixed(3), from_h: +A.aCast.getX(i).toFixed(2), cast_k: +A.aCast.getW(i).toFixed(2) }); }); }
+  r.ok = r.masts === COLS.length && r.cols.every(function (D, k) { var s = COLS[k], plinth = D.filter(function (d) { return Math.abs(d.half - (s.r + LIGHT_MAST.plinth_out)) < 1e-3; }), slim = D.filter(function (d) { return d.half <= 0.15; });
+    return plinth.length === 1 && (T === 'LOW' ? D.length === 1 && plinth[0].cast_k === 0 : D.length === 2 && plinth[0].from_h === LIGHT_MAST.plinth_h && slim.length === 1 && slim[0].from_h === s.h && slim[0].cast_k > 0 && slim[0].cast_k <= 0.5) && D.every(function (d) { return d.half <= 0.15 || d.from_h <= LIGHT_MAST.plinth_h + 1e-6; }); });
+  s7[T] = r; });
+ok('7. the contact decal at each column is the plinth (r + ' + LIGHT_MAST.plinth_out + ', cast from ' + LIGHT_MAST.plinth_h + ' m) plus one slim mast cast (MED / HIGH), no full-width column cast ' + JSON.stringify(s7.HIGH.cols[0]), s7.HIGH.ok && s7.MED.ok && s7.LOW.ok, s7);
 
 console.log('RESULT world m20 plaza furniture: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

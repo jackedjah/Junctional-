@@ -78,6 +78,14 @@ export function createContactAO(ctx) {
     /* plaza civic shapes from the host layout (grounded, solid, not walls / ramps / walkable decks / rims) */
     ((ctx.layout && ctx.layout.shapes) || []).forEach(function (s) { if ((s.y0 || 0) > 0.2 || s.walkable || s.rim || s.type === 'RAMP' || /^WALL_/.test(s.id || '') || !(s.h >= 0.6)) return;
       var fall = clamp(s.h * 0.22, 0.6, 2.6), k = s.h < 1.5 ? 0.28 : 0.4, cast = { h: Math.min(s.h, 40), cap: s.h < 1.5 ? 1.6 : (s.h > 30 ? 16 : 11), taper: s.type === 'CYLINDER' ? 0.8 : 0.92, k: s.h < 1.5 ? 0.5 : 0.8 };
+      /* M20 (owner 2026-09-27, plaza furniture: "reduce smooth primitive shells"): the field's light columns — a CYLINDER ≥ 4.2 m tall and
+         ≥ 0.4 m in radius that is not a building / pod / landmark / world shape, the gate fieldScene draws them by — are dressed by cityScene
+         as civic light masts (LIGHT_MAST there): a 0.46 m stone seat plinth on the footprint (r + 2 cm) and a slim ≈ 0.24 m mast up to the
+         lantern. The decal follows what is drawn: a tight band and a short cast for the plinth, and a slim, lighter cast for the mast and its
+         lantern that starts under the plinth (its own band is hidden there). The old drum's full-size cast (≈ 1.2 m wide, 4–5 m long) read
+         beside a slim post as the shadow of an invisible column. LOW (no casts) keeps one plinth band per column: never heavier. */
+      if (s.type === 'CYLINDER' && !s.building && !s.pod && !s.landmark && !s.world && s.h >= 4.2 && s.r >= 0.4) { var pr = s.r + 0.02;
+        push(s.x, s.z, pr, pr, 0.6, 0.28, pr, { h: 0.46, cap: 1.2, taper: 1, k: 0.5 }); if (!LOW) push(s.x, s.z, 0.12, 0.12, 0.3, 0.2, 0.12, { h: Math.min(s.h, 40), cap: 11, taper: 1, k: 0.42 }); info.civic++; info.masts = (info.masts || 0) + 1; return; }
       if (s.type === 'CYLINDER') { push(s.x, s.z, s.r, s.r, fall, k, s.r, cast); info.civic++; }
       else if (s.type === 'BOX') { var hx = (s.x2 - s.x1) / 2, hz = (s.z2 - s.z1) / 2; push((s.x1 + s.x2) / 2, (s.z1 + s.z2) / 2, hx, hz, fall, k, s.rounded ? Math.min(hx, hz) * 0.9 : 0.25, cast); info.civic++; } });
     /* landmark envelopes: inset so the band hugs the real footprint, a wide base darkening; the cast tapers (spired silhouettes) */
