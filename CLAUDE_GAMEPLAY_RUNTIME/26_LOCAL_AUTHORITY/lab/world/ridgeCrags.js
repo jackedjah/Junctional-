@@ -82,7 +82,7 @@ export function ridgeCragStrips(R, idx, stations, keepOut, tier, veilSpan, reach
       for (var e = 0; e < list.length; e++) { var S = list[e]; if (!S || (list[e - 1] && list[e + 1])) continue; var c = cragEndCentre(S); for (var j2 = 0; j2 + 1 < S.length; j2++) if (cragFlightHit(S[j2], S[j2 + 1], c, RQ, FLY)) { list[e] = null; hit = true; break; } }
       if (!hit) break; }
     var cur = []; list.forEach(function (sec) { if (!sec) { if (cur.length > 1) out.push({ role: role, sections: cur }); cur = []; } else cur.push(sec); }); if (cur.length > 1) out.push({ role: role, sections: cur }); }
-  function towers(x, z) { var r = 1 - Math.abs(2 * vn2(x / 24, z / 24, sd) - 1), pr = 0.7 * Math.pow(r, 1.2) + 0.3 * vn2(x / 60, z / 60, sd + 1); return 0.15 + 0.85 * (0.5 * sstep(0.08, 0.85, pr) + 0.5 * pr) + 0.12 * (vn2(x / 6, z / 6, sd + 2) - 0.5); }   /* towers every ≈ 20–40 m (they must read at 300 m), notches between; review fix: no flat plateaus (the crowns read as stacked slabs) */
+  function towers(x, z) { var q = 2 * vn2(x / 24, z / 24, sd) - 1, r = 1.14 - Math.sqrt(q * q + 0.02), pr = 0.7 * Math.pow(Math.max(0, r), 1.2) + 0.3 * vn2(x / 60, z / 60, sd + 1); return 0.15 + 0.85 * (0.5 * sstep(0.08, 0.85, pr) + 0.5 * pr) + 0.06 * (vn2(x / 9, z / 9, sd + 2) - 0.5); }   /* towers every ≈ 20–40 m (they must read at 300 m), notches between; review fix: no flat plateaus (the crowns read as stacked slabs); M20 smoothing (owner 2026-09-28: "sculpted and premium, not jagged and retro"): the ridged profile's crease is rounded (every tower tip was a knife point) and the 6 m tooth jitter is halved and broadened */
   function outerTop(F, a, b) { var rA = Math.hypot(a.x, a.z) || 1, rB = Math.hypot(b.x, b.z) || 1, hA = Math.max(2, a.h), hB = Math.max(2, b.h);   /* macro.js's uo rows, exactly */
     return [ridgeRockDsp(lerp3(F.outerA, F.crestA, 0.72), -a.x / rA, -a.z / rA, hA * 0.09, idx + 4), ridgeRockDsp(lerp3(F.outerB, F.crestB, 0.72), -b.x / rB, -b.z / rB, hB * 0.09, idx + 4)]; }
   /* CREST CAP */
@@ -93,8 +93,8 @@ export function ridgeCragStrips(R, idx, stations, keepOut, tier, veilSpan, reach
     for (var j = 0; j <= n; j++) { var t = j / n, C = lerp3(F.crestA, F.crestB, t), hl = C.y, fd = fade(C.x, C.z, hl) * flyK(C, hl, 4, 18), amp = Math.max(5, Math.min(22, hl * 0.14)) * fd, H = amp * towers(C.x, C.z) * (0.8 + 0.2 * sstep(0, 0.14, Math.min(t, 1 - t)));   /* each run eases a little toward the station folds, where the neighbouring run meets it at nearly the same height (review: the notch at every fold split a summit into two slabs) */
       if (fd <= 0.03) { secs.push(null); continue; } var uo = lerp3(UO[0], UO[1], t),   /* the cap runs only where it stands (a run ends at a pass, a keep circle, the low crest or the flight volume) */ Di = 0.8 * H + 1.5, Do = 0.6 * H + 1.5, Si = addS(C, sub(F.innerA, C), Di / Math.max(4, C.y - F.innerA.y)), So = addS(C, sub(uo, C), Do / Math.max(3, C.y - uo.y));
       var wob = (vn2(C.x / 11, C.z / 11, sd + 3) - 0.5) * 0.35 * H, hw = 0.3 * H * (0.7 + 0.6 * vn2(C.x / 13, C.z / 13, sd + 6)) + 0.6, hI = Math.hypot(nI.x, nI.z) || 1, Tc = { x: C.x + nI.x * wob, y: C.y + H, z: C.z + nI.z * wob };
-      var Ti = { x: Tc.x + nI.x / hI * hw, y: Tc.y - 0.2 * H, z: Tc.z + nI.z / hI * hw }, To = { x: Tc.x - nI.x / hI * hw, y: Tc.y - H * (0.22 + 0.16 * vn2(C.x / 5, C.z / 5, sd + 7)), z: Tc.z - nI.z / hI * hw }, bI = 0.22 * H * (0.6 + 0.8 * vn2(C.x / 7, C.z / 7, sd + 4)), bO = 0.12 * H;   /* a broken top ≈ 0.6 × its height wide, not a blade … */
-      var ap = (vn2(C.x / 9, C.z / 9, sd + 8) - 0.5) * 1.2 * hw, Tp = { x: Tc.x + nI.x / hI * ap, y: Tc.y + 0.04 * H, z: Tc.z + nI.z / hI * ap };   /* … and not a flat box either: an off-centre apex, the two sides falling away from it (review: the crowns read as stacked slabs) */
+      var Ti = { x: Tc.x + nI.x / hI * hw, y: Tc.y - 0.14 * H, z: Tc.z + nI.z / hI * hw }, To = { x: Tc.x - nI.x / hI * hw, y: Tc.y - H * (0.18 + 0.12 * vn2(C.x / 7, C.z / 7, sd + 7)), z: Tc.z - nI.z / hI * hw }, bI = 0.22 * H * (0.6 + 0.8 * vn2(C.x / 7, C.z / 7, sd + 4)), bO = 0.12 * H;   /* a broken top ≈ 0.6 × its height wide, not a blade … */
+      var ap = (vn2(C.x / 9, C.z / 9, sd + 8) - 0.5) * 1.2 * hw, Tp = { x: Tc.x + nI.x / hI * ap, y: Tc.y + 0.03 * H, z: Tc.z + nI.z / hI * ap };   /* … and not a flat box either: an off-centre apex, the two sides falling away from it (review: the crowns read as stacked slabs); M20 smoothing: a lower, rounder roof (the apex stood 0.24 H over the inner shoulder: a knife ridge along every cap — now 0.17 H, the outer fall shallower) */
       var sec = HI ? [Si, addS(lerp3(Si, Ti, 0.35), nI, bI * 0.55), addS(lerp3(Si, Ti, 0.72), nI, bI), Ti, Tp, To, addS(lerp3(So, To, 0.7), nO, bO), addS(lerp3(So, To, 0.32), nO, bO * 0.5), So] : [Si, addS(lerp3(Si, Ti, 0.6), nI, bI), Ti, Tp, To, addS(lerp3(So, To, 0.6), nO, bO), So];
       secs.push(sec.map(function (P, pi) { var Q = W(P); return pi === 0 ? onFace(Q, nI, 0.12) : pi === sec.length - 1 ? onFace(Q, nO, 0.25) : Q; })); }   /* the shoulders on the face */
     run('cap', secs); }
@@ -132,17 +132,19 @@ export function ridgeCragStrips(R, idx, stations, keepOut, tier, veilSpan, reach
 }
 
 /* One rock body, in world space: { pos, nrm, col } arrays (non-indexed, creased normals) — used by the coast's island outcrops (a geodesic
-   sphere lumped by a low noise, cut by three to five fracture planes at random attitudes, tapered; the planes keep crisp arrises). */
+   sphere lumped by a low noise, cut by three to five fracture planes at random attitudes, tapered; M20 smoothing (owner 2026-09-28: "sculpted
+   and premium, not jagged and retro"): the planes ease in, so their arrises are rounded rather than knife-crisp). */
+var CUT_K = 0.12;
 export function rockBlock(THREE, B, detail, rock, peak, hMax) {
   var rnd = seeded(Math.floor(B.sd * 7919) + 17), g = new THREE.IcosahedronGeometry(1, detail); g.deleteAttribute('normal'); g.deleteAttribute('uv'); var gm = mergeVertices(g, 1e-4); g.dispose(); g = gm;
   var P = g.attributes.position, cuts = [], o1 = rnd() * 9, o2 = rnd() * 9, o3 = rnd() * 9;
   for (var c = 0; c < B.cuts; c++) { var th = rnd() * TAU, el = c === 0 ? 0.75 + 0.6 * rnd() : (rnd() - 0.4) * 1.1; cuts.push([Math.cos(th) * Math.cos(el), Math.sin(el), Math.sin(th) * Math.cos(el), c === 0 ? 0.5 + 0.25 * rnd() : 0.62 + 0.25 * rnd()]); }   /* the first plane shears the top, the rest split the flanks */
   function lump(x, y, z) { return Math.sin(x * 2.1 + o1) * Math.sin(y * 1.7 + o2) * Math.sin(z * 2.3 + o3) * 0.5 + Math.sin(x * 4.3 - o2) * Math.sin(y * 3.9 + o3) * Math.sin(z * 4.1 - o1) * 0.25; }
   for (var i = 0; i < P.count; i++) { var x = P.getX(i), y = P.getY(i), z = P.getZ(i), m = 1 + 0.16 * lump(x, y, z); x *= m; y *= m; z *= m;
-    for (var q = 0; q < cuts.length; q++) { var C = cuts[q], s = x * C[0] + y * C[1] + z * C[2] - C[3]; if (s > 0 && y > -0.35) { x -= C[0] * s; y -= C[1] * s; z -= C[2] * s; } }
+    for (var q = 0; q < cuts.length; q++) { var C = cuts[q], s = x * C[0] + y * C[1] + z * C[2] - C[3]; s = s >= CUT_K ? s : s <= -CUT_K ? 0 : (s + CUT_K) * (s + CUT_K) / (4 * CUT_K); if (s > 0 && y > -0.35) { x -= C[0] * s; y -= C[1] * s; z -= C[2] * s; } }   /* M20 smoothing: a soft cut — the plane eases in over ± CUT_K, so its arris is rounded (≈ an eighth of the body) instead of a knife edge */
     var tp = 1 - B.taper * (y + 1) * 0.5; x *= tp; z *= tp; P.setXYZ(i, x * B.a, y * B.H * 0.5, z * B.b); }
   var m4 = new THREE.Matrix4().compose(new THREE.Vector3(B.x, B.y, B.z), new THREE.Quaternion().setFromEuler(new THREE.Euler(B.lean, B.yaw, B.roll, 'YXZ')), new THREE.Vector3(1, 1, 1)); g.applyMatrix4(m4); g.computeVertexNormals();
-  var gc = toCreasedNormals(g, 48 * Math.PI / 180); if (gc !== g) g.dispose();
+  var gc = toCreasedNormals(g, 58 * Math.PI / 180); if (gc !== g) g.dispose();   /* M20 smoothing: 48° → 58° (the rounded arrises shade through) */
   var p = gc.attributes.position, n = gc.attributes.normal, pos = [], nrm = [], col = [], cT = new THREE.Color(), tone = 0.95 + 0.14 * rnd();
   for (var v = 0; v < p.count; v++) { var py = p.getY(v), tH = Math.max(0, Math.min(1, py / hMax)); cT.copy(rock).lerp(peak, tH * tH * 0.3).multiplyScalar(tone); pos.push(p.getX(v), py, p.getZ(v)); nrm.push(n.getX(v), n.getY(v), n.getZ(v)); col.push(cT.r, cT.g, cT.b); }
   gc.dispose(); return { pos: pos, nrm: nrm, col: col };
@@ -198,6 +200,7 @@ export function createRidgeCrags(ctx) {
         pos.push(x, y, z); nrm.push(nx, ny, nz); col.push(cT.r, cT.g, cT.b); }
       gc.dispose(); info.strips++; info[S.role + 's']++; });
     if (!pos.length) return; var g2 = new THREE.BufferGeometry(); g2.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g2.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3)); g2.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g2.computeBoundingSphere(); own.push(g2);
+    if (ridge && ridge.geometry.attributes.aFoldN) { g2.setAttribute('aFoldD', new THREE.BufferAttribute(new Float32Array(pos.length), 3)); g2.setAttribute('aFoldN', new THREE.BufferAttribute(new Float32Array(pos.length), 3)); }   /* M20: the ridge's program reads the rounded-fold attributes (macro.js foldBevel, HIGH); the crags carry none (zeros: no fold) */
     if (!mat) { mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.86, metalness: 0.04 }); own.push(mat); }
     mesh = new THREE.Mesh(g2, mat); mesh.name = 'RIDGE_CRAGS_' + R.id; mesh.frustumCulled = false; mesh.receiveShadow = false; mesh.castShadow = false; mesh.userData.noMerge = true; ctx.group.add(mesh);
     info.tris = pos.length / 9; info.draw_calls = 1; log('ridgeCrags: ' + info.caps + ' crest caps, ' + info.ledges + ' ledges, ' + info.ribs + ' nose ribs, ' + info.tris + ' tris, 1 draw'); }

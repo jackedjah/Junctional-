@@ -55,6 +55,17 @@ export function ridgeWarpField(R, stations, idx, keepOut) {
   var perCrest = Math.max(8, Math.round(TAU * arc / 170)), perShelf = Math.max(8, Math.round(TAU * arc / 120)), perSpur = Math.max(8, Math.round(TAU * arc / (arc < 450 ? 105 : 130))), perNotch = Math.max(16, Math.round(TAU * arc / 55));
   var SSP = ridgeShelfStep(R), passes = R.passes || [];
   function at(b) { var f = (((b % TAU) + TAU) % TAU) / TAU * N, i = Math.min(N - 1, Math.floor(f)), t = f - i; return { r: rad[i] + (rad[i + 1] - rad[i]) * t, rs: rs[i] + (rs[i + 1] - rs[i]) * t, h: stations[i].h + (stations[i + 1].h - stations[i].h) * t, w: stations[i].w + (stations[i + 1].w - stations[i].w) * t }; }
+  /* M20 ROUNDED FOLDS (owner 2026-09-28: "round off or soften harsh edge reads … sculpted and premium, not jagged and retro"; lead: beyond reach the
+     station fins still read as knife edges and paper-thin fins — CL2 / V04 / V02). Every station line is a fold of the inner face: a razor nose
+     where the station juts toward the field (a fin), a razor re-entrant where it is set back (a bay). The inner face's radius at a height is
+     piecewise linear round the ring (station to station); here it is smoothed round the ring over ± 0.35 of a station span (a bell of seven
+     samples) and the face moves by the difference — flat between the folds, a rounded nose (≈ 5 m on the NEAR ring) where a fin was a knife, a
+     filleted corner in a bay. Inner face only, eased off toward the crest (the crest line has its own easing, term 1), weighted like every other
+     term (zero inside the reach square, the passes and the keep circles). */
+  function faceR(b, y) { var f = (((b % TAU) + TAU) % TAU) / TAU * N, i = Math.min(N - 1, Math.floor(f)), t = f - i, A = stations[i], B = stations[i + 1];
+    var ra = rad[i] - A.w * (1 - Math.max(0, Math.min(1, (y + 4) / (Math.max(2, A.h) + 4)))), rb = rad[i + 1] - B.w * (1 - Math.max(0, Math.min(1, (y + 4) / (Math.max(2, B.h) + 4)))); return ra + (rb - ra) * t; }
+  var FOLD_K = [0.06, 0.13, 0.19, 0.24, 0.19, 0.13, 0.06], FOLD_U = [-1, -0.667, -0.333, 0, 0.333, 0.667, 1], FOLD_D = 0.35 * TAU / N;
+  function foldRound(b, y) { var r0 = faceR(b, y), s = 0; for (var q = 0; q < 7; q++) s += FOLD_K[q] * faceR(b + FOLD_U[q] * FOLD_D, y); return s - r0; }
   var kb = (keepOut || []).reduce(function (b, K) { var m = K.r * 2.2; return [Math.min(b[0], K.x - m), Math.max(b[1], K.x + m), Math.min(b[2], K.z - m), Math.max(b[3], K.z + m)]; }, [1e9, -1e9, 1e9, -1e9]);   /* the keep circles' reach box: most vertices skip the loop */
   function weight(x, z) {
     var w = sstep(REACH_IN, REACH_OUT, maxNorm(x, z)); if (w <= 0) return 0;
@@ -69,6 +80,8 @@ export function ridgeWarpField(R, stations, idx, keepOut) {
     var cot = (side >= 0 ? S.w : S.w * 1.3) / (hb + 4);
     /* 1 · crest line: the fins pulled to the eased line, strongest at the top */
     var dr = (S.rs - S.r) * sstep(0.2, 1.0, yN) * 0.9;
+    /* 1b · M20 rounded folds (foldRound above): fin noses rounded back into the rock, bay corners filleted — inner face, eased off at the crest */
+    if (side > 0) dr += foldRound(b, y) * sstep(0, 0.6, side) * (1 - 0.7 * sstep(0.55, 1.0, yN));
     /* 2 · M19 SHELVES ON THE BEDDING: the face steps — a steep cliff band, then a setback ledge — on the regional beds (bedY: the shader's
        dip / fold), so every shelf is one continuous bed round the ring instead of a random phase per bearing. The lip wanders a little
        along the ring (broken shelf edges) and the strength drifts, so some walls are banded and others stay sheer. */
