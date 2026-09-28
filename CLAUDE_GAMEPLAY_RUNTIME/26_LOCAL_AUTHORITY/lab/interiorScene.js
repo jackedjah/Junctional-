@@ -5,7 +5,7 @@
    panel, never a placeholder item, price or purchase. Everything is presentation; the host owns movement (room size clamp, platforms, ceiling).
    Returns the wall solids for the camera boom (the field's camera probe reads them) and a `ready` promise (fault injection: `failRoom` throws,
    `slowMs` delays readiness — dev only, to exercise the failure / slow paths of the entrance transaction). */
-import { applySurface } from './world/surfaceDetail.js'; import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
+import { applySurface } from './world/surfaceDetail.js'; import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js'; import { defaultTextureCap } from './texCap.js';
 export function buildInterior(THREE, group, play, helpers) {
   var room = play.room, size = play.room_size_m || 24, half = size / 2, plan = play.interior_plan || null, planId = plan && plan.plan_id || null, H = play.ceiling_m || (plan && plan.ceiling_m) || (room === 'GYM_INTERIOR' ? 6.2 : (room === 'MATCH_HALL' ? 9 : 4.6)); var opts = helpers || {}; var WORLD = opts.world || null;   /* M5 owner correction: the host-published ceiling and plan are presentation truth; JOB B still owns MATCH HALL and gym props. */
   if (opts.failRoom && opts.failRoom === room) throw new Error('INTERIOR_BUILD_FAILED (' + room + ') — fault injection');
@@ -14,9 +14,12 @@ export function buildInterior(THREE, group, play, helpers) {
      (floor metalness 0.85 in navy, walls 0.82, a blue-white light rig) — no material identity. Presentation only (room size, walls, host
      platforms / solids, the doorway and exit are untouched): the floor, walls and ceiling get world-space surface detail (lab/world/surfaceDetail.js)
      and believable finishes — the gym a dense rubber tile floor, a dark impact wainscot, honed composite wall panels and an acoustic ceiling; the
-     market wings a honed stone floor, seamless plaster walls, a graphite wainscot and rose-gold vault ribs; a lit door leaf in every doorway frame; the light rig neutral white (same signature: 3 directional +
-     1 hemisphere). The MATCH HALL keeps its own look (its lights unchanged). */
-  var SHOPR = room === 'CLOTHING_SHOP' || room === 'WEAPON_SHOP' || !!play.room_shop, SDT = opts.shadows ? 'HIGH' : 'MED';   /* surface-detail tier: HIGH where the rig casts shadows (the HIGH tier), MED otherwise */
+     market wings a honed stone floor, seamless plaster walls, a graphite wainscot and rose-gold vault ribs; a pair of graphite door leaves with push bars in every
+     doorway frame (2–4.4 cm on the wall face); the light rig neutral white (same signature: 3 directional + 1 hemisphere). The MATCH HALL keeps its own look
+     (its lights unchanged). M20 review (LOW must never get heavier): no surface-detail shaders where the tier's texture edge is 512 (LOW: the plain
+     materials, as before), and the static trims are merged per material — baseboards, panel seams and door leaves one graphite draw, the cornices one,
+     the columns, floor ring, wainscot cap and push bars one steel draw, the ceiling strips one (were 50+ single boxes): every tier draws fewer. */
+  var SHOPR = room === 'CLOTHING_SHOP' || room === 'WEAPON_SHOP' || !!play.room_shop, TCE = (function () { try { var tc = defaultTextureCap(); return tc ? tc.maxEdge() : 0; } catch (e) { return 0; } })(), SDT = TCE && TCE <= 512 ? null : (opts.shadows ? 'HIGH' : 'MED');   /* surface-detail tier: HIGH where the rig casts shadows (the HIGH tier), MED otherwise, none on LOW (texture edge 512) */
   var M = {
     floor: SHOPR ? new THREE.MeshStandardMaterial({ color: 0x8e9093, roughness: 0.4, metalness: 0.04 }) : new THREE.MeshStandardMaterial({ color: 0x2c2f35, roughness: 0.8, metalness: 0.02 }),
     wall: SHOPR ? new THREE.MeshStandardMaterial({ color: 0xb9b8b7, roughness: 0.72, metalness: 0.02 }) : new THREE.MeshStandardMaterial({ color: 0x9c9ea2, roughness: 0.66, metalness: 0.08 }),
@@ -31,38 +34,41 @@ export function buildInterior(THREE, group, play, helpers) {
     blue: new THREE.MeshStandardMaterial({ color: 0x4f8cff, emissive: 0x163f9d, emissiveIntensity: 0.72, roughness: 0.2, metalness: 0.68 }),
     rose: new THREE.MeshStandardMaterial({ color: 0xd58ab4, emissive: 0x7a2f5a, emissiveIntensity: 0.48, roughness: 0.28, metalness: 0.62 })
   };
-  if (room !== 'MATCH_HALL') { applySurface(THREE, M.floor, SHOPR ? 'PLAZA' : 'KERB', SDT); applySurface(THREE, M.wall, SHOPR ? 'CONCRETE' : 'COMPOSITE', SDT); applySurface(THREE, M.ceil, 'CONCRETE', SDT); applySurface(THREE, M.steel, 'BRUSHED', SDT); }   /* gym: 1 m rubber tiles and composite wall panels · market: honed stone bond and seamless plaster (a panel grid read as bathroom tiles) · a seamless acoustic ceiling */
+  if (room !== 'MATCH_HALL' && SDT) { applySurface(THREE, M.floor, SHOPR ? 'PLAZA' : 'KERB', SDT); applySurface(THREE, M.wall, SHOPR ? 'CONCRETE' : 'COMPOSITE', SDT); applySurface(THREE, M.ceil, 'CONCRETE', SDT); applySurface(THREE, M.steel, 'BRUSHED', SDT); }   /* gym: 1 m rubber tiles and composite wall panels · market: honed stone bond and seamless plaster (a panel grid read as bathroom tiles) · a seamless acoustic ceiling */
   var solids = [];   /* camera-boom solids (BOX in room metres) */
   function box(w, h, d, mat, x, y, z) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); group.add(m); return m; }
   if (room === 'MATCH_HALL' && WORLD && WORLD.buildInterior) { var wreg = WORLD.ctx ? WORLD.ctx.registry : null; var mh = WORLD.buildInterior('MATCH_HALL', group, wreg && wreg.rooms_added ? wreg.rooms_added.MATCH_HALL : null);
     if (mh) { H = mh.ceiling_m || H; addLights(); doorway(); var readyM = new Promise(function (res) { var done = function () { res(true); }; if (opts.slowMs) setTimeout(done, opts.slowMs); else (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : setTimeout)(done); }); return { solids: mh.solids || [], ready: readyM, ceiling_m: H, size_m: size, world: 'MATCH_HALL', arena: mh.arena, tiers: mh.tiers, draw_calls: mh.draw_calls, tris: mh.tris }; } }
   /* floor + inlay ring */
   var floor = new THREE.Mesh(new THREE.PlaneGeometry(size, size), M.floor); floor.rotation.x = -Math.PI / 2; floor.position.y = 0.01; floor.receiveShadow = true; group.add(floor);
-  var ring = new THREE.Mesh(new THREE.RingGeometry(half * 0.385, half * 0.395, 96), M.chrome);   /* M20: a thin brushed-steel inlay (was a glowing white band) */ ring.rotation.x = -Math.PI / 2; ring.position.y = 0.02; group.add(ring);
+  var ringG = new THREE.RingGeometry(half * 0.385, half * 0.395, 96); ringG.rotateX(-Math.PI / 2); ringG.translate(0, 0.02, 0);   /* M20: a thin brushed-steel inlay (was a glowing white band); merged into the steel draw below */
   /* walls: panels with a baseboard and a cornice, thick enough for the camera probe; the doorway wall (+z) gets the lit frame at the exit point */
   var T = 0.6; [[0, -half - T / 2, size + 2 * T, T], [0, half + T / 2, size + 2 * T, T], [-half - T / 2, 0, T, size], [half + T / 2, 0, T, size]].forEach(function (w, i) { var m = box(w[2], H, w[3], M.wall, w[0], H / 2, w[1]); solids.push({ id: 'WALL_' + i, type: 'BOX', x1: w[0] - w[2] / 2, x2: w[0] + w[2] / 2, z1: w[1] - w[3] / 2, z2: w[1] + w[3] / 2, h: H, y0: 0 }); });
   /* baseboard / cornice trims and panel seams */
-  [[0, -half + 0.02, size, 0], [0, half - 0.02, size, 0], [-half + 0.02, 0, size, Math.PI / 2], [half - 0.02, 0, size, Math.PI / 2]].forEach(function (w) { var b = box(w[2], 0.12, 0.05, M.dark, w[0], 0.06, w[1]); b.rotation.y = w[3]; var c = box(w[2], 0.08, 0.05, M.trim, w[0], H - 0.3, w[1]); c.rotation.y = w[3]; for (var s = -half + 3; s < half; s += 3) { var seam = box(0.04, H - 0.5, 0.05, M.dark, w[3] ? w[0] : s, H / 2 - 0.1, w[3] ? s : w[1]); seam.rotation.y = w[3]; } });
-  (function () { var wsP = [], cpP = [], wh = SHOPR ? 0.9 : 1.2; [[0, -half + 0.015, size, 0], [0, half - 0.015, size, 0], [-half + 0.015, 0, size, Math.PI / 2], [half - 0.015, 0, size, Math.PI / 2]].forEach(function (w) { var a = new THREE.BoxGeometry(w[2] - 0.02, wh, 0.03), c = new THREE.BoxGeometry(w[2] - 0.02, 0.03, 0.045); a.rotateY(w[3]); a.translate(w[0], wh / 2, w[1]); c.rotateY(w[3]); c.translate(w[0], wh + 0.015, w[1]); wsP.push(a); cpP.push(c); });
-    [[wsP, SHOPR ? M.dark : M.panel], [cpP, M.chrome]].forEach(function (B) { var m = new THREE.Mesh(mergeGeometries(B[0], false), B[1]); B[0].forEach(function (q) { q.dispose(); }); group.add(m); }); })();   /* M20: a wainscot (gym: dark impact panels to 1.2 m; market: graphite to 0.9 m) under a brushed steel cap — 3–4.5 cm on the wall face, 2 merged draws */
+  var DK = [], TR = [], CH = [], ST = [], PN = [], EXD = play.exit && play.exit.position ? { x: play.exit.position.x, h: (plan && plan.portal && plan.portal.half_width_m || 1.5) + 0.11 } : null;   /* merged static trims per material (graphite, cornice, steel, strip, gym wainscot); EXD: the doorway run of the +z wall (jamb outer faces) */
+  function part(list, w, h, d, x, y, z, ry) { var q = new THREE.BoxGeometry(w, h, d); if (ry) q.rotateY(ry); q.translate(x, y, z); list.push(q); return q; }
+  function runs(i) { return (i === 1 && EXD ? [[-half, EXD.x - EXD.h], [EXD.x + EXD.h, half]] : [[-half, half]]).filter(function (r) { return r[1] - r[0] > 0.05; }); }   /* the +z wall's trims stop at the door frame */
+  var wh = SHOPR ? 0.9 : 1.2; [[0, -half, 0], [0, half, 0], [-half, 0, Math.PI / 2], [half, 0, Math.PI / 2]].forEach(function (w, i) { var sg = i % 2 ? -1 : 1; runs(i).forEach(function (r) { var L = r[1] - r[0], m = (r[0] + r[1]) / 2; function at(o) { return w[2] ? [w[0] + sg * o, m] : [m, w[1] + sg * o]; }
+    var p = at(0.02); part(DK, L, 0.12, 0.05, p[0], 0.06, p[1], w[2]); part(TR, L, 0.08, 0.05, p[0], H - 0.3, p[1], w[2]); var q = at(0.015); part(SHOPR ? DK : PN, L - 0.02, wh, 0.03, q[0], wh / 2, q[1], w[2]); part(CH, L - 0.02, 0.03, 0.045, q[0], wh + 0.015, q[1], w[2]); });
+    for (var s = -half + 3; s < half; s += 3) { if (i === 1 && EXD && Math.abs(s - EXD.x) < EXD.h) continue; var p2 = w[2] ? [w[0] + sg * 0.02, s] : [s, w[1] + sg * 0.02]; part(DK, 0.04, H - 0.5, 0.05, p2[0], H / 2 - 0.1, p2[1], w[2]); } });   /* M20: a wainscot (gym: dark impact panels to 1.2 m; market: graphite to 0.9 m) under a brushed steel cap — 3–4.5 cm on the wall face */
   /* ceiling with light strips */
   var ceil = new THREE.Mesh(new THREE.PlaneGeometry(size, size), M.ceil); ceil.rotation.x = Math.PI / 2; ceil.position.y = H; group.add(ceil);
-  for (var sx = -half + 2.5; sx < half; sx += 5) { box(0.14, 0.04, size * 0.86, M.strip, sx, H - 0.05, 0); }
+  for (var sx = -half + 2.5; sx < half; sx += 5) { part(ST, 0.14, 0.04, size * 0.86, sx, H - 0.05, 0); }
   /* the hall's own light: a cool hemisphere fill + one soft key from above (the shared base lights are dim; lights live in the group so a room change clears them) */
   /* the SAME light signature as the daytime field (3 directional + 1 hemisphere, the same shadow-casting count, fog present): the character's shader programs stay valid across the door — no per-entry recompile */
   addLights(true); function addLights(neutral) {
   var hemi = neutral ? new THREE.HemisphereLight(0xeef0f3, 0x33363c, 1.4) : new THREE.HemisphereLight(0xdfe8ff, 0x2a3140, 1.45); group.add(hemi);   /* M20: a neutral white rig in the halls (the MATCH HALL keeps its own) */ var key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(4, H, 6); if (opts.shadows) { key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = -half; key.shadow.camera.right = half; key.shadow.camera.top = half; key.shadow.camera.bottom = -half; key.shadow.camera.near = 0.5; key.shadow.camera.far = H + 20; } group.add(key); group.add(key.target); var rim = new THREE.DirectionalLight(neutral ? 0xe8eaee : 0xbfd8ff, 0.4); rim.position.set(-6, H * 0.7, -5); group.add(rim); var fill = new THREE.DirectionalLight(neutral ? 0xeceef1 : 0xcfe0ff, 0.3); fill.position.set(0, H * 0.5, 8); group.add(fill); }
   /* corner columns */
-  [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { var col = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, H, 16), M.chrome); col.position.set(c[0] * (half - 0.6), H / 2, c[1] * (half - 0.6)); group.add(col); });
+  [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { var col = new THREE.CylinderGeometry(0.32, 0.38, H, 16); col.translate(c[0] * (half - 0.6), H / 2, c[1] * (half - 0.6)); CH.push(col); });
   /* the doorway: a lit frame around the exit point on the +z wall */
-  doorway(); function doorway() {
+  doorway(); CH.push(ringG); [[DK, M.dark], [TR, M.trim], [CH, M.chrome], [ST, M.strip], [PN, M.panel]].forEach(function (B) { if (!B[0].length) return; var mm = new THREE.Mesh(mergeGeometries(B[0], false), B[1]); B[0].forEach(function (q) { q.dispose(); }); group.add(mm); }); function doorway() {
     var ex = play.exit; if (!ex || !ex.position) return;
     var dx = ex.position.x, dz = half, doorHalf = plan && plan.portal && plan.portal.half_width_m || 1.5, doorH = Math.min(H - 0.8, plan && plan.portal && plan.portal.height_m || 3.2);
     [-1, 1].forEach(function (s) { box(0.22, doorH, 0.3, M.chrome, dx + s * doorHalf, doorH / 2, dz - 0.15); });
     box(doorHalf * 2 + 0.3, 0.22, 0.3, M.chrome, dx, doorH + 0.11, dz - 0.15); box(doorHalf * 2 - 0.2, 0.06, 0.06, M.trim, dx, doorH - 0.12, dz - 0.32);
     var pad = new THREE.Mesh(new THREE.RingGeometry(ex.range_m - 0.12, ex.range_m, 40), M.trim); pad.rotation.x = -Math.PI / 2; pad.position.set(dx, 0.02, ex.position.z); group.add(pad);
     var doorTex = canvasTex(512, 96, function (g, w, h) { g.fillStyle = '#0b1220'; g.fillRect(0, 0, w, h); g.font = '600 44px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#dff3ff'; g.fillText('EXIT', w / 2, h / 2); });
-    if (room !== 'MATCH_HALL') { var leafM = new THREE.MeshStandardMaterial({ color: 0x14171c, roughness: 0.2, metalness: 0.4, emissive: 0xe9ebef, emissiveIntensity: 0.22 }); box(doorHalf * 2 - 0.2, doorH - 0.04, 0.03, leafM, dx, (doorH - 0.04) / 2, dz - 0.05); }   /* M20: a smoked-glass door leaf lit from outside inside the frame (the frame stood on bare wall) */
+    if (room !== 'MATCH_HALL') { var lw = doorHalf - 0.116, lh = doorH - 0.02; [-1, 1].forEach(function (sd) { var lx = dx + sd * (0.006 + lw / 2); part(DK, lw, lh, 0.02, lx, lh / 2, dz - 0.01); part(CH, lw * 0.62, 0.04, 0.024, lx, 1.05, dz - 0.032); }); }   /* M20: a pair of graphite door leaves with steel push bars inside the frame (the frame stood on bare wall; a single pale leaf read as a placeholder sticker) — 2 cm, the bars 4.4 cm on the wall face */
     var sign = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.3), new THREE.MeshBasicMaterial({ map: doorTex })); sign.position.set(dx, Math.min(H - 0.35, doorH + 0.45), dz - 0.34); sign.rotation.y = Math.PI; group.add(sign);
   }
   /* the host's walkable platforms at their exact boxes (equipment / counter) */
