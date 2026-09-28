@@ -32,7 +32,10 @@ export var SIZING = { melee_unit_m: 2.5, max_aoe_radius_m: 6.25, max_strike_reac
 export var IDENTITY_ORDER = ['ATHLETE', 'TITAN', 'LEAN', 'VISIONARY', 'BAGE'];   /* the five permanent class gems round the centre: gold, blue, crimson, violet, pink */
 /* the neutral palette (display values): every dormant / ready colour is white or pale ice (colour law: NEUTRAL or the BLUE window, never
    a class colour's saturation) */
-export var PALETTE = { ice: 0xb3d1ff, core: 0xe0edff, ready: 0xeef4ff, pearl: PEARL_HEX, fill_day: 0xd2def0, fill_night: 0x0d1320, sky_day: 0xd6e6fa, sky_night: 0x2b3f6b };
+/* M20 CLASS IDENTITY (owner 2026-09-28: "Correct the current BLUE dominance"; the courts are shared ground): the dormant court is pearl and
+   platinum — the pale-ice tones (TITAN's end of white) are equal-channel greys of the same value; the day sky sheen is neutral (the day sky is
+   violet-grey, not blue); the night sky sheen keeps the night sky's own blue (natural light, not a class accent) */
+export var PALETTE = { ice: 0xcccccc, core: 0xebebeb, ready: 0xf3f3f3, pearl: PEARL_HEX, fill_day: 0xdcdcdc, fill_night: 0x111214, sky_day: 0xe2e2e2, sky_night: 0x2b3f6b };
 
 export function combatZoneList(reg) { var C = (reg && reg.combat_zones) || {}, PL = C.playable_m || SIZING.playable_m, BO = C.border_m === undefined ? SIZING.border_m : C.border_m;
   return (C.list || []).filter(function (z) { return z && isFinite(z.x) && isFinite(z.z); }).map(function (z) { var o = Object.assign({ playable_m: PL, border_m: BO, yaw_deg: 45, y: 0 }, z); o.size_m = o.playable_m + 2 * o.border_m; return o; }); }

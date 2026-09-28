@@ -148,7 +148,7 @@ export function createFixtures(ctx) {
     streaks = createReflectionStreaks(THREE, lampList, { tier: FT, night: night, name: 'FIXTURE_WET_REFLECTIONS' }); if (streaks) { group.add(streaks.mesh); drawCalls++; }   /* M15: the polished night floor mirrors every luminaire as a streak toward the viewer */
 
     /* the few real lights: never shadow-casting, always present (a constant light count keeps one shader variant — intensity 0 is "off") */
-    for (var k = 0; k < nLights; k++) { var L = new THREE.PointLight(0xe3eaff, 0, reach, 2); L.castShadow = false; L.name = 'FIXTURE_LIGHT_' + k; L.position.set(0, headY, 0); group.add(L); lights.push(L); lightFix.push(-1); lightTarget.push(0); }
+    for (var k = 0; k < nLights; k++) { var L = new THREE.PointLight(0xf0f0f0, 0, reach, 2);   /* M20 CLASS IDENTITY: an unanchored light is equal-channel white (was TITAN's pale blue); an anchored one takes its lamp's cast tint */ L.castShadow = false; L.name = 'FIXTURE_LIGHT_' + k; L.position.set(0, headY, 0); group.add(L); lights.push(L); lightFix.push(-1); lightTarget.push(0); }
     bestN = Math.min(nLights, n); bestIdx = new Int32Array(Math.max(1, bestN)); bestD2 = new Float32Array(Math.max(1, bestN));
     built = true; acc = HOP_INTERVAL_S;
     log(n + ' fixtures (' + (F.kind || 'STREET_LIGHT') + ', pole ' + poleH + ' m), ' + nLights + ' dynamic lights (reach ' + reach + ' m), ' + drawCalls + ' draw calls, ' + (night ? 'night' : 'day'));
@@ -163,7 +163,7 @@ export function createFixtures(ctx) {
       while (j > 0 && bestD2[j - 1] > d2) { bestD2[j] = bestD2[j - 1]; bestIdx[j] = bestIdx[j - 1]; j--; } bestD2[j] = d2; bestIdx[j] = i; }
     for (k = 0; k < lights.length; k++) { f = lightFix[k]; var keep = false; if (f >= 0) for (q = 0; q < m; q++) if (bestIdx[q] === f) { keep = true; break; } if (!keep) lightFix[k] = -1; }
     for (q = 0; q < m; q++) { var idx = bestIdx[q]; var claimed = false; for (k = 0; k < lights.length; k++) if (lightFix[k] === idx) { claimed = true; break; } if (claimed) continue;
-      for (k = 0; k < lights.length; k++) if (lightFix[k] < 0) { lightFix[k] = idx; lights[k].position.set(hx[idx], hy[idx], hz[idx]); lights[k].intensity = 0; if (lampTint && lampTint[idx]) lights[k].color.copy(lampTint[idx]); else lights[k].color.setHex(0xe3eaff); break; } }   /* M19: a warm lamp lights the player warm */
+      for (k = 0; k < lights.length; k++) if (lightFix[k] < 0) { lightFix[k] = idx; lights[k].position.set(hx[idx], hy[idx], hz[idx]); lights[k].intensity = 0; if (lampTint && lampTint[idx]) lights[k].color.copy(lampTint[idx]); else lights[k].color.setHex(0xf0f0f0); break; } }   /* M19: a warm lamp lights the player warm */
     var near2 = NEAR_POLE_M * NEAR_POLE_M;
     for (k = 0; k < lights.length; k++) { f = lightFix[k]; if (f < 0) { lightTarget[k] = 0; continue; }
       if (night) lightTarget[k] = LIGHT_NIGHT; else { var ddx = px[f] - pxp, ddz = pz[f] - pzp; lightTarget[k] = (ddx * ddx + ddz * ddz <= near2) ? LIGHT_DAY_NEAR : 0; } }

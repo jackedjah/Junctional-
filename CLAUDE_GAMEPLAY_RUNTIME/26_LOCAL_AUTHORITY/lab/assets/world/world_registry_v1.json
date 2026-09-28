@@ -888,7 +888,7 @@
   "civic": {
    "name": "CIVIC",
    "tint": "#d9e2ea",
-   "accent": "#dfe8ff",
+   "accent": "#e6e6e6",
    "note": "colour law 2026-09-25: civic accents are neutral white light (was cyan); platinum + cyan / blue"
   },
   "gym": {
@@ -900,7 +900,7 @@
   "match": {
    "name": "MATCH",
    "tint": "#151a21",
-   "accent": "#dfe8ff",
+   "accent": "#e6e6e6",
    "note": "colour law 2026-09-25: MAH MATCH is black / graphite + neutral white light (was cyan); black / graphite + cyan-blue luminous lines"
   },
   "forest": {
@@ -912,7 +912,7 @@
   "market": {
    "name": "MARKET",
    "tint": "#e3e6ec",
-   "accent": "#b98cf0",
+   "accent": "#f08ab8",
    "note": "polished platinum + restrained amethyst / rose / champagne"
   }
  },
@@ -923,7 +923,9 @@
    "color": "#d4cbb4",
    "envMapIntensity": 0.5,
    "emissive": "#7a5a14",
-   "emissiveIntensity": 0.09
+   "emissiveIntensity": 0.09,
+   "gild": 0.62,
+   "note_m20": "M20 identity pass: gild 0.62 - fieldScene.applyLandmarkLook pulls the derivative's bronze / amber texels (display hue 20-35 deg) toward gold (~40-46 deg lit and tone-mapped) in linear light, keeping their order and value: the GOLD temple reads gold, not bronze"
   },
   "gym": {
    "family": "gold",
@@ -1470,8 +1472,8 @@
  "fixtures": {
   "kind": "CYAN_STREET_LIGHT",
   "pole_h": 7.2,
-  "head_color": "#bfe6ff",
-  "emissive": "#6fc3ff",
+  "head_color": "#e6e6e6",
+  "emissive": "#4a7cff",
   "spacing_m": 14,
   "side_offset_m": 11.5,
   "plaza_ring_r": 60,
@@ -1480,7 +1482,8 @@
   "dynamic_light_reach_m": 16,
   "day_pool_alpha": 0.05,
   "night_pool_alpha": 0.7,
-  "note": "instanced pole + head (2 draw calls) + additive light-pool decals; only 3 non-shadowing PointLights hop between the nearest fixtures"
+  "note": "instanced pole + head (2 draw calls) + additive light-pool decals; only 3 non-shadowing PointLights hop between the nearest fixtures",
+  "note_m20": "M20 identity pass: the registry lamp light is the TITAN lamp head only (every other lamp takes its class or neutral light in fixtures.js) - #4a7cff holds 218-221 deg through ACES at the head emissive 0.35-2.0 (the old #6fc3ff rendered cyan 197-200 deg, off the colour law, from 0.6 up); head_color is superseded (neutral)"
  },
  "ground": {
   "policy": "OPAQUE_PLATINUM",
@@ -3056,7 +3059,7 @@
  "paths": {
   "_doc": "owner next-pass 2026-09-20 §9: MAJOR ROADS ≈ 2.5–3× the B3 lanes (causeway 20 m, regional 8 m, trail 3 m) — real navigable MAHWORLD paths with heat-grey framing + restrained class-coloured seams. A primary road NEVER ends at a building door / side / back: CAUSEWAY → FORECOURT (a class-coloured crystalline disc in front of the real entrance or the landmark face) → optional short ENTRANCE SPUR aligned with the door. Flat inlays ≤ 0.02 m: no collider, no lane change (the walk lanes are the routes).",
   "frame_color": "#dfe6ee",
-  "causeway_core": "#cfe8ff",
+  "causeway_core": "#dedede",
   "causeway_w": 20,
   "regional_w": 8,
   "trail_w": 3,
@@ -5705,7 +5708,8 @@
     ],
     "note": "the open, collision-backed plaza floor is the civic connector; its four short rendered thresholds terminate at real doors"
    }
-  ]
+  ],
+  "m20_identity": "M20 identity pass (owner 2026-09-28): the causeway core is equal-channel platinum (was #cfe8ff, a pale TITAN blue that turned every causeway and forecourt - the ATHLETE temple approach, the gym forecourt - steel blue by day and night); the route seams keep their class colours (wayfinding)"
  },
  "ground_detail": {
   "_doc": "macro / meso / micro ground layers (owner redirect §E): MACRO = one translucent region tint sheet per region (the platinum floor stays the base), MESO = instanced crystal shard clusters in the region family (seeded, excluded from routes / paths / plaza / landmarks / doors; ≤ 0.35 m tall: decorative, no collider, never in a lane), MICRO = an additive crystal-dust point field. Surface tags name what each layer is for the map / future footstep audio.",

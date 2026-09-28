@@ -10,7 +10,11 @@
 
 var ENV_INTENSITY = 0.5;                                   /* the derivative PBR stays as exported; only the environment reflection is tamed */
 var PAD_T = 0.02, PAD_MARGIN_M = 0.35, PAD_SEGMENTS = 48;  /* graphite ground disc under the projector */
-var HOLO = { color: 0x3fb8ff, day: 0.35, night: 0.9, weightByAlbedo: true };   /* weightByAlbedo: the glow follows the base-colour texture (bright display glows, graphite body does not) — the derivative is one primitive, so this is the only way to keep the glow "on the display"; false = uniform emissive over the whole mesh */
+/* M20 CLASS IDENTITY (owner 2026-09-28: "Correct the current BLUE dominance"; colour law): the hologram emissive 0x3fb8ff rendered CYAN (194–197°
+   through ACES at 0.35–2.0 — off the colour law). It is equal-channel white now, so the glow takes the display's own colour from its texture
+   (weightByAlbedo: the beacon's albedo is the MAH GYM projector's own blue, 210–219°, inside the law). The MAH GYM's blue treatment is the
+   owner's M6 checkpoint and is kept; the hologram is no longer a cyan of its own. */
+var HOLO = { color: 0xf0f0f0, day: 0.35, night: 0.9, weightByAlbedo: true };   /* weightByAlbedo: the glow follows the base-colour texture (bright display glows, graphite body does not) — the derivative is one primitive, so this is the only way to keep the glow "on the display"; false = uniform emissive over the whole mesh */
 var DISPLAY_RE = /display|screen|holo|panel/i;             /* if a future re-export splits the display into its own mesh, only that mesh gets the hologram */
 var LOD_HYSTERESIS = 0.05;
 

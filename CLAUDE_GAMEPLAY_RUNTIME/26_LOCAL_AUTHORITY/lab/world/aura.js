@@ -21,9 +21,9 @@ export var CLASS_TINT = { gold: 0xe6c36a, blue: 0x5a8cf0, purple: 0x9a78e0, pink
 export var CRYSTAL_TINT = { gold: 0xffd88a, blue: 0x8fb4ff, red: 0xff6f82, purple: 0xb99cff, pink: 0xffa6d4, white: 0xf4f6ff };
 
 var VERT = [
-  'attribute vec3 aP; attribute vec4 aS; attribute vec3 aC; attribute vec4 aK; attribute vec3 aX;',
+  'attribute vec3 aP; attribute vec4 aS; attribute vec3 aC; attribute vec4 aK; attribute vec4 aX;',   /* aX.w: the prism (0 five-class, 1 the NEXUS gold / pearl) */
   'uniform float uTime;',
-  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX; varying float vNear;',
+  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec4 vX; varying float vNear;',
   'void main() { vUv = position.xy; vC = aC; vK = aK; vS = aS; vX = aX;',
   '  vec4 mv = viewMatrix * vec4(aP, 1.0); vNear = smoothstep(3.0, 22.0, -mv.z);',   /* M14: an aura goes faint as the viewer walks into it (never in anyone's face) */
   '  float s = aS.x * (1.0 + 0.035 * sin(uTime * 0.29 + aK.z * 3.7)); mv.xy += position.xy * vec2(s, s * aS.y);',   /* M14: a slow breath in size, not only in brightness */   /* camera-facing quad; aS.y stretches it vertically (columns, falls) */
@@ -33,13 +33,14 @@ var VERT = [
 
 var FRAG = [
   'uniform float uTime; uniform float uGlobal; uniform float uFringe; uniform float uNight; uniform float uRingK; uniform float uBreakMin;',
-  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX; varying float vNear;',
+  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec4 vX; varying float vNear;',
   'float auH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
   'float auN(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(auH(vec2(i, 1.7)), auH(vec2(i + 1.0, 1.7)), f); }',
   'vec3 spectral(float t) { t = fract(t) * 7.0;',   /* M16 five-class prism, seven equal steps: violet → ice blue → white → gold → white → pink → crimson → violet (violet held ~40 % of the old cycle and crimson none) */
   '  vec3 v = vec3(0.706, 0.549, 1.0), i = vec3(0.498, 0.816, 1.0), w = vec3(0.957, 0.965, 1.0), g = vec3(1.0, 0.847, 0.541), p = vec3(1.0, 0.604, 0.824), c = vec3(1.0, 0.44, 0.51);',
   '  if (t < 1.0) return mix(v, i, t); if (t < 2.0) return mix(i, w, t - 1.0); if (t < 3.0) return mix(w, g, t - 2.0); if (t < 4.0) return mix(g, w, t - 3.0);',
   '  if (t < 5.0) return mix(w, p, t - 4.0); if (t < 6.0) return mix(p, c, t - 5.0); return mix(c, v, t - 6.0); }',   /* gold sits between two whites (gold straight into pink or crimson would pass orange); pink → crimson → violet stay pink / red */
+  'vec3 prism(float t) { if (vX.w < 0.5) return spectral(t); float k = 0.5 - 0.5 * cos(6.2831853 * t); return mix(vec3(0.95), vec3(1.0, 0.847, 0.541), k); }',   /* M20 CLASS IDENTITY (owner 2026-09-28: "PURPLE remains VISIONARY — not generic magic"): a SHARED element (the NEXUS emblem, the Sun\'s halo) runs the gold / pearl prism — gold at the band centre easing to equal-channel pearl at its edges and back, never violet or ice (the five-class prism opens on violet) */
   'vec3 vivid(float t) { t = clamp(t, 0.0, 1.0); vec3 i = vec3(0.498, 0.816, 1.0), v = vec3(0.706, 0.549, 1.0), p = vec3(1.0, 0.604, 0.824), g = vec3(1.0, 0.847, 0.541);',   /* a vivid prismatic band, ice → violet → pink → gold: it turns through magenta, never green */
   '  if (t < 0.33) return mix(i, v, t / 0.33); if (t < 0.66) return mix(v, p, (t - 0.33) / 0.33); return mix(p, g, (t - 0.66) / 0.34); }',
   'void main() { float r = length(vUv); if (r > 1.0) discard;',
@@ -51,9 +52,9 @@ var FRAG = [
   '  float brk = mix(1.0, smoothstep(0.25, 0.85, auN(ang * 2.6 + ph * 3.0 + t * 0.04) * 0.7 + auN(ang * 7.0 - t * 0.07) * 0.3), max(vX.y, uBreakMin));',   /* the ring breaks into soft arcs (M20: never less than uBreakMin — no closed UI circle anywhere) */
   '  float shimmer = 0.78 + 0.22 * sin(ang * 5.0 + t * 0.45 + ph) * sin(ang * 3.0 - t * 0.31 + ph * 1.7);',
   '  float viv = clamp(vK.y - 1.0, 0.0, 1.0), spk = min(vK.y, 1.0);',   /* spectral > 1: the vivid band (the Veil glory); ≤ 1: pearl-soft, unchanged */
-  '  vec3 sp = mix(mix(spectral(rr * 0.22 + 0.5 + 0.04 * sin(t * 0.2 + ph)), vec3(1.0), 0.3), vivid(rr * 0.3 + 0.5), viv);',
+  '  vec3 sp = mix(mix(prism(rr * 0.22 + 0.5 + 0.04 * sin(t * 0.2 + ph)), vec3(1.0), 0.3), vivid(rr * 0.3 + 0.5), viv);',
   '  vec3 col = vC * bloom + sp * band * spk * shimmer * arc * brk;',
-  '  col += spectral(r * 2.6 - t * 0.035 + ph) * bloom * 0.22 * spk * uFringe;',   /* faint interference fringes inside the bloom */
+  '  col += prism(r * 2.6 - t * 0.035 + ph) * bloom * 0.22 * spk * uFringe;',   /* faint interference fringes inside the bloom */
   '  float edge = 1.0 - smoothstep(0.86, 1.0, r);',
   '  gl_FragColor = vec4(col * vK.x * uGlobal * mix(1.0, vX.z, uNight) * edge * vNear, 1.0); }'
 ].join('\n');
@@ -61,18 +62,19 @@ var FRAG = [
 /* items: [{ x, y, z, size (m, quad half-extent), aspect (vertical stretch, 1 = round), ring (0..1 ring radius as a fraction of the quad; 0 =
    no ring), ringW (ring half-width as a fraction), tint (hex, the bloom colour), spectral (0..1 ring / fringe strength; 1..2 blends the ring toward the vivid prismatic band), intensity (day
    brightness, ~0.2–1), pull (m toward the camera), phase }]. Returns { mesh, uniforms, setNight(n), tick(t), count }. */
-/* extra per item: arc (1 = upper arc only), breakup (0..1, the ring dissolves into soft arcs; default 0.75), nightK (night brightness factor; default 1) */
+/* extra per item: arc (1 = upper arc only), breakup (0..1, the ring dissolves into soft arcs; default 0.75), nightK (night brightness factor; default 1),
+   prism ('gold' = the NEXUS gold / pearl prism for a shared element; default the five-class prism) */
 /* opts: isNight, tier, name, renderOrder, day / night (global levels), cull (true for a fixed field: frustum-cull it as one sphere),
    ringK (ring strength, default 0.55 — M20: rings are a soft haze; 1 = the old full-strength line), breakMin (the least ring breakup, default 0.85) */
 export function createAuraField(THREE, items, opts) {
   opts = opts || {}; var n = items.length; if (!n) return null;
   var base = new THREE.PlaneGeometry(2, 2); var g = new THREE.InstancedBufferGeometry(); g.index = base.index; g.setAttribute('position', base.attributes.position); g.instanceCount = n;
-  var P = new Float32Array(n * 3), S = new Float32Array(n * 4), C = new Float32Array(n * 3), K = new Float32Array(n * 4), X = new Float32Array(n * 3), col = new THREE.Color();
+  var P = new Float32Array(n * 3), S = new Float32Array(n * 4), C = new Float32Array(n * 3), K = new Float32Array(n * 4), X = new Float32Array(n * 4), col = new THREE.Color();
   items.forEach(function (it, i) { P[i * 3] = it.x; P[i * 3 + 1] = it.y; P[i * 3 + 2] = it.z;
     S[i * 4] = it.size || 10; S[i * 4 + 1] = it.aspect || 1; S[i * 4 + 2] = it.ring === undefined ? 0.62 : it.ring; S[i * 4 + 3] = it.pull || 0;
     col.set(it.tint === undefined ? SPECTRAL.white : it.tint); C[i * 3] = col.r; C[i * 3 + 1] = col.g; C[i * 3 + 2] = col.b;
-    K[i * 4] = it.intensity === undefined ? 0.5 : it.intensity; K[i * 4 + 1] = it.spectral === undefined ? 0.6 : it.spectral; K[i * 4 + 2] = it.phase === undefined ? i * 1.37 : it.phase; K[i * 4 + 3] = it.ringW === undefined ? 0.06 : it.ringW; X[i * 3] = it.arc ? 1 : 0; X[i * 3 + 1] = it.breakup === undefined ? 0.75 : it.breakup; X[i * 3 + 2] = it.nightK === undefined ? 1 : it.nightK; });
-  g.setAttribute('aP', new THREE.InstancedBufferAttribute(P, 3)); g.setAttribute('aS', new THREE.InstancedBufferAttribute(S, 4)); g.setAttribute('aC', new THREE.InstancedBufferAttribute(C, 3)); g.setAttribute('aK', new THREE.InstancedBufferAttribute(K, 4)); g.setAttribute('aX', new THREE.InstancedBufferAttribute(X, 3));
+    K[i * 4] = it.intensity === undefined ? 0.5 : it.intensity; K[i * 4 + 1] = it.spectral === undefined ? 0.6 : it.spectral; K[i * 4 + 2] = it.phase === undefined ? i * 1.37 : it.phase; K[i * 4 + 3] = it.ringW === undefined ? 0.06 : it.ringW; X[i * 4] = it.arc ? 1 : 0; X[i * 4 + 1] = it.breakup === undefined ? 0.75 : it.breakup; X[i * 4 + 2] = it.nightK === undefined ? 1 : it.nightK; X[i * 4 + 3] = it.prism === 'gold' ? 1 : 0; });
+  g.setAttribute('aP', new THREE.InstancedBufferAttribute(P, 3)); g.setAttribute('aS', new THREE.InstancedBufferAttribute(S, 4)); g.setAttribute('aC', new THREE.InstancedBufferAttribute(C, 3)); g.setAttribute('aK', new THREE.InstancedBufferAttribute(K, 4)); g.setAttribute('aX', new THREE.InstancedBufferAttribute(X, 4));
   var day = opts.day === undefined ? 0.55 : opts.day, nightK = opts.night === undefined ? 1.0 : opts.night;
   var uniforms = { uTime: { value: 0 }, uGlobal: { value: opts.isNight ? nightK : day }, uFringe: { value: opts.tier === 'LOW' ? 0 : 1 }, uNight: { value: opts.isNight ? 1 : 0 }, uRingK: { value: opts.ringK === undefined ? 0.55 : opts.ringK }, uBreakMin: { value: opts.breakMin === undefined ? 0.85 : opts.breakMin } };   /* M20: every field's rings are softened by default (the civic emblem and HALO fields included) */
   var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uniforms, transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, toneMapped: false });
@@ -101,7 +103,7 @@ export function createAura(ctx) {
     function at(d, l) { return function () { var c = ctx.cameraPos(); return [c.x + d[0] / l * D, c.y + d[1] / l * D, c.z + d[2] / l * D]; }; }
     var sunHalf = ((C.sun && +C.sun.apparent_deg) || 6.5) / 2, moonHalf = ((C.moon && +C.moon.apparent_deg) || 11) / 2;   /* M14: drawn in the sky backdrop with the bodies (never over a far massif); the corona clears the larger Moon's limb */
     var haloR = D * Math.tan(Math.max(22, sunHalf * 1.38) * Math.PI / 180), coronaR = D * Math.tan(Math.max(7, moonHalf * 1.3) * Math.PI / 180);
-    req.push({ x: 0, y: 0, z: 0, size: haloR / 0.8, ring: 0.8, ringW: 0.03, breakup: 0.45, tint: 0x000000, spectral: 1.0, intensity: 0.75, nightK: 0, phase: 0.7, follow: at(sd, sl),
+    req.push({ x: 0, y: 0, z: 0, size: haloR / 0.8, ring: 0.8, ringW: 0.03, breakup: 0.45, tint: 0x000000, spectral: 1.0, prism: 'gold', intensity: 0.75, nightK: 0, phase: 0.7, follow: at(sd, sl),   /* M20 CLASS IDENTITY: the Sun's halo is a warm gold / pearl arc (it opened on violet and ice blue — purple is VISIONARY's) */
       fade: function (t, n) { if (n) return 0; var u = ((t % 300) + 300) % 300; return Math.min(1, Math.max(0, u / 12)) * Math.min(1, Math.max(0, (75 - u) / 12)); } });
     req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x1e1e1e, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),   /* M19: a neutral equal-channel silver bloom (was 0x241c36, a violet wash ~75° wide round the Moon); the five-class ring stays */
       fade: function (t, n) { return n ? 1 : 0; } }); }
@@ -109,7 +111,7 @@ export function createAura(ctx) {
      its shell (the rings' inner band edge clears the shell radius), and two great light frames far out over the sea. */
   function skyForms(F) { var H = HALO_LAYOUT, cy = H.arrival_height_m + 22, R = H.shell_radius_m + 32;
     F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.26, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
-    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: CRYSTAL_TINT.blue, intensity: 0.22, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });   /* M16: the HALO gyroscope is gold + TITAN blue (was gold + violet) — the shared hub is not VISIONARY's; M20: fainter (0.34 / 0.3 → 0.26 / 0.22), and the ring shader now breaks it into drifting arcs */
+    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: CRYSTAL_TINT.white, intensity: 0.22, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });   /* M16: the HALO gyroscope is gold + TITAN blue (was gold + violet) — the shared hub is not VISIONARY's; M20: fainter (0.34 / 0.3 → 0.26 / 0.22), and the ring shader now breaks it into drifting arcs; M20 CLASS IDENTITY (owner 2026-09-28: "Correct the current BLUE dominance"): gold + pearl — the shared hub is family GOLD, and TITAN's blue stays in TITAN */
     /* M20 (owner 2026-09-27: "remove … redundant aura … visually noisy effects"): the four free-standing sky figures are REMOVED — the 110 m
        crimson hex frame over the southern sea (TS1 / V33: a pink wireframe box in the sky), the 80 m rose diamond far east (V04 night), the
        MAH MATCH octahedron (MA: a white wire gem beside the Sun) and the crimson icosahedron over the north-west terraces. Each read as a UI
