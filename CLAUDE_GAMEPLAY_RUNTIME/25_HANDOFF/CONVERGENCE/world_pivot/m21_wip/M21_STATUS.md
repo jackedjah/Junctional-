@@ -76,3 +76,13 @@ a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit
   cost is structural). Real cuts mean removing accepted M20 look (soft patches, bevel relief, wear channels, pits),
   each needing MED proof renders + regression risk, with no phone profile proving a real problem (static counts are
   not frame times; LOW held per law). Verdict: park until a physical-device profile justifies it.
+
+## M21 #7 defect audit (2026-09-29: rail cleared, one unidentified cluster flagged, fragment tweak reverted)
+- Gold rail (MX foreground) = the flat NEXUS gold inlay ring (RingGeometry #d9b25a, r52) at grazing angle. Fine at
+  player eye level (PLAZA frame shows warm granite, no bar); bold from low aerials as a landmark ring. NO CHANGE.
+- White square-diamond + pole cluster ~(30..36,-36..-28) + white humanoid groups on the east plaza: UNIDENTIFIED after
+  12 probes (ruled out: wayfinders/crowns/posts by instance positions, sprites, gear bush-hints, combat scale refs
+  which need ?scaleRefs, NEXUS-fragment cause, horses by name, gold census). Rays pass through to ground (shader-
+  displaced or points); base geometry sits at origin. A plaza-fragment shrink (fcl size x0.55 NEXUS-only) showed NO
+  visible effect and was REVERTED (unproven changes do not ship). Needs live-devtools follow-up or owner eyeball -
+  do not burn more blind probes.
