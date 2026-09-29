@@ -105,3 +105,15 @@ Add-on 01 pillars shipped + reviewed. Suite: 71 files, 38 ok, 656 checks, 33 kno
 Final review (V03/V07/V13/V21 day+night + MED): premium across the set; night street walls especially strong.
 No map expansion, no Character/MAHFITT/S08 touch, no deploy, no paid generation. Awaiting owner: first-character
 calibration authorization, LEAN decision, reuse-scope + tuft eyeball. Nothing here is owner-approved.
+
+## Targeted batch (owner 2026-09-29: module boundary, LEAN, waterfall, clouds) - DONE
+- Module: CLAUDE_RUNTIME_FOUNDATION/package.json {"type":"module"} + terrain "stripes"->"banding" comment (no guard
+  change). Suite went 71 files 38 ok / 656 checks / 33 fail -> 69 ok / 1530 checks / 2 fail. Remaining: legs_faithful
+  (missing Character-lane GLB) + runtime (missing canon doc) - both explicit unavailable-source items, no action.
+  known_bridge_blocked_failures.txt reduced to those 2. Commit bc41bfa.
+- LEAN: house (-110,272)->(-102,252) + platform, colliders regen (4 LEAN shapes moved, 14 terrace trees re-scattered
+  coherently, --check IN SYNC), jobb check-27 prop accounting (27+3). Packet 03. Commit 9587f5b. KEEP.
+- Waterfall: front-veil hide isolation proved the veil load-bearing and the diagonal not-front-veil (likely rock crack
+  through translucent water); striping structural. No geometry defect demonstrated -> PARK, veilFalls.js untouched.
+- Clouds: red-tint isolation proved capsule small clouds are STREET-form (not HEAP); the STREET-targeted fix showed no
+  visible change at V21 (2x zoom) -> REVERTED. Parked. Do not retry without a new approach.
