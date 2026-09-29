@@ -69,3 +69,10 @@ a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit
   + spire crown show (a small red/white element floating high on the rock face). Any visibility correction needs
   relocation or ridge reshaping = a layout change. Per owner direction: STOP and FLAG rather than start a cascade.
 - Owner decision needed: relocate / reshape / accept as a ridge-crown folly. Red LEAN road + terrace groves read well.
+
+## M21 #6 MED shader cost (measured 2026-09-29: PARKED, no cut)
+- MED zonedPaving fragment: 167 ALU-tokens vs 103 at a330208 (+62% broad count; the +33% in the brief is a narrower
+  count - same direction). Fetches 4 vs 1. Spec-level trims move nothing (bevel:0 saves 6, grain/macro:0 save 0 -
+  cost is structural). Real cuts mean removing accepted M20 look (soft patches, bevel relief, wear channels, pits),
+  each needing MED proof renders + regression risk, with no phone profile proving a real problem (static counts are
+  not frame times; LOW held per law). Verdict: park until a physical-device profile justifies it.
