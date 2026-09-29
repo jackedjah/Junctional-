@@ -164,7 +164,7 @@ export function createTerrain(ctx) {
          BEND CORNERS            the courses FAN round the bend's inner corner, so the road visibly turns (rings there read as a
                                  bullseye in V25); the corner's edge course runs only along its outer kerb.
        Joints are 1–1.3 cm, filled darker, fading to their coverage before they can alias; a derivative bevel and a hair of per-stone tilt
-       near the eye (not on LOW). The regular diagonal 'vein' stripes and sine grain of the old core are gone (they read as a print). The
+       near the eye (not on LOW). The regular diagonal 'vein' banding and sine grain of the old core are gone (they read as a print). The
        kerb FRAME is honed granite now (metalness 0.78 → 0.3: it mirrored the sky), cut into 1 m stones along the road (radial on a disc),
        its outer arris catching the light. Night: the stone takes the wet-night sheen of the district floor (metalness 0.12 → 0.3, roughness
        0.6 → 0.5) instead of the old blue-lit core. Cost: the same draws / triangles; the world-grid seams of PAVER / KERB are off (seamless). */
