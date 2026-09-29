@@ -86,3 +86,12 @@ a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit
   displaced or points); base geometry sits at origin. A plaza-fragment shrink (fcl size x0.55 NEXUS-only) showed NO
   visible effect and was REVERTED (unproven changes do not ship). Needs live-devtools follow-up or owner eyeball -
   do not burn more blind probes.
+
+## M21 #7 audit close-out (2026-09-29)
+- Rail: cleared (flat NEXUS gold inlay ring, fine at eye level). Blue plaza splotch: authored floor-canvas paint. Horses: ambient life, fine.
+- Cream diamond-sprout cluster ~(30..36,-36..-28): 19 probes. Ruled out: wayfinders, sprites, gear hints, scale refs,
+  NEXUS-fragment cause (shrink had no effect, reverted), horses-by-name, road furniture, shards, courts (only 2 placed:
+  (45,110) + (-47,121.5)). Rays pass through (points/shader-displaced); base geometry at origin. Best remaining
+  hypothesis: meadow walk-side tufts with seed-head tops (unconfirmed). Crop evidence kept at refpack audit_crop paths
+  for owner eyeball - do not burn more blind probes; needs live devtools or a second camera side.
+- Suite: 71 files, 38 ok, 656 checks, 33 known-fail (mahgic_tree 30/0 only with static_dist present - kept deliberately).
