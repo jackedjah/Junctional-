@@ -7013,8 +7013,8 @@
     "id": "LEAN_SPIRE_HOUSE",
     "class": "LEAN",
     "family": "red",
-    "x": -110,
-    "z": 272,
+    "x": -102,
+    "z": 252,
     "terrace": "TERRACE_NW",
     "kind": "SPIRE_HOUSE",
     "_doc": "narrow, light, sharp: three slim platinum spires (24 / 18 / 14 m) with crimson crystal blades, a cut-through between them, and a flight-reachable TOP PLATFORM (walkable, 22 m) — the Lean class house",
@@ -7039,10 +7039,10 @@
      }
     ],
     "platform": {
-     "x1": -114,
-     "z1": 268,
-     "x2": -106,
-     "z2": 276,
+     "x1": -106,
+     "z1": 248,
+     "x2": -98,
+     "z2": 256,
      "h": 22
     },
     "crown": {
@@ -7051,7 +7051,8 @@
      "hover_m": 3,
      "spin_rps": 0.08,
      "bob_m": 0.5
-    }
+    },
+    "note_move_m21": "M21 reference add-on batch (owner: smallest coherent placement correction): moved (-110,272)->(-102,252), platform with it, so the spires clear the S150 ridge face (rock 31 m at the old site, 10 m at z259 falling south); 10 m east of its forecourt (-112,247), low rock backdrop to the north"
    },
    {
     "id": "VISIONARY_OVERLOOK",
