@@ -48,3 +48,11 @@ a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit
   warm_class_light 7/0, material_realism 10/0; build_static_demo 200 files clean. Independent review: KEEP (4/5 gates).
 - **Follow-up (queued, not started):** fascia-line travelling band in own-class colour (hook: architecture.js pushColored +
   ARCH_SEAMS uT; evidence: 1 house closeup clip) to close the existing-accent reuse gate. Then terrace grounding (M21 #3).
+
+## M21 #3 terrace grounding (done, OpenCode lead 2026-09-29, commit 3cf6db3)
+- 11 terrace-slab trees (FOREST_N_W/E + BAGE, gy 0.5, failing the bed-edge test) get merged soil discs (r = pitR)
+  + stone course rings (+0.35 m) in forest.js only: 2 draws, +0.8k tris, HIGH/MED (LOW builds none), flush decals
+  (max 2 cm proud, contactAO precedent), no registry / collider / geometry change. Packet: live_review packet 02 (W/E day/night + MED).
+- Route taken after a reverted shader attempt: a slabMat pit patch compiled but sampled nothing visible and then failed
+  program validation (slab vanished, hidden district-floor bed showed through) - root cause not isolated; reverted fully.
+  Flush merged decals chosen as the robust vehicle. Tests: tree_lod 8/0, material_realism 10/0, colour_law 4/0, host_safety 21/0.
