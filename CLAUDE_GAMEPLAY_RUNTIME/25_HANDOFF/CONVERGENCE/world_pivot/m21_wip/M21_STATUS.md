@@ -95,3 +95,13 @@ a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit
   hypothesis: meadow walk-side tufts with seed-head tops (unconfirmed). Crop evidence kept at refpack audit_crop paths
   for owner eyeball - do not burn more blind probes; needs live devtools or a second camera side.
 - Suite: 71 files, 38 ok, 656 checks, 33 known-fail (mahgic_tree 30/0 only with static_dist present - kept deliberately).
+
+## PRE-CHARACTER WORLD CHECKPOINT (OpenCode lead 2026-09-29)
+M21 worked through: #1 tone kept, #2 cloud patch reverted + source identified (3 HEAPs; visibles likely STREET/SHEET),
+#3 terrace pits shipped (11 trees, +2 draws), #4 falls rejected (structural striping, normal views strong), #5 LEAN
+flagged (needs owner layout decision), #6 MED cost parked (no safe cut; static counts are not frame times), #7 audit
+(rail cleared, paint authored, horses fine, one unidentified diamond-sprout cluster flagged for owner eyeball).
+Add-on 01 pillars shipped + reviewed. Suite: 71 files, 38 ok, 656 checks, 33 known-fail (owner-gated causes).
+Final review (V03/V07/V13/V21 day+night + MED): premium across the set; night street walls especially strong.
+No map expansion, no Character/MAHFITT/S08 touch, no deploy, no paid generation. Awaiting owner: first-character
+calibration authorization, LEAN decision, reuse-scope + tuft eyeball. Nothing here is owner-approved.
