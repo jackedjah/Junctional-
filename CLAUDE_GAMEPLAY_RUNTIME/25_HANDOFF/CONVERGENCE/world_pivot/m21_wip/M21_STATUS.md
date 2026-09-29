@@ -56,3 +56,16 @@ a clean PRE-CHARACTER WORLD CHECKPOINT. Character integration waits for explicit
 - Route taken after a reverted shader attempt: a slabMat pit patch compiled but sampled nothing visible and then failed
   program validation (slab vanished, hidden district-floor bed showed through) - root cause not isolated; reverted fully.
   Flush merged decals chosen as the robust vehicle. Tests: tree_lod 8/0, material_realism 10/0, colour_law 4/0, host_safety 21/0.
+
+## M21 #4 Veil close-range banding (assessed 2026-09-29: REJECTED, fully reverted, tree clean)
+- BEFORE at curtain base (WB1), lip (WB2), foot (FP): hard lateral striping + white core blowout + a diagonal sheet seam.
+- Tried: streak smoothstep 0.32-0.92 -> 0.22-0.95 and alpha floor 0.6 -> 0.68. AFTER: no obvious change at any cam.
+- Cause judgement: striping is structural (discrete vfStrand strands + sheet/boundary geometry, not the noise ramp);
+  the FP diagonal is a sheet boundary no ramp can feather. Normal views stay strong - no further falls shader churn
+  without owner direction. A geometry-pass note (hem/seam continuity) is the honest vehicle, not another constant tweak.
+
+## M21 #5 LEAN spire house (assessed 2026-09-29: FLAG, no fix attempted)
+- Rendered LEAN1/LEAN2 day: the house body is entirely inside MACRO_RIDGE_RIDGE_NEAR; only the 22 m platform edge
+  + spire crown show (a small red/white element floating high on the rock face). Any visibility correction needs
+  relocation or ridge reshaping = a layout change. Per owner direction: STOP and FLAG rather than start a cascade.
+- Owner decision needed: relocate / reshape / accept as a ridge-crown folly. Red LEAN road + terrace groves read well.
