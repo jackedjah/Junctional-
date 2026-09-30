@@ -23,3 +23,4 @@ E2 | gym + tower closeups (building character) | none - blue crystal = authorize
 P1-plaza | NE quadrant eye-level (PLNE) | none - bollard rows are functional lane-edging, planters/lamps intentional, plaza clean | SKIP | hp/plazane | none | P2 architecture scout (exchange)
 P2-arch | gym + tower + exchange closeups | none - crystal bush authorized, beacon functional, tower spectacular, exchange clean | SKIP | hp/build + exch | none | P3 aura (packet 04 kept) then P4 rock fins
 P4-rock | Veil fins 109/111 closeup (FIN2) | none - knife reads are silhouette/geometry; geometry move forbidden (collision bit-identical law), shading proven useless in M20 | PARK (principled) | hp/fins2 | none | CLOSE cycle
+VERIFY | LEAN-area post-move coherence (GROVE3) | none needed - re-scattered grove natural, pit discs present, no collisions, house proven in packet 03 | VERIFIED | hp/leanverify2 | +0 | CLOSE
