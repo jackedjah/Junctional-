@@ -117,3 +117,9 @@ calibration authorization, LEAN decision, reuse-scope + tuft eyeball. Nothing he
   through translucent water); striping structural. No geometry defect demonstrated -> PARK, veilFalls.js untouched.
 - Clouds: red-tint isolation proved capsule small clouds are STREET-form (not HEAP); the STREET-targeted fix showed no
   visible change at V21 (2x zoom) -> REVERTED. Parked. Do not retry without a new approach.
+
+## Aura enhancement (done 2026-09-30, verdict KEEP)
+- Fragment size x1.5 system-wide + day edge/body readability (0.55->0.7, 0.62->0.7; night endpoints untouched).
+  Same 85 instances, same sites/tints/drift, zero draw/tris change (points). Packet 04 (EDGEUP day/night vs worktree
+  baseline) + drift GIF. Tests: ambient 5/0, colour 4/0. Failed placement lesson applied: verified rendered output
+  (balloon diagnostic) before judging; LEAN-crown site rejected by clearance (0/4 placed).
