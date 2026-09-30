@@ -123,3 +123,8 @@ calibration authorization, LEAN decision, reuse-scope + tuft eyeball. Nothing he
   Same 85 instances, same sites/tints/drift, zero draw/tris change (points). Packet 04 (EDGEUP day/night vs worktree
   baseline) + drift GIF. Tests: ambient 5/0, colour 4/0. Failed placement lesson applied: verified rendered output
   (balloon diagnostic) before judging; LEAN-crown site rejected by clearance (0/4 placed).
+
+## Leaf material (done 2026-09-30, verdict KEEP)
+- Per-leaf tone variation (model-space 0.35 m hash + instance offset, x0.85-1.15 scalar, hue-safe) in the tree-lock
+  shader; footprint proven by B/W diagnostic (diff localized to crowns). Packet 05 (closeup day/night). Tests:
+  tree_lod 8/0, colour 4/0. Zero draw/tris/program change.
