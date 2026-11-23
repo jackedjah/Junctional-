@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121218">
+<meta name="description" content="MAHFITT is a training app by Jahsua Matthews. Try a guest workout, watch a real recorded workout, and see why the next target changes.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>MAHFITT · Jahsua Matthews</title>
+<link rel="icon" href="media/favicon-32.png">
+<link rel="apple-touch-icon" href="media/app-icon.png">
+<link rel="preload" href="fonts/space-grotesk.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <a class="bar__brand" href="#top"><img src="media/mahfitt-crest-gold.png" width="122" height="134" alt=""><span>Jahsua Matthews</span></a>
+  <a class="bar__cta" href="app/workout/">Guest workout</a>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-h">
+    <img class="hero__mark" src="media/mahfitt-full-gold.png" width="1172" height="384" alt="MAHFITT">
+    <h1 id="hero-h">Know what to train. Know why.</h1>
+    <p class="hero__lead">MAHFITT is a training app I designed and test on my phone. Start today’s workout, log each set, and the app works out your next target and tells you why.</p>
+    <div class="hero__acts">
+      <a class="btn btn--go" href="app/workout/">Try the guest workout</a>
+      <a class="btn" href="#watch">Watch a real workout</a>
+    </div>
+    <p class="hero__note">No account · sample data · about two minutes</p>
+  </section>
+
+  <section class="band" id="screens" aria-labelledby="screens-h">
+    <p class="kicker">The app today</p>
+    <h2 id="screens-h">Real screens from the current build</h2>
+    <p class="lead">Captured on a phone-sized screen with a sample account. Swipe or scroll sideways.</p>
+    <ol class="reel" aria-label="App screens">
+      <li><figure><img src="media/screens/home.webp" width="780" height="1688" loading="lazy" alt="MAHFITT Home: Today, Week and Workouts, then Community, MAH Habits, MAH Calendar, MAH Progress, Check In and Freestyle, with Home, Log, Calendar and Gym tabs."><figcaption><b>Home</b> Today, week and workouts, plus community, habits, calendar, progress and check-in.</figcaption></figure></li>
+      <li><figure><img src="media/screens/programs.webp" width="780" height="1688" loading="lazy" alt="MAH Programs: the Upper Strength program card, Program Library, Planner, Activity and Connected Apps &amp; Devices."><figcaption><b>Programs</b> Saved programs, the program library and the planner.</figcaption></figure></li>
+      <li><figure><img src="media/screens/live-workout.webp" width="780" height="1688" loading="lazy" alt="Live Workout for Upper A: timer, workout completion bar, the gym view, and Bench Press with three sets of 135 lbs by 10 reps."><figcaption><b>Live workout</b> Timer, completion bar and every set as weight × reps.</figcaption></figure></li>
+      <li><figure><img src="media/screens/sets-logged.webp" width="780" height="1688" loading="lazy" alt="Bench Press with all three sets logged and shown in green; the last set is 11 reps. Completion reads 33%."><figcaption><b>Logged sets</b> A logged set turns green. Change the numbers first if you did something different.</figcaption></figure></li>
+      <li><figure><img src="media/screens/finish.webp" width="780" height="1688" loading="lazy" alt="Finish this workout? dialog with Keep Working and Finish Workout buttons."><figcaption><b>Finish</b> One confirmation, so a stray tap can’t end a workout.</figcaption></figure></li>
+      <li><figure><img src="media/screens/recap.webp" width="780" height="1688" loading="lazy" alt="Workout recap for Upper A: time, 3 sets, 31 reps, 4,185 pounds moved, top set Bench Press 135 lb by 11."><figcaption><b>Recap</b> Time, sets, reps, pounds moved and the top set.</figcaption></figure></li>
+      <li><figure><img src="media/screens/progress.webp" width="780" height="1688" loading="lazy" alt="MAH Progress: MAH Media, Body Metrics, Activity, Program Library, Calculators and Workout Variables."><figcaption><b>Progress</b> Media, body metrics, activity, programs and calculators.</figcaption></figure></li>
+      <li><figure><img src="media/screens/meal-log.webp" width="780" height="1688" loading="lazy" alt="Meal Log: Auto Plan, Set Goal, macros and calories, meal filters for breakfast, lunch, dinner and snack, and today's meals."><figcaption><b>Meal log</b> Meals by type, macros and a calorie goal.</figcaption></figure></li>
+    </ol>
+  </section>
+
+  <section class="band band--split" id="watch" aria-labelledby="watch-h">
+    <div class="split__copy">
+      <p class="kicker">Recorded, not mocked up</p>
+      <h2 id="watch-h">Watch a real workout</h2>
+      <p class="lead">From the current build with a sample account: open Workouts, start Upper A, log three bench sets (the last one at 11 reps), finish, and read the recap.</p>
+      <p class="fine">33 seconds · no sound · recorded November 2026</p>
+    </div>
+    <figure class="phone">
+      <video controls muted playsinline preload="metadata" poster="media/real-workout-poster.jpg" width="600" height="1298" aria-describedby="watch-cap">
+        <source src="media/real-workout.webm" type="video/webm">
+        <source src="media/real-workout.mp4" type="video/mp4">
+      </video>
+      <figcaption id="watch-cap" class="sr">Screen recording of a MAHFITT workout: start Upper A, log three sets of bench press, finish and view the recap.</figcaption>
+    </figure>
+  </section>
+
+  <section class="band" id="why" aria-labelledby="why-h">
+    <p class="kicker">See why</p>
+    <h2 id="why-h">Why the next target changes</h2>
+    <p class="lead">After a workout, MAHFITT compares what you did with the target and explains the next one in plain words. The guest workout runs the same rules file as the app.</p>
+    <div class="example" aria-label="Example target change">
+      <div><span>Target</span><b>135 lbs × 10 / 10 / 10</b></div>
+      <div><span>You did</span><b>10 / 10 / 11 · 2 reps left</b></div>
+      <div class="example__next"><span>Next target</span><b>135 lbs × 11 / 10 / 10</b><em>+1 rep on set 1</em></div>
+    </div>
+    <ul class="rules">
+      <li><b>Reps first.</b> Hit the rep target with the planned effort (2 reps left) and one rep is added to the lowest set, one set at a time, inside an 8–12 range.</li>
+      <li><b>Then load.</b> Weight goes up 5 lbs, never more than 5% at once, after every set reaches 12 reps on two comparable workouts.</li>
+      <li><b>No guessing.</b> Pain, a skipped set or effort that wasn’t recorded makes the target hold or ask for review.</li>
+      <li><b>You choose how it applies.</b> Off keeps targets as written. Review First asks you to USE UPDATE or KEEP CURRENT. Automatic applies after each workout.</li>
+    </ul>
+    <a class="btn btn--go" href="app/workout/">Try it with your own numbers</a>
+  </section>
+
+  <section class="band" id="role" aria-labelledby="role-h">
+    <p class="kicker">My part</p>
+    <h2 id="role-h">What I did on MAHFITT</h2>
+    <div class="cards">
+      <article><h3>AI output review</h3><p>Defined how AI-generated workout plans must honor equipment, sets and rest periods. Offline testing passed 31 groups of output-quality checks and 15 groups of program-constraint checks.</p></article>
+      <article><h3>Image review</h3><p>Caught a generated exercise image that had passed review because the character added an unintended front raise, and specified the correct arm and weight position.</p></article>
+      <article><h3>Save recovery</h3><p>Defined how an interrupted save should recover. A local build passed 239 browser checks, including a retry that avoided creating a duplicate program.</p></article>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p><b>Jahsua Matthews</b> · Brooklyn, NY · <a href="mailto:jahsuamatthews@gmail.com">jahsuamatthews@gmail.com</a></p>
+  <nav aria-label="Other work"><a href="../mahworld/">MAHWORLD</a><a href="https://fob.systems/">FOB Systems</a><a href="https://www.junctionaltraining.com/">Junctional Training</a></nav>
+  <p class="fine">Screens and recording use a sample account. No real member data.</p>
+</footer>
+</body>
+</html>

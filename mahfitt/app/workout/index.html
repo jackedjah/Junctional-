@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121218">
+<meta name="description" content="Try a MAHFITT workout without an account: start, log a set, then see why your next target changed.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Guest workout · MAHFITT</title>
+<link rel="icon" href="../../media/favicon-32.png">
+<link rel="preload" href="../../fonts/space-grotesk.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="workout.css">
+<script src="cjs-shim.js"></script>
+<script src="progression.js"></script>
+<script src="workout-core.js"></script>
+<script src="workout.js" defer></script>
+</head>
+<body class="wk-page">
+<a class="wk-skip" href="#wk-main">Skip to the workout</a>
+<div class="wk-shell">
+  <header class="wk-crown" aria-label="Workout status">
+    <div class="wk-crown__row">
+      <a class="wk-crest" href="../../" aria-label="Back to the MAHFITT overview. Your guest workout keeps running in this tab."><img src="../../media/mahfitt-crest-gold.png" width="122" height="134" alt=""></a>
+      <img class="wk-mark" src="../../media/mahfitt-full-gold.png" width="1172" height="384" alt="MAHFITT">
+      <button class="wk-menu" type="button" data-a="menu" aria-haspopup="dialog" aria-label="Guest session options"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5"/></svg></button>
+    </div>
+    <p class="wk-title"><span data-title>UPPER A</span></p>
+    <span class="wk-clock"><span class="sr">Elapsed time </span><time data-clock datetime="PT0S">00:00:00</time></span>
+    <div class="wk-progress">
+      <div class="wk-progress__top"><span>WORKOUT COMPLETION</span><span class="wk-pct" data-pct>0%</span></div>
+      <div class="wk-track" data-track role="progressbar" aria-label="Workout completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i><b></b></div>
+      <div class="wk-meta"><span data-save data-state="ready">READY</span></div>
+    </div>
+    <p class="wk-date" data-date></p>
+  </header>
+  <main id="wk-main" class="wk-main" tabindex="-1">
+    <noscript><p class="wk-guide">This demo needs JavaScript. You can still <a href="../../#watch">watch a recorded workout</a>.</p></noscript>
+  </main>
+  <footer class="wk-foot">
+    <p><b>Guest workout · no account · sample data.</b> Saved only in this tab. Built to match the app’s Live Workout and runs the app’s own progression rules.</p>
+    <nav aria-label="More"><a href="../../">MAHFITT overview</a><a href="../../#watch">Watch a real workout</a></nav>
+  </footer>
+</div>
+
+<dialog class="wk-dialog" id="finish-dialog" aria-labelledby="finish-title">
+  <form method="dialog" class="wk-panel">
+    <p class="wk-kicker">LIVE WORKOUT</p>
+    <h2 id="finish-title">Finish this workout?</h2>
+    <p id="finish-body">Your sets and workout time will be saved.</p>
+    <div class="wk-acts"><button class="wk-ghost" value="keep" type="submit" autofocus>Keep working</button><button class="wk-go" value="finish" type="submit">Finish workout</button></div>
+  </form>
+</dialog>
+
+<dialog class="wk-dialog" id="menu-dialog" aria-labelledby="menu-title">
+  <form method="dialog" class="wk-panel">
+    <p class="wk-kicker">GUEST SESSION</p>
+    <h2 id="menu-title">Options</h2>
+    <div class="wk-settings" data-menu-settings></div>
+    <div class="wk-acts">
+      <button class="wk-ghost" type="button" data-a="discard" hidden>Discard this workout</button>
+      <button class="wk-ghost" type="button" data-a="reset">Reset guest session</button>
+      <button class="wk-go" value="close" type="submit">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="wk-dialog" id="confirm-dialog" aria-labelledby="confirm-title">
+  <form method="dialog" class="wk-panel">
+    <p class="wk-kicker" data-confirm-kicker>GUEST SESSION</p>
+    <h2 id="confirm-title" data-confirm-title>Reset the guest session?</h2>
+    <p data-confirm-body>Your sample workouts and targets in this tab are cleared.</p>
+    <div class="wk-acts"><button class="wk-ghost" value="cancel" type="submit" autofocus>Keep it</button><button class="wk-go" value="ok" type="submit" data-confirm-ok>Reset</button></div>
+  </form>
+</dialog>
+</body>
+</html>

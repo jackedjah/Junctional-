@@ -1,9 +1,8 @@
 # Portfolio pages (Jahsua Matthews)
 
-Self-contained copies of three public pages, each one HTML file with its images, fonts, styles and scripts inlined:
+Public project pages, served by GitHub Pages from this branch:
 
-- `mahfitt-overview.html` — MAHFITT overview, live at https://jahsua-mahfitt.netlify.app/
-- `mahfitt-guest-workout.html` — account-free guest workout, live at https://jahsua-mahfitt-workout.netlify.app/
-- `mahworld-overview.html` — MAHWORLD overview, live at https://jahsua-mahworld.netlify.app/
+- `mahfitt/` — MAHFITT overview and the account-free guest workout (`mahfitt/app/workout/`)
+- `mahworld/` — MAHWORLD overview (the game itself stays at mahdemo.fob.systems, password required)
 
 This branch is separate from the game code and shares no history with it.

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07101d">
+<meta name="description" content="MAHWORLD is a fitness MMORPG in very early development. Ride a 240-meter elevator to the HALO arena, then play a first-to-seven volleyball match against a bot.">
+<meta property="og:title" content="MAHWORLD · Play the early demo">
+<meta property="og:description" content="A fitness MMORPG in very early development, built solo by Jahsua Matthews.">
+<meta property="og:image" content="https://jackedjah.github.io/Junctional-/mahworld/media/halo-exterior.webp">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>MAHWORLD · Play the early demo</title>
+<link rel="preload" href="media/space-grotesk.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="media/halo-exterior.webp" as="image">
+<link rel="stylesheet" href="style.css">
+<script src="world.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap top__in"><span class="top__name">Jahsua Matthews</span><span class="top__role">Solo game project</span></div></header>
+<main id="main">
+  <section class="hero" aria-labelledby="hero-h">
+    <img class="hero__img" src="media/halo-exterior.webp" width="1440" height="900" alt="In-game view of the HALO arena: a glass dome with the court inside.">
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="wrap hero__in">
+      <h1 id="hero-h" class="hero__title">MAHWORLD</h1>
+      <p class="hero__what">MAHWORLD is a fitness MMORPG in very early development.</p>
+      <p class="hero__why">Ride a 240-meter elevator to the HALO arena, then play a first-to-seven volleyball match against a bot.</p>
+      <div class="gate">
+        <p class="gate__note" id="gate-note"><span class="gate__icon" aria-hidden="true"></span>Game demo password required. You’ll find it beside the MAHWORLD link on my résumé.</p>
+        <a class="play" data-play href="https://mahdemo.fob.systems/claude_gameplay_runtime/26_local_authority/lab/play?field=1" aria-describedby="gate-note">Play the early demo</a>
+      </div>
+      <p class="hero__fine">Opens the game’s password page. Keyboard or touch.</p>
+    </div>
+  </section>
+
+  <section class="journey" aria-labelledby="journey-h">
+    <div class="wrap">
+      <h2 id="journey-h" class="journey__title">Ride to HALO. First to seven against the bot.</h2>
+    </div>
+    <div class="wrap journey__grid">
+      <ol class="journey__steps">
+        <li class="jstep" data-shot="0">
+          <figure class="jstep__fig"><img src="media/mainland.webp" width="1440" height="900" loading="lazy" alt="Night-time mainland at ground level, with the tall elevator column rising beside the road."></figure>
+          <p class="jstep__k">01 · Ground</p>
+          <h3>Start on the mainland</h3>
+          <p>The elevator column rises from the road. Walk to it and board.</p>
+        </li>
+        <li class="jstep" data-shot="1">
+          <figure class="jstep__fig"><img src="media/halo-exterior.webp" width="1440" height="900" loading="lazy" alt="The glass HALO dome seen from outside, high above the city."></figure>
+          <p class="jstep__k">02 · Rise</p>
+          <h3>Ride 240 meters up</h3>
+          <p>A 20-second ride lifts you to the dome. The ride back down docks you on the mainland.</p>
+        </li>
+        <li class="jstep" data-shot="2">
+          <figure class="jstep__fig"><img src="media/arrival-court.webp" width="1440" height="900" loading="lazy" alt="The blue HALO arrival court with its docking station."></figure>
+          <p class="jstep__k">03 · Court</p>
+          <h3>Play to seven</h3>
+          <p>One bot, rally scoring, first to seven. Replay resets the score to 0–0. Leave the court any time.</p>
+        </li>
+      </ol>
+      <div class="journey__frame" aria-hidden="true">
+        <img data-frame="0" src="media/mainland.webp" width="1440" height="900" alt="" loading="lazy">
+        <img data-frame="1" src="media/halo-exterior.webp" width="1440" height="900" alt="" loading="lazy">
+        <img data-frame="2" src="media/arrival-court.webp" width="1440" height="900" alt="" loading="lazy">
+        <span class="journey__alt" data-alt>Ground</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="serve" aria-labelledby="serve-h">
+    <div class="wrap serve__grid">
+      <div>
+        <p class="kicker">Serve Lab</p>
+        <h2 id="serve-h">Five serves. Call your target.</h2>
+        <p class="lede">Aim left, center or right. Each landing is scored, then you can replay or leave.</p>
+        <div class="aim" role="group" aria-label="Pick a target to preview">
+          <button type="button" data-aim="left" aria-pressed="false">Left</button>
+          <button type="button" data-aim="center" aria-pressed="true">Center</button>
+          <button type="button" data-aim="right" aria-pressed="false">Right</button>
+        </div>
+        <p class="aim__note" data-aim-note aria-live="polite">Center picked. Now serve for real in the demo.</p>
+        <a class="play play--small" href="https://mahdemo.fob.systems/claude_gameplay_runtime/26_local_authority/lab/play?field=1">Play the Serve Lab</a>
+      </div>
+      <figure class="court" aria-hidden="true">
+        <svg viewBox="0 0 320 200" role="img">
+          <rect x="10" y="10" width="300" height="180" rx="4" class="court__floor"/>
+          <line x1="10" y1="100" x2="310" y2="100" class="court__net"/>
+          <rect x="22" y="22" width="88" height="66" class="zone" data-zone="left"/>
+          <rect x="116" y="22" width="88" height="66" class="zone" data-zone="center"/>
+          <rect x="210" y="22" width="88" height="66" class="zone" data-zone="right"/>
+          <text x="66" y="60" class="zone__t">LEFT</text><text x="160" y="60" class="zone__t">CENTER</text><text x="254" y="60" class="zone__t">RIGHT</text>
+          <circle cx="160" cy="170" r="7" class="court__you"/>
+          <text x="160" y="194" class="court__lbl">YOU SERVE</text>
+        </svg>
+        <figcaption class="sr">Court diagram with three target zones.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="tested" aria-labelledby="tested-h">
+    <div class="wrap tested__grid">
+      <div>
+        <p class="kicker">What I tested</p>
+        <h2 id="tested-h">Played it, broke it, wrote it down.</h2>
+      </div>
+      <div class="tested__body">
+        <p>I playtested MAHWORLD myself and logged <b>12 defects</b> in one review. Three of them:</p>
+        <ul class="bugs">
+          <li><b>Road junctions flickered</b> where two roads met.</li>
+          <li><b>Players walked through solid objects.</b></li>
+          <li><b>Distant trees rendered black</b> until you walked up to them.</li>
+        </ul>
+        <p>A separate review on a real phone caught the camera fighting the joystick.</p>
+        <p class="tested__ledger">Different measure: the September 24 build record lists <b>1,542 automated checks</b> passing across 58 test programs, and a local run through seven rallies, a replay reset and five serves. <a href="https://github.com/jackedjah/Junctional-/blob/backup/mahworld-m6-20260924T190351Z/CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/CONVERGENCE/halo_repair_and_play/EXECUTION_LEDGER.md">Read the build record</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="future" aria-labelledby="future-h">
+    <div class="wrap">
+      <p class="kicker">Where MAHWORLD is going</p>
+      <h2 id="future-h">The bigger plan</h2>
+      <p class="lede">None of this is in the demo yet. The demo has no accounts, no multiplayer, no saved progress and no workout sync.</p>
+      <ul class="plan">
+        <li><h3>Five sanctuaries</h3><p>A larger world built around five sanctuaries.</p></li>
+        <li><h3>Movement from training</h3><p>Ways of moving through the world drawn from real training patterns.</p></li>
+        <li><h3>MAHGIC</h3><p>Magic that comes from training. In the demo it appears only as a ride cost, set to zero.</p></li>
+        <li><h3>Five stats</h3><p><span class="stat">FORCE</span> <span class="stat">POWER</span> <span class="stat">ENGINE</span> <span class="stat">CONTROL</span> <span class="stat">RESILIENCE</span></p></li>
+        <li><h3>Optional MAHFITT link</h3><p>A proposed connection to MAHFITT. It would use signals derived from training, and only if you choose to share them.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="again" aria-labelledby="again-h">
+    <div class="wrap again__in">
+      <h2 id="again-h" class="sr">Play MAHWORLD</h2>
+      <p class="gate__note"><span class="gate__icon" aria-hidden="true"></span>Game demo password required. You’ll find it beside the MAHWORLD link on my résumé.</p>
+      <a class="play" href="https://mahdemo.fob.systems/claude_gameplay_runtime/26_local_authority/lab/play?field=1">Play the early demo</a>
+    </div>
+  </section>
+</main>
+<footer class="wrap foot"><p>MAHWORLD <span>built solo by Jahsua Matthews</span></p><nav aria-label="Other projects"><a href="../mahfitt/">MAHFITT</a><a href="https://fob.systems/">FOB Systems</a><a href="https://www.junctionaltraining.com/">Junctional Training</a></nav></footer>
+</body>
+</html>
